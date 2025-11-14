@@ -15,7 +15,7 @@ Portal de gestión de partners para Omniwallet.
 - **Next.js 14** - Framework React con App Router
 - **TypeScript** - Tipado estático
 - **Prisma** - ORM para base de datos
-- **PostgreSQL** - Base de datos
+- **SQLite** - Base de datos
 - **Tailwind CSS** - Estilos y diseño
 - **Lucide React** - Iconos
 
@@ -29,7 +29,7 @@ npm install
 2. Configurar base de datos:
 ```bash
 cp .env.example .env
-# Editar .env con tus credenciales de base de datos
+# La base de datos SQLite se creará automáticamente
 ```
 
 3. Ejecutar migraciones de Prisma:
