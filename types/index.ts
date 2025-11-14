@@ -1,6 +1,19 @@
-import { Partner, PartnerStatus, PartnerType } from '@prisma/client'
+import { Partner } from '@prisma/client'
 
-export type { Partner, PartnerStatus, PartnerType }
+export type { Partner }
+
+// Enums for type safety (since SQLite doesn't support native enums)
+export enum PartnerStatus {
+  PENDING = 'PENDING',
+  ACTIVE = 'ACTIVE',
+  REJECTED = 'REJECTED',
+  SUSPENDED = 'SUSPENDED',
+}
+
+export enum PartnerType {
+  LEAD = 'LEAD',
+  CLIENT = 'CLIENT',
+}
 
 export interface DashboardStats {
   activePartners: number

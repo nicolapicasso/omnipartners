@@ -1,6 +1,5 @@
 import { prisma } from '@/lib/prisma'
-import { PartnerStatus, PartnerType } from '@prisma/client'
-import { DashboardStats } from '@/types'
+import { PartnerStatus, PartnerType, DashboardStats } from '@/types'
 import { Users, UserCheck, TrendingUp, Building2 } from 'lucide-react'
 import { ApproveButton, RejectButton } from './components/ActionButtons'
 

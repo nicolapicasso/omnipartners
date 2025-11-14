@@ -2,7 +2,7 @@
 
 import { prisma } from '@/lib/prisma'
 import { revalidatePath } from 'next/cache'
-import { PartnerStatus } from '@prisma/client'
+import { PartnerStatus } from '@/types'
 
 export async function approvePartner(partnerId: string) {
   try {
