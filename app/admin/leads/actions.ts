@@ -1,0 +1,172 @@
+'use server'
+
+import { prisma } from '@/lib/prisma'
+import { revalidatePath } from 'next/cache'
+import { getAdminSession } from '@/lib/session'
+import { LeadStatus, CommissionType, NotificationType } from '@/types'
+
+export async function createLead(data: {
+  companyName: string
+  contactName: string
+  email: string
+  phone?: string
+  country: string
+  website?: string
+  notes?: string
+  partnerId: string
+  commissionType: CommissionType
+  commissionRate: number
+}) {
+  try {
+    const session = await getAdminSession() // Verify admin
+
+    // Create a default admin user to assign as creator
+    let adminUser = await prisma.user.findFirst({
+      where: { email: session.user.email },
+    })
+
+    if (!adminUser) {
+      // If admin doesn't exist in User table, get any admin
+      adminUser = await prisma.user.findFirst({
+        where: { role: 'ADMIN' },
+      })
+    }
+
+    if (!adminUser) {
+      return { success: false, error: 'Admin user not found' }
+    }
+
+    const lead = await prisma.lead.create({
+      data: {
+        companyName: data.companyName,
+        contactName: data.contactName,
+        email: data.email,
+        phone: data.phone,
+        country: data.country,
+        website: data.website,
+        notes: data.notes,
+        partnerId: data.partnerId,
+        createdById: adminUser.id,
+        commissionType: data.commissionType,
+        commissionRate: data.commissionRate,
+        status: LeadStatus.LEAD,
+      },
+    })
+
+    // Notify partner
+    await prisma.notification.create({
+      data: {
+        partnerId: data.partnerId,
+        type: NotificationType.NEW_LEAD,
+        title: 'Nuevo Lead Asignado',
+        message: `Se te ha asignado un nuevo lead: ${data.companyName}`,
+      },
+    })
+
+    revalidatePath('/admin/leads')
+    revalidatePath('/admin/partners')
+    return { success: true, leadId: lead.id }
+  } catch (error) {
+    console.error('Error creating lead:', error)
+    return { success: false, error: 'Failed to create lead' }
+  }
+}
+
+export async function updateLeadCommission(
+  leadId: string,
+  commissionType: CommissionType,
+  commissionRate: number
+) {
+  try {
+    await getAdminSession() // Verify admin
+
+    await prisma.lead.update({
+      where: { id: leadId },
+      data: {
+        commissionType,
+        commissionRate,
+      },
+    })
+
+    revalidatePath('/admin/leads')
+    revalidatePath(`/admin/leads/${leadId}`)
+    return { success: true }
+  } catch (error) {
+    console.error('Error updating lead commission:', error)
+    return { success: false, error: 'Failed to update lead commission' }
+  }
+}
+
+export async function updateLeadStatus(leadId: string, status: LeadStatus) {
+  try {
+    await getAdminSession() // Verify admin
+
+    const lead = await prisma.lead.findUnique({
+      where: { id: leadId },
+      include: { partner: true },
+    })
+
+    if (!lead) {
+      return { success: false, error: 'Lead not found' }
+    }
+
+    const updateData: any = { status }
+
+    if (status === LeadStatus.CLIENT && !lead.convertedAt) {
+      updateData.convertedAt = new Date()
+
+      // Notify partner of conversion
+      await prisma.notification.create({
+        data: {
+          partnerId: lead.partnerId,
+          type: NotificationType.LEAD_CONVERTED,
+          title: '¡Lead Convertido a Cliente!',
+          message: `${lead.companyName} ha sido convertido a cliente.`,
+        },
+      })
+    }
+
+    await prisma.lead.update({
+      where: { id: leadId },
+      data: updateData,
+    })
+
+    revalidatePath('/admin/leads')
+    revalidatePath(`/admin/leads/${leadId}`)
+    return { success: true }
+  } catch (error) {
+    console.error('Error updating lead status:', error)
+    return { success: false, error: 'Failed to update lead status' }
+  }
+}
+
+export async function reassignLead(leadId: string, newPartnerId: string) {
+  try {
+    await getAdminSession() // Verify admin
+
+    const lead = await prisma.lead.update({
+      where: { id: leadId },
+      data: {
+        partnerId: newPartnerId,
+        assignedAt: new Date(),
+      },
+    })
+
+    // Notify new partner
+    await prisma.notification.create({
+      data: {
+        partnerId: newPartnerId,
+        type: NotificationType.NEW_LEAD,
+        title: 'Lead Reasignado',
+        message: `Se te ha reasignado el lead: ${lead.companyName}`,
+      },
+    })
+
+    revalidatePath('/admin/leads')
+    revalidatePath('/admin/partners')
+    return { success: true }
+  } catch (error) {
+    console.error('Error reassigning lead:', error)
+    return { success: false, error: 'Failed to reassign lead' }
+  }
+}
