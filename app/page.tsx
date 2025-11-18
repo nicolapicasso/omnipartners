@@ -7,12 +7,18 @@ export default function Home() {
         <div className="text-center text-white">
           <h1 className="text-5xl font-bold mb-4">Omniwallet</h1>
           <p className="text-2xl mb-8">Portal de Partners</p>
-          <div className="flex gap-4 justify-center">
+          <div className="flex flex-col sm:flex-row gap-4 justify-center">
             <Link
-              href="/admin"
+              href="/login"
               className="bg-white text-omniwallet-primary px-6 py-3 rounded-lg font-semibold hover:bg-omniwallet-light transition"
             >
-              Dashboard Admin
+              Iniciar Sesión
+            </Link>
+            <Link
+              href="/register"
+              className="bg-omniwallet-accent text-white px-6 py-3 rounded-lg font-semibold hover:bg-pink-600 transition"
+            >
+              Regístrate como Partner
             </Link>
           </div>
         </div>
