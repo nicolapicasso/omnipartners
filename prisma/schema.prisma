@@ -10,17 +10,263 @@ datasource db {
   url      = env("DATABASE_URL")
 }
 
+// ============================================
+// PARTNERS
+// ============================================
+
 model Partner {
+  id               String   @id @default(cuid())
+  email            String   @unique
+  password         String
+  companyName      String
+  contactName      String
+  phone            String?
+  country          String
+  website          String?
+  address          String?
+
+  // Status: PENDING, ACTIVE, REJECTED, SUSPENDED
+  status           String   @default("PENDING")
+
+  // Partner Category: AGENCY_PARTNER, TECH_PARTNER, REFERRAL, CUSTOM
+  partnerCategory  String   @default("REFERRAL")
+
+  // Role: always PARTNER_OWNER for Partner model
+  role             String   @default("PARTNER_OWNER")
+
+  createdAt        DateTime @default(now())
+  updatedAt        DateTime @updatedAt
+  approvedAt       DateTime?
+
+  // Relaciones
+  users            User[]
+  leads            Lead[]
+  invoices         Invoice[]
+  notifications    Notification[]
+
+  @@map("partners")
+}
+
+// ============================================
+// USERS (Multi-usuario por partner)
+// ============================================
+
+model User {
   id          String   @id @default(cuid())
   email       String   @unique
-  companyName String
-  contactName String
-  phone       String?
-  country     String
-  status      String   @default("PENDING") // PENDING, ACTIVE, REJECTED, SUSPENDED
-  type        String   @default("LEAD")    // LEAD, CLIENT
+  password    String
+  name        String
+
+  // Role: ADMIN, PARTNER_OWNER, PARTNER_USER
+  role        String
+
+  partnerId   String?
+  partner     Partner? @relation(fields: [partnerId], references: [id], onDelete: Cascade)
+
+  isActive    Boolean  @default(true)
+  createdAt   DateTime @default(now())
+  updatedAt   DateTime @updatedAt
+  lastLoginAt DateTime?
+
+  // Relaciones
+  leadsCreated    Lead[]
+  notifications   Notification[]
+
+  @@map("users")
+}
+
+// ============================================
+// LEADS (Clientes potenciales y actuales)
+// ============================================
+
+model Lead {
+  id              String   @id @default(cuid())
+  companyName     String
+  contactName     String
+  email           String
+  phone           String?
+  country         String
+  website         String?
+
+  // Status: LEAD, PROSPECT, CLIENT
+  status          String   @default("LEAD")
+
+  // Commission Type: AGENCY_PARTNER, TECH_PARTNER, REFERRAL, CUSTOM
+  commissionType  String   @default("REFERRAL")
+
+  // Commission percentage (0.0 - 100.0)
+  commissionRate  Float    @default(0.0)
+
+  // Relaciones
+  partnerId       String
+  partner         Partner  @relation(fields: [partnerId], references: [id], onDelete: Cascade)
+
+  createdById     String
+  createdBy       User     @relation(fields: [createdById], references: [id])
+
+  notes           String?
+
+  createdAt       DateTime @default(now())
+  updatedAt       DateTime @updatedAt
+  assignedAt      DateTime @default(now())
+  convertedAt     DateTime? // Cuando pasa a CLIENT
+
+  // Relaciones
+  payments        Payment[]
+
+  @@map("leads")
+}
+
+// ============================================
+// PAYMENTS (Pagos de clientes)
+// ============================================
+
+model Payment {
+  id                String   @id @default(cuid())
+
+  leadId            String
+  lead              Lead     @relation(fields: [leadId], references: [id], onDelete: Cascade)
+
+  amount            Float
+  currency          String   @default("EUR")
+  paymentDate       DateTime
+
+  // Status: PENDING, COMPLETED, FAILED
+  status            String   @default("PENDING")
+
+  // Comisión calculada automáticamente
+  commissionAmount  Float
+
+  // Referencia externa (de la intranet de Omniwallet)
+  externalReference String?
+
+  description       String?
+
+  createdAt         DateTime @default(now())
+  updatedAt         DateTime @updatedAt
+
+  // Relaciones
+  invoices          InvoicePayment[]
+
+  @@map("payments")
+}
+
+// ============================================
+// INVOICES (Facturas de comisiones)
+// ============================================
+
+model Invoice {
+  id            String   @id @default(cuid())
+
+  partnerId     String
+  partner       Partner  @relation(fields: [partnerId], references: [id], onDelete: Cascade)
+
+  invoiceNumber String   @unique
+
+  // Periodo de facturación
+  periodMonth   Int      // 1-12
+  periodYear    Int      // 2024, 2025, etc.
+
+  totalAmount   Float
+  currency      String   @default("EUR")
+
+  // Status: DRAFT, SENT, PAID
+  status        String   @default("DRAFT")
+
+  pdfUrl        String?
+
+  createdAt     DateTime @default(now())
+  updatedAt     DateTime @updatedAt
+  sentAt        DateTime?
+  paidAt        DateTime?
+
+  // Relaciones
+  payments      InvoicePayment[]
+
+  @@map("invoices")
+}
+
+// ============================================
+// INVOICE_PAYMENT (Relación muchos a muchos)
+// ============================================
+
+model InvoicePayment {
+  id         String   @id @default(cuid())
+
+  invoiceId  String
+  invoice    Invoice  @relation(fields: [invoiceId], references: [id], onDelete: Cascade)
+
+  paymentId  String
+  payment    Payment  @relation(fields: [paymentId], references: [id], onDelete: Cascade)
+
+  createdAt  DateTime @default(now())
+
+  @@unique([invoiceId, paymentId])
+  @@map("invoice_payments")
+}
+
+// ============================================
+// CONTENT (Contenido del portal)
+// ============================================
+
+model Content {
+  id          String   @id @default(cuid())
+
+  title       String
+  description String?
+
+  // Type: COMMERCIAL, TECHNICAL, STRATEGIC, DOCUMENT, CONTRACT, VIDEO, CERTIFICATION
+  type        String
+
+  category    String?
+
+  // URLs
+  fileUrl     String?
+  videoUrl    String?
+
+  // Metadata
+  fileSize    Int?     // bytes
+  mimeType    String?
+
+  isPublished Boolean  @default(false)
+  publishedAt DateTime?
+
+  // Orden de visualización
+  order       Int      @default(0)
+
   createdAt   DateTime @default(now())
   updatedAt   DateTime @updatedAt
 
-  @@map("partners")
+  @@map("contents")
+}
+
+// ============================================
+// NOTIFICATIONS
+// ============================================
+
+model Notification {
+  id        String   @id @default(cuid())
+
+  // Puede ser para un User o un Partner
+  userId    String?
+  user      User?    @relation(fields: [userId], references: [id], onDelete: Cascade)
+
+  partnerId String?
+  partner   Partner? @relation(fields: [partnerId], references: [id], onDelete: Cascade)
+
+  // Type: PARTNER_REGISTERED, PARTNER_APPROVED, NEW_LEAD, LEAD_CONVERTED, NEW_PAYMENT, etc.
+  type      String
+
+  title     String
+  message   String
+
+  isRead    Boolean  @default(false)
+  readAt    DateTime?
+
+  // Datos adicionales en formato JSON
+  metadata  String?
+
+  createdAt DateTime @default(now())
+
+  @@map("notifications")
 }

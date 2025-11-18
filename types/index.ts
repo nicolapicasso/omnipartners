@@ -1,8 +1,30 @@
-import { Partner } from '@prisma/client'
+import {
+  Partner,
+  User,
+  Lead,
+  Payment,
+  Invoice,
+  InvoicePayment,
+  Content,
+  Notification,
+} from '@prisma/client'
 
-export type { Partner }
+// Export Prisma types
+export type {
+  Partner,
+  User,
+  Lead,
+  Payment,
+  Invoice,
+  InvoicePayment,
+  Content,
+  Notification,
+}
 
-// Enums for type safety (since SQLite doesn't support native enums)
+// ============================================
+// ENUMS (for type safety, since SQLite doesn't support native enums)
+// ============================================
+
 export enum PartnerStatus {
   PENDING = 'PENDING',
   ACTIVE = 'ACTIVE',
@@ -10,14 +32,116 @@ export enum PartnerStatus {
   SUSPENDED = 'SUSPENDED',
 }
 
-export enum PartnerType {
+export enum PartnerCategory {
+  AGENCY_PARTNER = 'AGENCY_PARTNER',
+  TECH_PARTNER = 'TECH_PARTNER',
+  REFERRAL = 'REFERRAL',
+  CUSTOM = 'CUSTOM',
+}
+
+export enum UserRole {
+  ADMIN = 'ADMIN',
+  PARTNER_OWNER = 'PARTNER_OWNER',
+  PARTNER_USER = 'PARTNER_USER',
+}
+
+export enum LeadStatus {
   LEAD = 'LEAD',
+  PROSPECT = 'PROSPECT',
   CLIENT = 'CLIENT',
 }
+
+export enum CommissionType {
+  AGENCY_PARTNER = 'AGENCY_PARTNER',
+  TECH_PARTNER = 'TECH_PARTNER',
+  REFERRAL = 'REFERRAL',
+  CUSTOM = 'CUSTOM',
+}
+
+export enum PaymentStatus {
+  PENDING = 'PENDING',
+  COMPLETED = 'COMPLETED',
+  FAILED = 'FAILED',
+}
+
+export enum InvoiceStatus {
+  DRAFT = 'DRAFT',
+  SENT = 'SENT',
+  PAID = 'PAID',
+}
+
+export enum ContentType {
+  COMMERCIAL = 'COMMERCIAL',
+  TECHNICAL = 'TECHNICAL',
+  STRATEGIC = 'STRATEGIC',
+  DOCUMENT = 'DOCUMENT',
+  CONTRACT = 'CONTRACT',
+  VIDEO = 'VIDEO',
+  CERTIFICATION = 'CERTIFICATION',
+}
+
+export enum NotificationType {
+  PARTNER_REGISTERED = 'PARTNER_REGISTERED',
+  PARTNER_APPROVED = 'PARTNER_APPROVED',
+  PARTNER_REJECTED = 'PARTNER_REJECTED',
+  NEW_LEAD = 'NEW_LEAD',
+  LEAD_CONVERTED = 'LEAD_CONVERTED',
+  NEW_PAYMENT = 'NEW_PAYMENT',
+  INVOICE_GENERATED = 'INVOICE_GENERATED',
+  INVOICE_PAID = 'INVOICE_PAID',
+  NEW_CONTENT = 'NEW_CONTENT',
+  USER_INVITED = 'USER_INVITED',
+}
+
+// ============================================
+// INTERFACES
+// ============================================
 
 export interface DashboardStats {
   activePartners: number
   pendingPartners: number
   leads: number
   clients: number
+}
+
+export interface PartnerDashboardStats {
+  totalLeads: number
+  totalProspects: number
+  totalClients: number
+  totalCommissions: number
+  pendingCommissions: number
+  paidCommissions: number
+}
+
+export interface AdminDashboardStats {
+  totalPartners: number
+  activePartners: number
+  pendingPartners: number
+  totalLeads: number
+  totalClients: number
+  totalRevenue: number
+  totalCommissions: number
+}
+
+// Types with relations
+export type PartnerWithRelations = Partner & {
+  users?: User[]
+  leads?: Lead[]
+  invoices?: Invoice[]
+}
+
+export type LeadWithRelations = Lead & {
+  partner?: Partner
+  createdBy?: User
+  payments?: Payment[]
+}
+
+export type PaymentWithRelations = Payment & {
+  lead?: LeadWithRelations
+  invoices?: InvoicePayment[]
+}
+
+export type InvoiceWithRelations = Invoice & {
+  partner?: Partner
+  payments?: InvoicePayment[]
 }
