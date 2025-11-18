@@ -54,6 +54,13 @@ export default async function LeadsPage() {
             </div>
             <div className="flex gap-3">
               <Link
+                href="/admin/leads/new"
+                className="bg-omniwallet-accent text-white px-4 py-2 rounded-lg font-semibold hover:bg-pink-600 transition inline-flex items-center gap-2"
+              >
+                <Plus className="w-4 h-4" />
+                Crear Lead
+              </Link>
+              <Link
                 href="/admin"
                 className="bg-white text-omniwallet-primary px-4 py-2 rounded-lg font-semibold hover:bg-omniwallet-light transition"
               >
