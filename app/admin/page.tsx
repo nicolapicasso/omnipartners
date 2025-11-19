@@ -5,6 +5,7 @@ import { Users, UserCheck, TrendingUp, Building2, Eye, Plus } from 'lucide-react
 import { ApproveButton, RejectButton } from './components/ActionButtons'
 import Link from 'next/link'
 import LogoutButton from '@/components/LogoutButton'
+import Logo from '@/components/Logo'
 
 async function getAdminDashboardStats(): Promise<AdminDashboardStats> {
   const [
@@ -66,6 +67,9 @@ export default async function AdminDashboard() {
       {/* Header */}
       <header className="bg-omniwallet-primary text-white shadow-lg">
         <div className="container mx-auto px-6 py-6">
+          <div className="mb-4">
+            <Logo variant="light" size="md" href="/admin" />
+          </div>
           <div className="flex justify-between items-center">
             <div>
               <h1 className="text-3xl font-bold">Dashboard de Administración</h1>

@@ -4,6 +4,7 @@ import { useState } from 'react'
 import { useRouter } from 'next/navigation'
 import Link from 'next/link'
 import { UserPlus, Loader2, CheckCircle } from 'lucide-react'
+import Logo from '@/components/Logo'
 
 export default function RegisterPage() {
   const router = useRouter()
@@ -82,6 +83,9 @@ export default function RegisterPage() {
     return (
       <div className="min-h-screen bg-gradient-to-br from-omniwallet-primary via-omniwallet-secondary to-omniwallet-accent flex items-center justify-center p-4">
         <div className="bg-white rounded-2xl shadow-2xl w-full max-w-md p-8 text-center">
+          <div className="flex justify-center mb-4">
+            <Logo variant="dark" size="md" />
+          </div>
           <CheckCircle className="w-16 h-16 text-green-500 mx-auto mb-4" />
           <h2 className="text-2xl font-bold text-gray-800 mb-2">
             ¡Registro Exitoso!
@@ -102,10 +106,13 @@ export default function RegisterPage() {
       <div className="bg-white rounded-2xl shadow-2xl w-full max-w-2xl p-8">
         {/* Header */}
         <div className="text-center mb-8">
-          <h1 className="text-3xl font-bold text-omniwallet-primary mb-2">
+          <div className="flex justify-center mb-4">
+            <Logo variant="dark" size="lg" />
+          </div>
+          <h1 className="text-2xl font-bold text-omniwallet-dark mb-2">
             Regístrate como Partner
           </h1>
-          <p className="text-gray-600">Completa el formulario para comenzar</p>
+          <p className="text-gray-600 font-medium">Completa el formulario para comenzar</p>
         </div>
 
         {/* Registration Form */}

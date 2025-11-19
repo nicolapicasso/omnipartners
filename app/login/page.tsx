@@ -5,6 +5,7 @@ import { signIn } from 'next-auth/react'
 import { useRouter } from 'next/navigation'
 import Link from 'next/link'
 import { LogIn, Loader2 } from 'lucide-react'
+import Logo from '@/components/Logo'
 
 export default function LoginPage() {
   const router = useRouter()
@@ -47,10 +48,10 @@ export default function LoginPage() {
       <div className="bg-white rounded-2xl shadow-2xl w-full max-w-md p-8">
         {/* Logo/Header */}
         <div className="text-center mb-8">
-          <h1 className="text-3xl font-bold text-omniwallet-primary mb-2">
-            Omniwallet
-          </h1>
-          <p className="text-gray-600">Portal de Partners</p>
+          <div className="flex justify-center mb-4">
+            <Logo variant="dark" size="lg" />
+          </div>
+          <p className="text-gray-600 font-medium">Portal de Partners</p>
         </div>
 
         {/* Login Form */}

@@ -16,6 +16,9 @@ module.exports = {
           light: '#f7f7f7',
         },
       },
+      fontFamily: {
+        sans: ['var(--font-montserrat)', 'Montserrat', 'sans-serif'],
+      },
     },
   },
   plugins: [],
