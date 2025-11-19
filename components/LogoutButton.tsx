@@ -3,9 +3,11 @@
 import { signOut } from 'next-auth/react'
 import { LogOut } from 'lucide-react'
 import { useState } from 'react'
+import { useLanguage } from '@/lib/i18n/LanguageContext'
 
 export default function LogoutButton({ className }: { className?: string }) {
   const [loading, setLoading] = useState(false)
+  const { t } = useLanguage()
 
   const handleLogout = async () => {
     setLoading(true)
@@ -19,7 +21,7 @@ export default function LogoutButton({ className }: { className?: string }) {
       className={className || 'flex items-center gap-2 text-white hover:text-omniwallet-light transition disabled:opacity-50'}
     >
       <LogOut className="w-4 h-4" />
-      {loading ? 'Cerrando...' : 'Cerrar Sesión'}
+      {loading ? `${t.common.loading}` : t.common.logout}
     </button>
   )
 }
