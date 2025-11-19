@@ -1,5 +1,5 @@
-import { Wallet } from 'lucide-react'
 import Link from 'next/link'
+import Image from 'next/image'
 
 interface LogoProps {
   variant?: 'light' | 'dark'
@@ -8,35 +8,35 @@ interface LogoProps {
 }
 
 export default function Logo({ variant = 'light', size = 'md', href }: LogoProps) {
-  const sizeClasses = {
-    sm: 'text-xl',
-    md: 'text-2xl',
-    lg: 'text-3xl',
+  // Tamaños de altura para el logo
+  const heights = {
+    sm: 24,
+    md: 32,
+    lg: 40,
   }
 
-  const iconSizes = {
-    sm: 'w-5 h-5',
-    md: 'w-6 h-6',
-    lg: 'w-8 h-8',
-  }
-
-  const textColor = variant === 'light' ? 'text-white' : 'text-omniwallet-dark'
-  const iconColor = variant === 'light' ? 'text-omniwallet-accent' : 'text-omniwallet-primary'
+  // Logo blanco para fondos oscuros, logo normal para fondos claros
+  const logoUrl =
+    variant === 'light'
+      ? 'https://www.omniwallet.net/wp-content/uploads/2023/09/omniwallet-logo-blanco.png'
+      : 'https://www.omniwallet.net/wp-content/uploads/2023/09/omniwallet-logo.png'
 
   const content = (
-    <div className="flex items-center gap-2">
-      <div className={`${iconColor} ${iconSizes[size]}`}>
-        <Wallet className="w-full h-full" strokeWidth={2.5} />
-      </div>
-      <span className={`${textColor} ${sizeClasses[size]} font-bold tracking-tight`}>
-        Omni<span className={iconColor}>wallet</span>
-      </span>
+    <div className="relative">
+      <Image
+        src={logoUrl}
+        alt="Omniwallet"
+        width={heights[size] * 4} // Aproximado para mantener aspect ratio
+        height={heights[size]}
+        className="object-contain"
+        priority
+      />
     </div>
   )
 
   if (href) {
     return (
-      <Link href={href} className="hover:opacity-80 transition">
+      <Link href={href} className="hover:opacity-80 transition inline-block">
         {content}
       </Link>
     )
