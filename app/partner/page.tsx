@@ -3,6 +3,7 @@ import { getPartnerSession } from '@/lib/session'
 import { PartnerDashboardStats, LeadStatus } from '@/types'
 import { TrendingUp, Users, DollarSign, CheckCircle, Clock, Target } from 'lucide-react'
 import Link from 'next/link'
+import LogoutButton from '@/components/LogoutButton'
 
 async function getPartnerStats(partnerId: string): Promise<PartnerDashboardStats> {
   const [totalLeads, totalProspects, totalClients] = await Promise.all([
@@ -94,11 +95,24 @@ export default async function PartnerDashboard() {
                 Mis Leads
               </Link>
               <Link
+                href="/partner/commissions"
+                className="bg-white text-omniwallet-primary px-4 py-2 rounded-lg font-semibold hover:bg-omniwallet-light transition"
+              >
+                Comisiones
+              </Link>
+              <Link
+                href="/partner/resources"
+                className="bg-white text-omniwallet-primary px-4 py-2 rounded-lg font-semibold hover:bg-omniwallet-light transition"
+              >
+                Recursos
+              </Link>
+              <Link
                 href="/partner/team"
                 className="bg-omniwallet-secondary text-white px-4 py-2 rounded-lg font-semibold hover:bg-purple-700 transition"
               >
                 Mi Equipo
               </Link>
+              <LogoutButton className="bg-red-600 text-white px-4 py-2 rounded-lg font-semibold hover:bg-red-700 transition disabled:opacity-50 flex items-center gap-2" />
             </div>
           </div>
         </div>
