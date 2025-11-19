@@ -165,11 +165,11 @@ Las comisiones se configuran **por lead individual**, no por partner. Esto permi
 
 ## 🎨 Colores de Omniwallet
 
-- **Primary**: `#6366f1` (Indigo)
-- **Secondary**: `#8b5cf6` (Purple)
-- **Accent**: `#ec4899` (Pink)
-- **Dark**: `#1e1b4b` (Dark Indigo)
-- **Light**: `#f1f5f9` (Light Gray)
+- **Primary**: `#3e95b0` (Turquesa)
+- **Secondary**: `#255664` (Azul Oscuro)
+- **Accent**: `#4dbbdd` (Cyan Claro)
+- **Dark**: `#232323` (Negro)
+- **Light**: `#f7f7f7` (Gris Claro)
 
 ## 📄 Licencia
 
