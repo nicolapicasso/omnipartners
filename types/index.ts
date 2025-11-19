@@ -6,6 +6,8 @@ import {
   Invoice,
   InvoicePayment,
   Content,
+  ContentView,
+  ContentFavorite,
   Notification,
 } from '@prisma/client'
 
@@ -18,6 +20,8 @@ export type {
   Invoice,
   InvoicePayment,
   Content,
+  ContentView,
+  ContentFavorite,
   Notification,
 }
 
@@ -71,13 +75,24 @@ export enum InvoiceStatus {
 }
 
 export enum ContentType {
+  DOCUMENT = 'DOCUMENT',
+  VIDEO = 'VIDEO',
+  GUIDE = 'GUIDE',
+  CONTRACT = 'CONTRACT',
+  CERTIFICATION = 'CERTIFICATION',
+}
+
+export enum ContentCategory {
   COMMERCIAL = 'COMMERCIAL',
   TECHNICAL = 'TECHNICAL',
   STRATEGIC = 'STRATEGIC',
-  DOCUMENT = 'DOCUMENT',
-  CONTRACT = 'CONTRACT',
-  VIDEO = 'VIDEO',
-  CERTIFICATION = 'CERTIFICATION',
+  LEGAL = 'LEGAL',
+  GENERAL = 'GENERAL',
+}
+
+export enum ContentStatus {
+  DRAFT = 'DRAFT',
+  PUBLISHED = 'PUBLISHED',
 }
 
 export enum NotificationType {
@@ -91,6 +106,7 @@ export enum NotificationType {
   INVOICE_PAID = 'INVOICE_PAID',
   NEW_CONTENT = 'NEW_CONTENT',
   USER_INVITED = 'USER_INVITED',
+  TEAM_MEMBER_ADDED = 'TEAM_MEMBER_ADDED',
 }
 
 // ============================================

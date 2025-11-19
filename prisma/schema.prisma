@@ -69,8 +69,10 @@ model User {
   lastLoginAt DateTime?
 
   // Relaciones
-  leadsCreated    Lead[]
-  notifications   Notification[]
+  leadsCreated     Lead[]
+  notifications    Notification[]
+  contentViews     ContentView[]
+  contentFavorites ContentFavorite[]
 
   @@map("users")
 }
@@ -215,29 +217,82 @@ model Content {
   title       String
   description String?
 
-  // Type: COMMERCIAL, TECHNICAL, STRATEGIC, DOCUMENT, CONTRACT, VIDEO, CERTIFICATION
+  // Type: DOCUMENT, VIDEO, GUIDE, CONTRACT, CERTIFICATION
   type        String
 
-  category    String?
+  // Category: COMMERCIAL, TECHNICAL, STRATEGIC, LEGAL, GENERAL
+  category    String
 
   // URLs
-  fileUrl     String?
-  videoUrl    String?
+  fileUrl     String?  // URL del archivo subido
+  externalUrl String?  // URL externa (YouTube, etc.)
+
+  // Tags para búsqueda (JSON array)
+  tags        String?
 
   // Metadata
   fileSize    Int?     // bytes
   mimeType    String?
 
-  isPublished Boolean  @default(false)
-  publishedAt DateTime?
+  // Status: DRAFT, PUBLISHED
+  status      String   @default("DRAFT")
+
+  // Destacado en dashboard
+  isFeatured  Boolean  @default(false)
 
   // Orden de visualización
   order       Int      @default(0)
 
+  // Counters
+  viewCount     Int    @default(0)
+  downloadCount Int    @default(0)
+
   createdAt   DateTime @default(now())
   updatedAt   DateTime @updatedAt
 
+  // Relaciones
+  views       ContentView[]
+  favorites   ContentFavorite[]
+
   @@map("contents")
+}
+
+// ============================================
+// CONTENT VIEWS (Tracking de visualizaciones)
+// ============================================
+
+model ContentView {
+  id         String   @id @default(cuid())
+
+  contentId  String
+  content    Content  @relation(fields: [contentId], references: [id], onDelete: Cascade)
+
+  userId     String
+  user       User     @relation(fields: [userId], references: [id], onDelete: Cascade)
+
+  downloaded Boolean  @default(false)
+  viewedAt   DateTime @default(now())
+
+  @@map("content_views")
+}
+
+// ============================================
+// CONTENT FAVORITES (Favoritos de usuarios)
+// ============================================
+
+model ContentFavorite {
+  id         String   @id @default(cuid())
+
+  contentId  String
+  content    Content  @relation(fields: [contentId], references: [id], onDelete: Cascade)
+
+  userId     String
+  user       User     @relation(fields: [userId], references: [id], onDelete: Cascade)
+
+  createdAt  DateTime @default(now())
+
+  @@unique([contentId, userId])
+  @@map("content_favorites")
 }
 
 // ============================================
