@@ -82,151 +82,140 @@ export default async function PartnerDashboard() {
         companyName={partner.companyName}
       />
 
-      <main className="container mx-auto px-6 py-8">
+      <main className="container mx-auto px-6 py-8 max-w-7xl">
+        {/* Page Title */}
+        <div className="mb-8">
+          <h1 className="text-2xl font-semibold text-gray-900">Dashboard</h1>
+          <p className="text-sm text-gray-500 mt-1">Overview of your partner performance</p>
+        </div>
+
         {/* Stats Cards */}
         <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6 mb-8">
-          <div className="bg-white rounded-lg shadow-md p-6 border-l-4 border-gray-500">
-            <div className="flex items-center justify-between">
-              <div>
-                <p className="text-gray-600 text-sm font-medium">Leads</p>
-                <p className="text-3xl font-bold text-gray-900 mt-2">
-                  {stats.totalLeads}
-                </p>
-              </div>
-              <div className="bg-gray-100 p-3 rounded-full">
-                <Target className="w-8 h-8 text-gray-600" />
+          <div className="bg-white rounded-lg shadow-sm border border-gray-200 p-6 hover:shadow-md transition">
+            <div className="flex items-center justify-between mb-4">
+              <div className="bg-gray-50 p-2.5 rounded-lg">
+                <Target className="w-5 h-5 text-gray-600" />
               </div>
             </div>
+            <p className="text-sm font-medium text-gray-500">Leads</p>
+            <p className="text-2xl font-semibold text-gray-900 mt-1">
+              {stats.totalLeads}
+            </p>
           </div>
 
-          <div className="bg-white rounded-lg shadow-md p-6 border-l-4 border-blue-500">
-            <div className="flex items-center justify-between">
-              <div>
-                <p className="text-gray-600 text-sm font-medium">Prospects</p>
-                <p className="text-3xl font-bold text-blue-600 mt-2">
-                  {stats.totalProspects}
-                </p>
-              </div>
-              <div className="bg-blue-100 p-3 rounded-full">
-                <Clock className="w-8 h-8 text-blue-600" />
+          <div className="bg-white rounded-lg shadow-sm border border-gray-200 p-6 hover:shadow-md transition">
+            <div className="flex items-center justify-between mb-4">
+              <div className="bg-blue-50 p-2.5 rounded-lg">
+                <Clock className="w-5 h-5 text-blue-600" />
               </div>
             </div>
+            <p className="text-sm font-medium text-gray-500">Prospects</p>
+            <p className="text-2xl font-semibold text-gray-900 mt-1">
+              {stats.totalProspects}
+            </p>
           </div>
 
-          <div className="bg-white rounded-lg shadow-md p-6 border-l-4 border-green-500">
-            <div className="flex items-center justify-between">
-              <div>
-                <p className="text-gray-600 text-sm font-medium">Clientes</p>
-                <p className="text-3xl font-bold text-green-600 mt-2">
-                  {stats.totalClients}
-                </p>
-              </div>
-              <div className="bg-green-100 p-3 rounded-full">
-                <CheckCircle className="w-8 h-8 text-green-600" />
+          <div className="bg-white rounded-lg shadow-sm border border-gray-200 p-6 hover:shadow-md transition">
+            <div className="flex items-center justify-between mb-4">
+              <div className="bg-green-50 p-2.5 rounded-lg">
+                <CheckCircle className="w-5 h-5 text-green-600" />
               </div>
             </div>
+            <p className="text-sm font-medium text-gray-500">Clients</p>
+            <p className="text-2xl font-semibold text-gray-900 mt-1">
+              {stats.totalClients}
+            </p>
           </div>
 
-          <div className="bg-white rounded-lg shadow-md p-6 border-l-4 border-omniwallet-primary">
-            <div className="flex items-center justify-between">
-              <div>
-                <p className="text-gray-600 text-sm font-medium">Total Comisiones</p>
-                <p className="text-3xl font-bold text-omniwallet-primary mt-2">
-                  €{stats.totalCommissions.toFixed(2)}
-                </p>
-              </div>
-              <div className="bg-omniwallet-primary/10 p-3 rounded-full">
-                <DollarSign className="w-8 h-8 text-omniwallet-primary" />
+          <div className="bg-white rounded-lg shadow-sm border border-gray-200 p-6 hover:shadow-md transition">
+            <div className="flex items-center justify-between mb-4">
+              <div className="bg-omniwallet-primary/10 p-2.5 rounded-lg">
+                <DollarSign className="w-5 h-5 text-omniwallet-primary" />
               </div>
             </div>
+            <p className="text-sm font-medium text-gray-500">Total Commissions</p>
+            <p className="text-2xl font-semibold text-gray-900 mt-1">
+              €{stats.totalCommissions.toFixed(2)}
+            </p>
           </div>
 
-          <div className="bg-white rounded-lg shadow-md p-6 border-l-4 border-yellow-500">
-            <div className="flex items-center justify-between">
-              <div>
-                <p className="text-gray-600 text-sm font-medium">Pendientes de Pago</p>
-                <p className="text-3xl font-bold text-yellow-600 mt-2">
-                  €{stats.pendingCommissions.toFixed(2)}
-                </p>
-              </div>
-              <div className="bg-yellow-100 p-3 rounded-full">
-                <Clock className="w-8 h-8 text-yellow-600" />
+          <div className="bg-white rounded-lg shadow-sm border border-gray-200 p-6 hover:shadow-md transition">
+            <div className="flex items-center justify-between mb-4">
+              <div className="bg-yellow-50 p-2.5 rounded-lg">
+                <Clock className="w-5 h-5 text-yellow-600" />
               </div>
             </div>
+            <p className="text-sm font-medium text-gray-500">Pending Payment</p>
+            <p className="text-2xl font-semibold text-gray-900 mt-1">
+              €{stats.pendingCommissions.toFixed(2)}
+            </p>
           </div>
 
-          <div className="bg-white rounded-lg shadow-md p-6 border-l-4 border-omniwallet-accent">
-            <div className="flex items-center justify-between">
-              <div>
-                <p className="text-gray-600 text-sm font-medium">Miembros del Equipo</p>
-                <p className="text-3xl font-bold text-omniwallet-accent mt-2">
-                  {teamMembers.length}
-                </p>
-              </div>
-              <div className="bg-omniwallet-accent/10 p-3 rounded-full">
-                <Users className="w-8 h-8 text-omniwallet-accent" />
+          <div className="bg-white rounded-lg shadow-sm border border-gray-200 p-6 hover:shadow-md transition">
+            <div className="flex items-center justify-between mb-4">
+              <div className="bg-omniwallet-accent/10 p-2.5 rounded-lg">
+                <Users className="w-5 h-5 text-omniwallet-accent" />
               </div>
             </div>
+            <p className="text-sm font-medium text-gray-500">Team Members</p>
+            <p className="text-2xl font-semibold text-gray-900 mt-1">
+              {teamMembers.length}
+            </p>
           </div>
         </div>
 
-        <div className="grid grid-cols-1 lg:grid-cols-2 gap-6">
+        <div className="grid grid-cols-1 lg:grid-cols-2 gap-6 mb-8">
           {/* Recent Leads */}
-          <div className="bg-white rounded-lg shadow-md">
-            <div className="px-6 py-4 border-b border-gray-200 flex justify-between items-center">
-              <h2 className="text-xl font-semibold text-gray-800">Leads Recientes</h2>
+          <div className="bg-white rounded-lg shadow-sm border border-gray-200">
+            <div className="px-6 py-4 border-b border-gray-100 flex justify-between items-center">
+              <h2 className="text-base font-semibold text-gray-900">Recent Leads</h2>
               <Link
                 href="/partner/leads"
-                className="text-omniwallet-primary hover:text-omniwallet-secondary text-sm font-semibold"
+                className="text-omniwallet-primary hover:text-omniwallet-secondary text-sm font-medium transition"
               >
-                Ver todos →
+                View all
               </Link>
             </div>
             <div className="p-6">
               {recentLeads.length === 0 ? (
-                <div className="text-center py-8 text-gray-500">
-                  <p className="mb-4">No tienes leads todavía</p>
+                <div className="text-center py-12 text-gray-500">
+                  <TrendingUp className="w-12 h-12 mx-auto text-gray-300 mb-4" />
+                  <p className="text-sm mb-4">No leads yet</p>
                   <Link
                     href="/partner/leads/new"
-                    className="inline-flex items-center gap-2 bg-omniwallet-primary text-white px-4 py-2 rounded-lg font-semibold hover:bg-omniwallet-secondary transition"
+                    className="inline-flex items-center gap-2 bg-omniwallet-primary text-white px-4 py-2 rounded-md text-sm font-medium hover:bg-omniwallet-secondary transition"
                   >
-                    <TrendingUp className="w-4 h-4" />
-                    Crear tu primer lead
+                    Create your first lead
                   </Link>
                 </div>
               ) : (
-                <div className="space-y-4">
+                <div className="space-y-3">
                   {recentLeads.map((lead) => (
-                    <div
+                    <Link
                       key={lead.id}
-                      className="flex items-center justify-between p-4 border border-gray-200 rounded-lg hover:bg-gray-50 transition"
+                      href={`/partner/leads/${lead.id}`}
+                      className="flex items-center justify-between p-3 rounded-md hover:bg-gray-50 transition cursor-pointer group"
                     >
                       <div>
-                        <Link
-                          href={`/partner/leads/${lead.id}`}
-                          className="font-medium text-gray-900 hover:text-omniwallet-primary"
-                        >
+                        <p className="text-sm font-medium text-gray-900 group-hover:text-omniwallet-primary transition">
                           {lead.companyName}
-                        </Link>
-                        <p className="text-sm text-gray-500">{lead.contactName}</p>
+                        </p>
+                        <p className="text-xs text-gray-500 mt-0.5">{lead.contactName}</p>
                       </div>
-                      <div className="text-right">
+                      <div className="flex items-center gap-3">
                         <span
-                          className={`px-2 py-1 text-xs font-semibold rounded-full ${
+                          className={`px-2.5 py-1 text-xs font-medium rounded-full ${
                             lead.status === 'CLIENT'
-                              ? 'bg-green-100 text-green-800'
+                              ? 'bg-green-50 text-green-700'
                               : lead.status === 'PROSPECT'
-                              ? 'bg-blue-100 text-blue-800'
-                              : 'bg-gray-100 text-gray-800'
+                              ? 'bg-blue-50 text-blue-700'
+                              : 'bg-gray-50 text-gray-700'
                           }`}
                         >
                           {lead.status}
                         </span>
-                        <p className="text-xs text-gray-500 mt-1">
-                          {lead._count.payments} pagos
-                        </p>
                       </div>
-                    </div>
+                    </Link>
                   ))}
                 </div>
               )}
@@ -234,26 +223,26 @@ export default async function PartnerDashboard() {
           </div>
 
           {/* Team Members */}
-          <div className="bg-white rounded-lg shadow-md">
-            <div className="px-6 py-4 border-b border-gray-200 flex justify-between items-center">
-              <h2 className="text-xl font-semibold text-gray-800">Mi Equipo</h2>
+          <div className="bg-white rounded-lg shadow-sm border border-gray-200">
+            <div className="px-6 py-4 border-b border-gray-100 flex justify-between items-center">
+              <h2 className="text-base font-semibold text-gray-900">Team</h2>
               <Link
                 href="/partner/team"
-                className="text-omniwallet-primary hover:text-omniwallet-secondary text-sm font-semibold"
+                className="text-omniwallet-primary hover:text-omniwallet-secondary text-sm font-medium transition"
               >
-                Gestionar →
+                Manage
               </Link>
             </div>
             <div className="p-6">
               {teamMembers.length === 0 ? (
-                <div className="text-center py-8 text-gray-500">
-                  <p className="mb-4">No hay miembros en el equipo</p>
+                <div className="text-center py-12 text-gray-500">
+                  <Users className="w-12 h-12 mx-auto text-gray-300 mb-4" />
+                  <p className="text-sm mb-4">No team members</p>
                   <Link
                     href="/partner/team"
-                    className="inline-flex items-center gap-2 bg-omniwallet-secondary text-white px-4 py-2 rounded-lg font-semibold hover:bg-purple-700 transition"
+                    className="inline-flex items-center gap-2 bg-omniwallet-primary text-white px-4 py-2 rounded-md text-sm font-medium hover:bg-omniwallet-secondary transition"
                   >
-                    <Users className="w-4 h-4" />
-                    Invitar miembros
+                    Invite members
                   </Link>
                 </div>
               ) : (
@@ -261,17 +250,17 @@ export default async function PartnerDashboard() {
                   {teamMembers.map((member) => (
                     <div
                       key={member.id}
-                      className="flex items-center justify-between p-4 border border-gray-200 rounded-lg"
+                      className="flex items-center justify-between p-3 rounded-md hover:bg-gray-50 transition"
                     >
                       <div>
-                        <p className="font-medium text-gray-900">{member.name}</p>
-                        <p className="text-sm text-gray-500">{member.email}</p>
+                        <p className="text-sm font-medium text-gray-900">{member.name}</p>
+                        <p className="text-xs text-gray-500 mt-0.5">{member.email}</p>
                       </div>
                       <span
-                        className={`px-2 py-1 text-xs font-semibold rounded-full ${
+                        className={`px-2.5 py-1 text-xs font-medium rounded-full ${
                           member.role === 'PARTNER_OWNER'
-                            ? 'bg-purple-100 text-purple-800'
-                            : 'bg-blue-100 text-blue-800'
+                            ? 'bg-purple-50 text-purple-700'
+                            : 'bg-blue-50 text-blue-700'
                         }`}
                       >
                         {member.role === 'PARTNER_OWNER' ? 'Owner' : 'User'}
@@ -285,37 +274,43 @@ export default async function PartnerDashboard() {
         </div>
 
         {/* Quick Actions */}
-        <div className="mt-8 bg-omniwallet-primary/10 rounded-lg p-6">
-          <h3 className="text-lg font-semibold text-gray-800 mb-4">Acciones Rápidas</h3>
+        <div className="bg-white rounded-lg shadow-sm border border-gray-200 p-6">
+          <h3 className="text-base font-semibold text-gray-900 mb-4">Quick Actions</h3>
           <div className="grid grid-cols-1 md:grid-cols-3 gap-4">
             <Link
               href="/partner/leads/new"
-              className="flex items-center gap-3 p-4 bg-white rounded-lg shadow hover:shadow-md transition"
+              className="flex items-start gap-3 p-4 rounded-md border border-gray-200 hover:border-omniwallet-primary hover:bg-omniwallet-primary/5 transition group"
             >
-              <TrendingUp className="w-6 h-6 text-omniwallet-primary" />
+              <div className="bg-omniwallet-primary/10 p-2 rounded-md group-hover:bg-omniwallet-primary/20 transition">
+                <TrendingUp className="w-5 h-5 text-omniwallet-primary" />
+              </div>
               <div>
-                <p className="font-semibold text-gray-900">Crear Lead</p>
-                <p className="text-sm text-gray-500">Añade un nuevo lead</p>
+                <p className="text-sm font-medium text-gray-900">Create Lead</p>
+                <p className="text-xs text-gray-500 mt-1">Add a new lead to your pipeline</p>
               </div>
             </Link>
             <Link
               href="/partner/commissions"
-              className="flex items-center gap-3 p-4 bg-white rounded-lg shadow hover:shadow-md transition"
+              className="flex items-start gap-3 p-4 rounded-md border border-gray-200 hover:border-green-500 hover:bg-green-50/50 transition group"
             >
-              <DollarSign className="w-6 h-6 text-green-600" />
+              <div className="bg-green-50 p-2 rounded-md group-hover:bg-green-100 transition">
+                <DollarSign className="w-5 h-5 text-green-600" />
+              </div>
               <div>
-                <p className="font-semibold text-gray-900">Ver Comisiones</p>
-                <p className="text-sm text-gray-500">Revisa tus ganancias</p>
+                <p className="text-sm font-medium text-gray-900">View Commissions</p>
+                <p className="text-xs text-gray-500 mt-1">Check your earnings</p>
               </div>
             </Link>
             <Link
               href="/partner/team"
-              className="flex items-center gap-3 p-4 bg-white rounded-lg shadow hover:shadow-md transition"
+              className="flex items-start gap-3 p-4 rounded-md border border-gray-200 hover:border-omniwallet-accent hover:bg-omniwallet-accent/5 transition group"
             >
-              <Users className="w-6 h-6 text-omniwallet-accent" />
+              <div className="bg-omniwallet-accent/10 p-2 rounded-md group-hover:bg-omniwallet-accent/20 transition">
+                <Users className="w-5 h-5 text-omniwallet-accent" />
+              </div>
               <div>
-                <p className="font-semibold text-gray-900">Gestionar Equipo</p>
-                <p className="text-sm text-gray-500">Invita a tu equipo</p>
+                <p className="text-sm font-medium text-gray-900">Manage Team</p>
+                <p className="text-xs text-gray-500 mt-1">Invite and manage members</p>
               </div>
             </Link>
           </div>

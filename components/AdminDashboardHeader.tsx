@@ -14,39 +14,44 @@ export default function AdminDashboardHeader({ userName }: AdminDashboardHeaderP
   const { t } = useLanguage()
 
   return (
-    <header className="bg-omniwallet-primary text-white shadow-lg">
-      <div className="container mx-auto px-6 py-6">
-        <div className="mb-4 flex justify-between items-center">
-          <Logo variant="light" size="md" href="/admin" />
-          <LanguageSelector />
-        </div>
+    <header className="bg-white border-b border-gray-200">
+      <div className="container mx-auto px-6 py-4">
         <div className="flex justify-between items-center">
-          <div>
-            <h1 className="text-3xl font-bold">{t.admin.title}</h1>
-            <p className="text-omniwallet-light mt-2">
-              {t.common.welcome}, {userName}
-            </p>
+          <div className="flex items-center gap-8">
+            <Logo variant="dark" size="sm" href="/admin" />
+            <nav className="hidden md:flex gap-1">
+              <Link
+                href="/admin"
+                className="px-4 py-2 text-sm font-medium text-gray-700 hover:text-omniwallet-primary hover:bg-gray-50 rounded-md transition"
+              >
+                {t.nav.dashboard}
+              </Link>
+              <Link
+                href="/admin/partners"
+                className="px-4 py-2 text-sm font-medium text-gray-700 hover:text-omniwallet-primary hover:bg-gray-50 rounded-md transition"
+              >
+                {t.admin.managePartners}
+              </Link>
+              <Link
+                href="/admin/leads"
+                className="px-4 py-2 text-sm font-medium text-gray-700 hover:text-omniwallet-primary hover:bg-gray-50 rounded-md transition"
+              >
+                {t.admin.manageLeads}
+              </Link>
+              <Link
+                href="/admin/content"
+                className="px-4 py-2 text-sm font-medium text-gray-700 hover:text-omniwallet-primary hover:bg-gray-50 rounded-md transition"
+              >
+                {t.nav.content}
+              </Link>
+            </nav>
           </div>
-          <div className="flex gap-3">
-            <Link
-              href="/admin/partners"
-              className="bg-white text-omniwallet-primary px-4 py-2 rounded-lg font-semibold hover:bg-omniwallet-light transition"
-            >
-              {t.admin.managePartners}
-            </Link>
-            <Link
-              href="/admin/leads"
-              className="bg-omniwallet-secondary text-white px-4 py-2 rounded-lg font-semibold hover:bg-purple-700 transition"
-            >
-              {t.admin.manageLeads}
-            </Link>
-            <Link
-              href="/admin/content"
-              className="bg-white text-omniwallet-primary px-4 py-2 rounded-lg font-semibold hover:bg-omniwallet-light transition"
-            >
-              {t.nav.content}
-            </Link>
-            <LogoutButton className="bg-red-600 text-white px-4 py-2 rounded-lg font-semibold hover:bg-red-700 transition disabled:opacity-50 flex items-center gap-2" />
+          <div className="flex items-center gap-3">
+            <span className="text-sm text-gray-600 hidden md:block">
+              {userName}
+            </span>
+            <LanguageSelector />
+            <LogoutButton className="text-sm text-gray-600 hover:text-gray-900 transition" />
           </div>
         </div>
       </div>

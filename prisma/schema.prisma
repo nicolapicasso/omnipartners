@@ -103,8 +103,8 @@ model Lead {
   partnerId       String
   partner         Partner  @relation(fields: [partnerId], references: [id], onDelete: Cascade)
 
-  createdById     String
-  createdBy       User     @relation(fields: [createdById], references: [id])
+  createdById     String?
+  createdBy       User?    @relation(fields: [createdById], references: [id])
 
   notes           String?
 

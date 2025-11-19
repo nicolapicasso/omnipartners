@@ -18,14 +18,11 @@ export async function createPartnerLead(data: {
     const session = await getPartnerSession()
     const partnerId = session.user.partnerId!
 
-    // Get the user who is creating the lead
+    // Try to get the user who is creating the lead (if exists in User table)
+    // For PARTNER_OWNER, this will be null since they only exist in Partner table
     const user = await prisma.user.findUnique({
-      where: { email: session.user.email },
+      where: { email: session.user.email || '' },
     })
-
-    if (!user) {
-      return { success: false, error: 'User not found' }
-    }
 
     // Get partner to use default commission settings
     const partner = await prisma.partner.findUnique({
@@ -48,7 +45,7 @@ export async function createPartnerLead(data: {
         website: data.website,
         notes: data.notes,
         partnerId,
-        createdById: user.id,
+        createdById: user?.id, // Optional - null for PARTNER_OWNER
         status: LeadStatus.LEAD,
         commissionType: partner.partnerCategory, // Use partner's category
         commissionRate: 10, // Default rate, admin can adjust
