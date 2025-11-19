@@ -3,8 +3,7 @@ import { getPartnerSession } from '@/lib/session'
 import { PartnerDashboardStats, LeadStatus } from '@/types'
 import { TrendingUp, Users, DollarSign, CheckCircle, Clock, Target } from 'lucide-react'
 import Link from 'next/link'
-import LogoutButton from '@/components/LogoutButton'
-import Logo from '@/components/Logo'
+import PartnerDashboardHeader from '@/components/PartnerDashboardHeader'
 
 async function getPartnerStats(partnerId: string): Promise<PartnerDashboardStats> {
   const [totalLeads, totalProspects, totalClients] = await Promise.all([
@@ -78,49 +77,10 @@ export default async function PartnerDashboard() {
 
   return (
     <div className="min-h-screen bg-gray-50">
-      {/* Header */}
-      <header className="bg-omniwallet-primary text-white shadow-lg">
-        <div className="container mx-auto px-6 py-6">
-          <div className="mb-4">
-            <Logo variant="light" size="md" href="/partner" />
-          </div>
-          <div className="flex justify-between items-center">
-            <div>
-              <h1 className="text-3xl font-bold">Portal de Partners</h1>
-              <p className="text-omniwallet-light mt-2">
-                Bienvenido, {session.user.name} - {partner.companyName}
-              </p>
-            </div>
-            <div className="flex gap-3">
-              <Link
-                href="/partner/leads"
-                className="bg-white text-omniwallet-primary px-4 py-2 rounded-lg font-semibold hover:bg-omniwallet-light transition"
-              >
-                Mis Leads
-              </Link>
-              <Link
-                href="/partner/commissions"
-                className="bg-white text-omniwallet-primary px-4 py-2 rounded-lg font-semibold hover:bg-omniwallet-light transition"
-              >
-                Comisiones
-              </Link>
-              <Link
-                href="/partner/resources"
-                className="bg-white text-omniwallet-primary px-4 py-2 rounded-lg font-semibold hover:bg-omniwallet-light transition"
-              >
-                Recursos
-              </Link>
-              <Link
-                href="/partner/team"
-                className="bg-omniwallet-secondary text-white px-4 py-2 rounded-lg font-semibold hover:bg-purple-700 transition"
-              >
-                Mi Equipo
-              </Link>
-              <LogoutButton className="bg-red-600 text-white px-4 py-2 rounded-lg font-semibold hover:bg-red-700 transition disabled:opacity-50 flex items-center gap-2" />
-            </div>
-          </div>
-        </div>
-      </header>
+      <PartnerDashboardHeader
+        userName={session.user.name || 'Partner'}
+        companyName={partner.companyName}
+      />
 
       <main className="container mx-auto px-6 py-8">
         {/* Stats Cards */}

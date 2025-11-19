@@ -6,9 +6,12 @@ import { useRouter } from 'next/navigation'
 import Link from 'next/link'
 import { LogIn, Loader2 } from 'lucide-react'
 import Logo from '@/components/Logo'
+import LanguageSelector from '@/components/LanguageSelector'
+import { useLanguage } from '@/lib/i18n/LanguageContext'
 
 export default function LoginPage() {
   const router = useRouter()
+  const { t } = useLanguage()
   const [email, setEmail] = useState('')
   const [password, setPassword] = useState('')
   const [error, setError] = useState('')
@@ -38,7 +41,7 @@ export default function LoginPage() {
         router.refresh()
       }
     } catch (err) {
-      setError('Error al iniciar sesión. Intenta nuevamente.')
+      setError(t.login.error)
       setLoading(false)
     }
   }
@@ -51,14 +54,19 @@ export default function LoginPage() {
           <div className="flex justify-center mb-4">
             <Logo variant="dark" size="lg" />
           </div>
-          <p className="text-gray-600 font-medium">Portal de Partners</p>
+          <p className="text-gray-600 font-medium">{t.login.subtitle}</p>
+        </div>
+
+        {/* Language Selector */}
+        <div className="flex justify-end mb-4">
+          <LanguageSelector />
         </div>
 
         {/* Login Form */}
         <form onSubmit={handleSubmit} className="space-y-6">
           <div>
             <label htmlFor="email" className="block text-sm font-medium text-gray-700 mb-2">
-              Email
+              {t.login.email}
             </label>
             <input
               id="email"
@@ -73,7 +81,7 @@ export default function LoginPage() {
 
           <div>
             <label htmlFor="password" className="block text-sm font-medium text-gray-700 mb-2">
-              Contraseña
+              {t.login.password}
             </label>
             <input
               id="password"
@@ -100,12 +108,12 @@ export default function LoginPage() {
             {loading ? (
               <>
                 <Loader2 className="w-5 h-5 animate-spin" />
-                Iniciando sesión...
+                {t.common.loading}
               </>
             ) : (
               <>
                 <LogIn className="w-5 h-5" />
-                Iniciar Sesión
+                {t.login.submit}
               </>
             )}
           </button>
@@ -114,12 +122,12 @@ export default function LoginPage() {
         {/* Footer */}
         <div className="mt-6 text-center">
           <p className="text-gray-600 text-sm">
-            ¿No tienes cuenta?{' '}
+            {t.login.noAccount}{' '}
             <Link
               href="/register"
               className="text-omniwallet-primary font-semibold hover:text-omniwallet-secondary transition"
             >
-              Regístrate aquí
+              {t.login.register}
             </Link>
           </p>
         </div>

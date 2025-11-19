@@ -4,8 +4,7 @@ import { PartnerStatus, LeadStatus, AdminDashboardStats } from '@/types'
 import { Users, UserCheck, TrendingUp, Building2, Eye, Plus } from 'lucide-react'
 import { ApproveButton, RejectButton } from './components/ActionButtons'
 import Link from 'next/link'
-import LogoutButton from '@/components/LogoutButton'
-import Logo from '@/components/Logo'
+import AdminDashboardHeader from '@/components/AdminDashboardHeader'
 
 async function getAdminDashboardStats(): Promise<AdminDashboardStats> {
   const [
@@ -64,43 +63,7 @@ export default async function AdminDashboard() {
 
   return (
     <div className="min-h-screen bg-gray-50">
-      {/* Header */}
-      <header className="bg-omniwallet-primary text-white shadow-lg">
-        <div className="container mx-auto px-6 py-6">
-          <div className="mb-4">
-            <Logo variant="light" size="md" href="/admin" />
-          </div>
-          <div className="flex justify-between items-center">
-            <div>
-              <h1 className="text-3xl font-bold">Dashboard de Administración</h1>
-              <p className="text-omniwallet-light mt-2">
-                Bienvenido, {session.user.name}
-              </p>
-            </div>
-            <div className="flex gap-3">
-              <Link
-                href="/admin/partners"
-                className="bg-white text-omniwallet-primary px-4 py-2 rounded-lg font-semibold hover:bg-omniwallet-light transition"
-              >
-                Gestionar Partners
-              </Link>
-              <Link
-                href="/admin/leads"
-                className="bg-omniwallet-secondary text-white px-4 py-2 rounded-lg font-semibold hover:bg-purple-700 transition"
-              >
-                Gestionar Leads
-              </Link>
-              <Link
-                href="/admin/content"
-                className="bg-white text-omniwallet-primary px-4 py-2 rounded-lg font-semibold hover:bg-omniwallet-light transition"
-              >
-                Contenidos
-              </Link>
-              <LogoutButton className="bg-red-600 text-white px-4 py-2 rounded-lg font-semibold hover:bg-red-700 transition disabled:opacity-50 flex items-center gap-2" />
-            </div>
-          </div>
-        </div>
-      </header>
+      <AdminDashboardHeader userName={session.user.name || 'Admin'} />
 
       <main className="container mx-auto px-6 py-8">
         {/* Stats Cards */}

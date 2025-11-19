@@ -5,9 +5,12 @@ import { useRouter } from 'next/navigation'
 import Link from 'next/link'
 import { UserPlus, Loader2, CheckCircle } from 'lucide-react'
 import Logo from '@/components/Logo'
+import LanguageSelector from '@/components/LanguageSelector'
+import { useLanguage } from '@/lib/i18n/LanguageContext'
 
 export default function RegisterPage() {
   const router = useRouter()
+  const { t } = useLanguage()
   const [formData, setFormData] = useState({
     email: '',
     password: '',
@@ -37,7 +40,7 @@ export default function RegisterPage() {
 
     // Validate passwords match
     if (formData.password !== formData.confirmPassword) {
-      setError('Las contraseñas no coinciden')
+      setError(t.login.error)
       setLoading(false)
       return
     }
@@ -61,7 +64,7 @@ export default function RegisterPage() {
       const data = await response.json()
 
       if (!response.ok) {
-        setError(data.error || 'Error al registrar')
+        setError(data.error || t.login.error)
         setLoading(false)
         return
       }
@@ -74,7 +77,7 @@ export default function RegisterPage() {
         router.push('/login')
       }, 3000)
     } catch (err) {
-      setError('Error al registrar. Intenta nuevamente.')
+      setError(t.login.error)
       setLoading(false)
     }
   }
@@ -88,13 +91,13 @@ export default function RegisterPage() {
           </div>
           <CheckCircle className="w-16 h-16 text-green-500 mx-auto mb-4" />
           <h2 className="text-2xl font-bold text-gray-800 mb-2">
-            ¡Registro Exitoso!
+            {t.register.success}
           </h2>
           <p className="text-gray-600 mb-4">
-            Tu solicitud ha sido enviada y está pendiente de aprobación por el equipo de Omniwallet.
+            {t.register.pending}
           </p>
           <p className="text-sm text-gray-500">
-            Serás redirigido al login en unos segundos...
+            {t.common.loading}
           </p>
         </div>
       </div>
@@ -110,9 +113,14 @@ export default function RegisterPage() {
             <Logo variant="dark" size="lg" />
           </div>
           <h1 className="text-2xl font-bold text-omniwallet-dark mb-2">
-            Regístrate como Partner
+            {t.register.title}
           </h1>
-          <p className="text-gray-600 font-medium">Completa el formulario para comenzar</p>
+          <p className="text-gray-600 font-medium">{t.register.subtitle}</p>
+        </div>
+
+        {/* Language Selector */}
+        <div className="flex justify-end mb-4">
+          <LanguageSelector />
         </div>
 
         {/* Registration Form */}
@@ -121,7 +129,7 @@ export default function RegisterPage() {
             {/* Company Name */}
             <div className="md:col-span-2">
               <label htmlFor="companyName" className="block text-sm font-medium text-gray-700 mb-2">
-                Nombre de la Empresa *
+                {t.register.companyName} *
               </label>
               <input
                 id="companyName"
@@ -138,7 +146,7 @@ export default function RegisterPage() {
             {/* Contact Name */}
             <div>
               <label htmlFor="contactName" className="block text-sm font-medium text-gray-700 mb-2">
-                Nombre de Contacto *
+                {t.register.contactName} *
               </label>
               <input
                 id="contactName"
@@ -155,7 +163,7 @@ export default function RegisterPage() {
             {/* Email */}
             <div>
               <label htmlFor="email" className="block text-sm font-medium text-gray-700 mb-2">
-                Email *
+                {t.login.email} *
               </label>
               <input
                 id="email"
@@ -172,7 +180,7 @@ export default function RegisterPage() {
             {/* Phone */}
             <div>
               <label htmlFor="phone" className="block text-sm font-medium text-gray-700 mb-2">
-                Teléfono
+                {t.register.phone}
               </label>
               <input
                 id="phone"
@@ -188,7 +196,7 @@ export default function RegisterPage() {
             {/* Country */}
             <div>
               <label htmlFor="country" className="block text-sm font-medium text-gray-700 mb-2">
-                País *
+                {t.register.country} *
               </label>
               <input
                 id="country"
@@ -205,7 +213,7 @@ export default function RegisterPage() {
             {/* Website */}
             <div className="md:col-span-2">
               <label htmlFor="website" className="block text-sm font-medium text-gray-700 mb-2">
-                Sitio Web
+                {t.register.website}
               </label>
               <input
                 id="website"
@@ -221,7 +229,7 @@ export default function RegisterPage() {
             {/* Address */}
             <div className="md:col-span-2">
               <label htmlFor="address" className="block text-sm font-medium text-gray-700 mb-2">
-                Dirección
+                {t.register.address}
               </label>
               <textarea
                 id="address"
@@ -237,7 +245,7 @@ export default function RegisterPage() {
             {/* Password */}
             <div>
               <label htmlFor="password" className="block text-sm font-medium text-gray-700 mb-2">
-                Contraseña *
+                {t.login.password} *
               </label>
               <input
                 id="password"
@@ -255,7 +263,7 @@ export default function RegisterPage() {
             {/* Confirm Password */}
             <div>
               <label htmlFor="confirmPassword" className="block text-sm font-medium text-gray-700 mb-2">
-                Confirmar Contraseña *
+                {t.login.password} *
               </label>
               <input
                 id="confirmPassword"
@@ -285,12 +293,12 @@ export default function RegisterPage() {
             {loading ? (
               <>
                 <Loader2 className="w-5 h-5 animate-spin" />
-                Registrando...
+                {t.common.loading}
               </>
             ) : (
               <>
                 <UserPlus className="w-5 h-5" />
-                Registrarse
+                {t.register.submit}
               </>
             )}
           </button>
@@ -299,12 +307,12 @@ export default function RegisterPage() {
         {/* Footer */}
         <div className="mt-6 text-center">
           <p className="text-gray-600 text-sm">
-            ¿Ya tienes cuenta?{' '}
+            {t.register.hasAccount}{' '}
             <Link
               href="/login"
               className="text-omniwallet-primary font-semibold hover:text-omniwallet-secondary transition"
             >
-              Inicia sesión aquí
+              {t.register.login}
             </Link>
           </p>
         </div>
