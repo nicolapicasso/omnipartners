@@ -78,7 +78,7 @@ export default async function PartnerCommissionsPage() {
       />
       <PartnerSidebar />
 
-      <main className="ml-64 pt-16 px-8 py-8">
+      <main className="ml-64 pt-20 px-8 py-8">
         {/* Page Title */}
         <div className="mb-8">
           <h1 className="text-2xl font-semibold text-gray-900">My Commissions</h1>

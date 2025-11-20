@@ -3,9 +3,20 @@ import { getPartnerSession } from '@/lib/session'
 import { ContentType } from '@/types'
 import Link from 'next/link'
 import { ArrowLeft, Star, FileText, Video, BookOpen, FileCheck, Award } from 'lucide-react'
+import PartnerDashboardHeader from '@/components/PartnerDashboardHeader'
+import PartnerSidebar from '@/components/PartnerSidebar'
 
 export default async function FavoritesPage() {
   const session = await getPartnerSession()
+  const partnerId = session.user.partnerId!
+
+  const partner = await prisma.partner.findUnique({
+    where: { id: partnerId },
+  })
+
+  if (!partner) {
+    return <div>Partner not found</div>
+  }
 
   const user = await prisma.user.findUnique({
     where: { email: session.user.email! },
@@ -55,37 +66,39 @@ export default async function FavoritesPage() {
 
   return (
     <div className="min-h-screen bg-gray-50">
-      <header className="bg-omniwallet-primary text-white shadow-lg">
-        <div className="container mx-auto px-6 py-6">
+      <PartnerDashboardHeader
+        userName={session.user.name || 'Partner'}
+        companyName={partner.companyName}
+      />
+      <PartnerSidebar />
+
+      <main className="ml-64 pt-20 px-8 py-8">
+        {/* Page Header */}
+        <div className="mb-8">
           <Link
             href="/partner/resources"
-            className="inline-flex items-center gap-2 text-white hover:text-omniwallet-light mb-4"
+            className="inline-flex items-center gap-2 text-sm text-gray-600 hover:text-omniwallet-primary mb-4 transition"
           >
             <ArrowLeft className="w-4 h-4" />
-            Volver a Recursos
+            Back to Resources
           </Link>
-          <div className="flex justify-between items-center">
+          <div className="flex items-center gap-3">
+            <Star className="w-6 h-6 text-yellow-500 fill-yellow-500" />
             <div>
-              <h1 className="text-3xl font-bold flex items-center gap-3">
-                <Star className="w-8 h-8 fill-white" />
-                Mis Favoritos
-              </h1>
-              <p className="text-omniwallet-light mt-2">{favorites.length} recursos guardados</p>
+              <h1 className="text-2xl font-semibold text-gray-900">My Favorites</h1>
+              <p className="text-sm text-gray-500 mt-1">{favorites.length} saved resources</p>
             </div>
           </div>
         </div>
-      </header>
-
-      <main className="container mx-auto px-6 py-8">
         {favorites.length === 0 ? (
-          <div className="text-center py-16 bg-white rounded-lg">
+          <div className="text-center py-16 bg-white rounded-lg shadow-sm border border-gray-200">
             <Star className="w-16 h-16 text-gray-300 mx-auto mb-4" />
-            <p className="text-gray-500 mb-4">No tienes recursos favoritos todavía</p>
+            <p className="text-gray-500 mb-4">You don't have any favorite resources yet</p>
             <Link
               href="/partner/resources"
-              className="text-omniwallet-primary hover:text-omniwallet-secondary font-semibold"
+              className="text-omniwallet-primary hover:text-omniwallet-secondary text-sm font-medium"
             >
-              Explorar recursos →
+              Explore resources →
             </Link>
           </div>
         ) : (
@@ -94,7 +107,7 @@ export default async function FavoritesPage() {
               <Link
                 key={content.id}
                 href={`/partner/resources/${content.id}`}
-                className="bg-white rounded-lg shadow-md p-6 hover:shadow-lg transition border-2 border-yellow-100"
+                className="bg-white rounded-lg shadow-sm border border-gray-200 p-6 hover:shadow-md transition"
               >
                 <div className="flex items-start gap-3 mb-3">
                   <div className="w-10 h-10 bg-omniwallet-primary bg-opacity-10 rounded-lg flex items-center justify-center text-omniwallet-primary">

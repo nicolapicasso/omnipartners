@@ -4,6 +4,8 @@ import { ContentType } from '@/types'
 import Link from 'next/link'
 import { ArrowLeft, Download, Calendar, Eye, FileText, Video, BookOpen, FileCheck, Award, Tag } from 'lucide-react'
 import { FavoriteButton, TrackViewButton } from '../components/ResourceActions'
+import PartnerDashboardHeader from '@/components/PartnerDashboardHeader'
+import PartnerSidebar from '@/components/PartnerSidebar'
 
 export default async function ResourceDetailPage({
   params,
@@ -11,6 +13,15 @@ export default async function ResourceDetailPage({
   params: { id: string }
 }) {
   const session = await getPartnerSession()
+  const partnerId = session.user.partnerId!
+
+  const partner = await prisma.partner.findUnique({
+    where: { id: partnerId },
+  })
+
+  if (!partner) {
+    return <div>Partner not found</div>
+  }
 
   const user = await prisma.user.findUnique({
     where: { email: session.user.email! },
@@ -89,24 +100,30 @@ export default async function ResourceDetailPage({
   return (
     <div className="min-h-screen bg-gray-50">
       <TrackViewButton contentId={content.id} />
+      <PartnerDashboardHeader
+        userName={session.user.name || 'Partner'}
+        companyName={partner.companyName}
+      />
+      <PartnerSidebar />
 
-      <header className="bg-omniwallet-primary text-white shadow-lg">
-        <div className="container mx-auto px-6 py-6">
+      <main className="ml-64 pt-20 px-8 py-8">
+        {/* Page Header */}
+        <div className="mb-8">
           <Link
             href="/partner/resources"
-            className="inline-flex items-center gap-2 text-white hover:text-omniwallet-light mb-4"
+            className="inline-flex items-center gap-2 text-sm text-gray-600 hover:text-omniwallet-primary mb-4 transition"
           >
             <ArrowLeft className="w-4 h-4" />
-            Volver a Recursos
+            Back to Resources
           </Link>
           <div className="flex justify-between items-start">
             <div>
-              <h1 className="text-3xl font-bold">{content.title}</h1>
-              <div className="flex items-center gap-3 mt-3">
-                <span className={`px-3 py-1 rounded-full text-sm font-semibold ${getCategoryColor(content.category)}`}>
+              <h1 className="text-2xl font-semibold text-gray-900">{content.title}</h1>
+              <div className="flex items-center gap-3 mt-2">
+                <span className={`px-3 py-1 rounded-full text-xs font-medium ${getCategoryColor(content.category)}`}>
                   {content.category}
                 </span>
-                <span className="text-omniwallet-light text-sm flex items-center gap-1">
+                <span className="text-gray-500 text-sm flex items-center gap-1">
                   <Calendar className="w-4 h-4" />
                   {new Date(content.createdAt).toLocaleDateString('es-ES')}
                 </span>
@@ -115,14 +132,11 @@ export default async function ResourceDetailPage({
             <FavoriteButton contentId={content.id} initialIsFavorite={isFavorite} />
           </div>
         </div>
-      </header>
-
-      <main className="container mx-auto px-6 py-8">
         <div className="grid grid-cols-1 lg:grid-cols-3 gap-6">
           {/* Main Content */}
           <div className="lg:col-span-2 space-y-6">
             {/* Viewer/Player */}
-            <div className="bg-white rounded-lg shadow-md p-6">
+            <div className="bg-white rounded-lg shadow-sm border border-gray-200 p-6">
               <div className="flex items-center gap-3 mb-4">
                 <div className="w-12 h-12 bg-omniwallet-primary bg-opacity-10 rounded-lg flex items-center justify-center text-omniwallet-primary">
                   {getTypeIcon(content.type)}
@@ -162,28 +176,28 @@ export default async function ResourceDetailPage({
                   href={resourceUrl}
                   target="_blank"
                   rel="noopener noreferrer"
-                  className="w-full bg-omniwallet-primary text-white px-6 py-3 rounded-lg font-semibold hover:bg-omniwallet-secondary transition inline-flex items-center justify-center gap-2"
+                  className="w-full bg-omniwallet-primary text-white px-4 py-3 rounded-md text-sm font-medium hover:bg-omniwallet-secondary transition inline-flex items-center justify-center gap-2"
                 >
-                  <Download className="w-5 h-5" />
-                  {content.type === ContentType.VIDEO ? 'Ver Video' : 'Descargar Recurso'}
+                  <Download className="w-4 h-4" />
+                  {content.type === ContentType.VIDEO ? 'Watch Video' : 'Download Resource'}
                 </a>
               )}
             </div>
 
             {/* Description */}
             {content.description && (
-              <div className="bg-white rounded-lg shadow-md p-6">
-                <h2 className="text-xl font-semibold text-gray-800 mb-4">Descripción</h2>
+              <div className="bg-white rounded-lg shadow-sm border border-gray-200 p-6">
+                <h2 className="text-base font-semibold text-gray-900 mb-4">Description</h2>
                 <p className="text-gray-700 whitespace-pre-wrap">{content.description}</p>
               </div>
             )}
 
             {/* Tags */}
             {tags.length > 0 && (
-              <div className="bg-white rounded-lg shadow-md p-6">
-                <h3 className="text-lg font-semibold text-gray-800 mb-3 flex items-center gap-2">
+              <div className="bg-white rounded-lg shadow-sm border border-gray-200 p-6">
+                <h3 className="text-base font-semibold text-gray-900 mb-3 flex items-center gap-2">
                   <Tag className="w-5 h-5" />
-                  Etiquetas
+                  Tags
                 </h3>
                 <div className="flex flex-wrap gap-2">
                   {tags.map((tag: string) => (
@@ -200,9 +214,9 @@ export default async function ResourceDetailPage({
 
             {/* Related Content */}
             {relatedContent.length > 0 && (
-              <div className="bg-white rounded-lg shadow-md p-6">
-                <h3 className="text-lg font-semibold text-gray-800 mb-4">
-                  Recursos Relacionados
+              <div className="bg-white rounded-lg shadow-sm border border-gray-200 p-6">
+                <h3 className="text-base font-semibold text-gray-900 mb-4">
+                  Related Resources
                 </h3>
                 <div className="space-y-3">
                   {relatedContent.map((related) => (
@@ -232,8 +246,8 @@ export default async function ResourceDetailPage({
           {/* Sidebar */}
           <div className="space-y-6">
             {/* Stats Card */}
-            <div className="bg-white rounded-lg shadow-md p-6">
-              <h3 className="text-lg font-semibold text-gray-800 mb-4">Estadísticas</h3>
+            <div className="bg-white rounded-lg shadow-sm border border-gray-200 p-6">
+              <h3 className="text-base font-semibold text-gray-900 mb-4">Statistics</h3>
               <div className="space-y-3">
                 <div className="flex items-center justify-between">
                   <div className="flex items-center gap-2 text-gray-600">
@@ -255,8 +269,8 @@ export default async function ResourceDetailPage({
             </div>
 
             {/* Info Card */}
-            <div className="bg-white rounded-lg shadow-md p-6">
-              <h3 className="text-lg font-semibold text-gray-800 mb-4">Información</h3>
+            <div className="bg-white rounded-lg shadow-sm border border-gray-200 p-6">
+              <h3 className="text-base font-semibold text-gray-900 mb-4">Information</h3>
               <div className="space-y-3 text-sm">
                 <div>
                   <p className="text-gray-500">Tipo</p>

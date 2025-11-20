@@ -26,7 +26,7 @@ export default async function NewPartnerLeadPage() {
       />
       <PartnerSidebar />
 
-      <main className="ml-64 pt-16 px-8 py-8">
+      <main className="ml-64 pt-20 px-8 py-8">
         <div className="max-w-4xl mx-auto">
           {/* Page Header */}
           <div className="mb-6">

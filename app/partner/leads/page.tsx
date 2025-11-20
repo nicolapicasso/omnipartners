@@ -54,7 +54,7 @@ export default async function PartnerLeadsPage() {
       />
       <PartnerSidebar />
 
-      <main className="ml-64 pt-16 px-8 py-8">
+      <main className="ml-64 pt-20 px-8 py-8">
         {/* Page Title */}
         <div className="mb-8 flex justify-between items-start">
           <div>
