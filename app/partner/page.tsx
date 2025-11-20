@@ -4,6 +4,7 @@ import { PartnerDashboardStats, LeadStatus } from '@/types'
 import { TrendingUp, Users, DollarSign, CheckCircle, Clock, Target } from 'lucide-react'
 import Link from 'next/link'
 import PartnerDashboardHeader from '@/components/PartnerDashboardHeader'
+import PartnerSidebar from '@/components/PartnerSidebar'
 
 async function getPartnerStats(partnerId: string): Promise<PartnerDashboardStats> {
   const [totalLeads, totalProspects, totalClients] = await Promise.all([
@@ -81,8 +82,9 @@ export default async function PartnerDashboard() {
         userName={session.user.name || 'Partner'}
         companyName={partner.companyName}
       />
+      <PartnerSidebar />
 
-      <main className="container mx-auto px-6 py-8 max-w-7xl">
+      <main className="ml-64 pt-16 px-8 py-8">
         {/* Page Title */}
         <div className="mb-8">
           <h1 className="text-2xl font-semibold text-gray-900">Dashboard</h1>

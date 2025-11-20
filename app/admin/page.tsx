@@ -5,6 +5,7 @@ import { Users, UserCheck, TrendingUp, Building2, Eye, Plus } from 'lucide-react
 import { ApproveButton, RejectButton } from './components/ActionButtons'
 import Link from 'next/link'
 import AdminDashboardHeader from '@/components/AdminDashboardHeader'
+import AdminSidebar from '@/components/AdminSidebar'
 
 async function getAdminDashboardStats(): Promise<AdminDashboardStats> {
   const [
@@ -64,88 +65,87 @@ export default async function AdminDashboard() {
   return (
     <div className="min-h-screen bg-gray-50">
       <AdminDashboardHeader userName={session.user.name || 'Admin'} />
+      <AdminSidebar />
 
-      <main className="container mx-auto px-6 py-8">
+      <main className="ml-64 pt-16 px-8 py-8">
+        {/* Page Title */}
+        <div className="mb-8">
+          <h1 className="text-2xl font-semibold text-gray-900">Dashboard</h1>
+          <p className="text-sm text-gray-500 mt-1">Overview of system performance</p>
+        </div>
+
         {/* Stats Cards */}
         <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-6 mb-8">
-          <div className="bg-white rounded-lg shadow-md p-6 border-l-4 border-omniwallet-primary">
-            <div className="flex items-center justify-between">
-              <div>
-                <p className="text-gray-600 text-sm font-medium">Partners Activos</p>
-                <p className="text-3xl font-bold text-omniwallet-primary mt-2">
-                  {stats.activePartners}
-                </p>
-                <p className="text-xs text-gray-500 mt-1">
-                  Total: {stats.totalPartners}
-                </p>
-              </div>
-              <div className="bg-omniwallet-primary/10 p-3 rounded-full">
-                <UserCheck className="w-8 h-8 text-omniwallet-primary" />
+          <div className="bg-white rounded-lg shadow-sm border border-gray-200 p-6 hover:shadow-md transition">
+            <div className="flex items-center justify-between mb-4">
+              <div className="bg-omniwallet-primary/10 p-2.5 rounded-lg">
+                <UserCheck className="w-5 h-5 text-omniwallet-primary" />
               </div>
             </div>
+            <p className="text-sm font-medium text-gray-500">Active Partners</p>
+            <p className="text-2xl font-semibold text-gray-900 mt-1">
+              {stats.activePartners}
+            </p>
+            <p className="text-xs text-gray-400 mt-2">
+              Total: {stats.totalPartners}
+            </p>
           </div>
 
-          <div className="bg-white rounded-lg shadow-md p-6 border-l-4 border-omniwallet-accent">
-            <div className="flex items-center justify-between">
-              <div>
-                <p className="text-gray-600 text-sm font-medium">Solicitudes Pendientes</p>
-                <p className="text-3xl font-bold text-omniwallet-accent mt-2">
-                  {stats.pendingPartners}
-                </p>
-                {stats.pendingPartners > 0 && (
-                  <p className="text-xs text-red-500 mt-1">¡Requieren atención!</p>
-                )}
-              </div>
-              <div className="bg-omniwallet-accent/10 p-3 rounded-full">
-                <Users className="w-8 h-8 text-omniwallet-accent" />
+          <div className="bg-white rounded-lg shadow-sm border border-gray-200 p-6 hover:shadow-md transition">
+            <div className="flex items-center justify-between mb-4">
+              <div className="bg-yellow-50 p-2.5 rounded-lg">
+                <Users className="w-5 h-5 text-yellow-600" />
               </div>
             </div>
+            <p className="text-sm font-medium text-gray-500">Pending Requests</p>
+            <p className="text-2xl font-semibold text-gray-900 mt-1">
+              {stats.pendingPartners}
+            </p>
+            {stats.pendingPartners > 0 && (
+              <p className="text-xs text-red-600 mt-2">Requires attention!</p>
+            )}
           </div>
 
-          <div className="bg-white rounded-lg shadow-md p-6 border-l-4 border-omniwallet-secondary">
-            <div className="flex items-center justify-between">
-              <div>
-                <p className="text-gray-600 text-sm font-medium">Total Leads</p>
-                <p className="text-3xl font-bold text-omniwallet-secondary mt-2">
-                  {stats.totalLeads}
-                </p>
-                <p className="text-xs text-gray-500 mt-1">
-                  Clientes: {stats.totalClients}
-                </p>
-              </div>
-              <div className="bg-omniwallet-secondary/10 p-3 rounded-full">
-                <TrendingUp className="w-8 h-8 text-omniwallet-secondary" />
+          <div className="bg-white rounded-lg shadow-sm border border-gray-200 p-6 hover:shadow-md transition">
+            <div className="flex items-center justify-between mb-4">
+              <div className="bg-blue-50 p-2.5 rounded-lg">
+                <TrendingUp className="w-5 h-5 text-blue-600" />
               </div>
             </div>
+            <p className="text-sm font-medium text-gray-500">Total Leads</p>
+            <p className="text-2xl font-semibold text-gray-900 mt-1">
+              {stats.totalLeads}
+            </p>
+            <p className="text-xs text-gray-400 mt-2">
+              Clients: {stats.totalClients}
+            </p>
           </div>
 
-          <div className="bg-white rounded-lg shadow-md p-6 border-l-4 border-green-500">
-            <div className="flex items-center justify-between">
-              <div>
-                <p className="text-gray-600 text-sm font-medium">Comisiones Totales</p>
-                <p className="text-3xl font-bold text-green-600 mt-2">
-                  €{stats.totalCommissions.toFixed(2)}
-                </p>
-                <p className="text-xs text-gray-500 mt-1">
-                  Ingresos: €{stats.totalRevenue.toFixed(2)}
-                </p>
-              </div>
-              <div className="bg-green-100 p-3 rounded-full">
-                <Building2 className="w-8 h-8 text-green-600" />
+          <div className="bg-white rounded-lg shadow-sm border border-gray-200 p-6 hover:shadow-md transition">
+            <div className="flex items-center justify-between mb-4">
+              <div className="bg-green-50 p-2.5 rounded-lg">
+                <Building2 className="w-5 h-5 text-green-600" />
               </div>
             </div>
+            <p className="text-sm font-medium text-gray-500">Total Commissions</p>
+            <p className="text-2xl font-semibold text-gray-900 mt-1">
+              €{stats.totalCommissions.toFixed(2)}
+            </p>
+            <p className="text-xs text-gray-400 mt-2">
+              Revenue: €{stats.totalRevenue.toFixed(2)}
+            </p>
           </div>
         </div>
 
         {/* Pending Requests Table */}
         {stats.pendingPartners > 0 && (
-          <div className="bg-white rounded-lg shadow-md mb-8">
-            <div className="px-6 py-4 border-b border-gray-200 flex justify-between items-center">
-              <h2 className="text-xl font-semibold text-gray-800">
-                Solicitudes Pendientes
+          <div className="bg-white rounded-lg shadow-sm border border-gray-200 mb-8">
+            <div className="px-6 py-4 border-b border-gray-100 flex justify-between items-center">
+              <h2 className="text-base font-semibold text-gray-900">
+                Pending Requests
               </h2>
-              <span className="bg-red-100 text-red-800 text-xs font-semibold px-3 py-1 rounded-full">
-                {stats.pendingPartners} pendientes
+              <span className="bg-red-50 text-red-700 text-xs font-medium px-3 py-1 rounded-full">
+                {stats.pendingPartners} pending
               </span>
             </div>
             <div className="overflow-x-auto">
@@ -213,15 +213,14 @@ export default async function AdminDashboard() {
         )}
 
         {/* Recent Active Partners */}
-        <div className="bg-white rounded-lg shadow-md">
-          <div className="px-6 py-4 border-b border-gray-200 flex justify-between items-center">
-            <h2 className="text-xl font-semibold text-gray-800">Partners Recientes</h2>
+        <div className="bg-white rounded-lg shadow-sm border border-gray-200">
+          <div className="px-6 py-4 border-b border-gray-100 flex justify-between items-center">
+            <h2 className="text-base font-semibold text-gray-900">Recent Partners</h2>
             <Link
               href="/admin/partners"
-              className="text-omniwallet-primary hover:text-omniwallet-secondary text-sm font-semibold flex items-center gap-1"
+              className="text-omniwallet-primary hover:text-omniwallet-secondary text-sm font-medium flex items-center gap-1 transition"
             >
-              Ver todos
-              <Eye className="w-4 h-4" />
+              View all
             </Link>
           </div>
           <div className="overflow-x-auto">
