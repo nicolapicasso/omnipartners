@@ -44,8 +44,12 @@ export async function createPartnerLead(data: {
         country: data.country,
         website: data.website,
         notes: data.notes,
-        partnerId,
-        createdById: user?.id, // Optional - null for PARTNER_OWNER
+        partner: {
+          connect: { id: partnerId }
+        },
+        createdBy: user ? {
+          connect: { id: user.id }
+        } : undefined,
         status: LeadStatus.LEAD,
         commissionType: partner.partnerCategory, // Use partner's category
         commissionRate: 10, // Default rate, admin can adjust
