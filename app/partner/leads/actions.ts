@@ -57,7 +57,8 @@ export async function createPartnerLead(data: {
     return { success: true, leadId: lead.id }
   } catch (error) {
     console.error('Error creating lead:', error)
-    return { success: false, error: 'Failed to create lead' }
+    const errorMessage = error instanceof Error ? error.message : 'Unknown error'
+    return { success: false, error: `Failed to create lead: ${errorMessage}` }
   }
 }
 
