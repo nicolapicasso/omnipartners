@@ -2,10 +2,12 @@ import { prisma } from '@/lib/prisma'
 import { getAdminSession } from '@/lib/session'
 import { PartnerStatus } from '@/types'
 import Link from 'next/link'
-import { Eye, UserPlus } from 'lucide-react'
+import { Eye } from 'lucide-react'
+import AdminDashboardHeader from '@/components/AdminDashboardHeader'
+import AdminSidebar from '@/components/AdminSidebar'
 
 export default async function PartnersPage() {
-  await getAdminSession()
+  const session = await getAdminSession()
 
   const partners = await prisma.partner.findMany({
     orderBy: { createdAt: 'desc' },
@@ -33,29 +35,19 @@ export default async function PartnersPage() {
 
   return (
     <div className="min-h-screen bg-gray-50">
-      <header className="bg-omniwallet-primary text-white shadow-lg">
-        <div className="container mx-auto px-6 py-6">
-          <div className="flex justify-between items-center">
-            <div>
-              <h1 className="text-3xl font-bold">Gestión de Partners</h1>
-              <p className="text-omniwallet-light mt-2">
-                Total: {partners.length} partners
-              </p>
-            </div>
-            <div className="flex gap-3">
-              <Link
-                href="/admin"
-                className="bg-white text-omniwallet-primary px-4 py-2 rounded-lg font-semibold hover:bg-omniwallet-light transition"
-              >
-                ← Volver al Dashboard
-              </Link>
-            </div>
-          </div>
-        </div>
-      </header>
+      <AdminDashboardHeader userName={session.user.name || 'Admin'} />
+      <AdminSidebar />
 
-      <main className="container mx-auto px-6 py-8">
-        <div className="bg-white rounded-lg shadow-md">
+      <main className="ml-64 pt-16 px-8 py-8">
+        {/* Page Title */}
+        <div className="mb-8">
+          <h1 className="text-2xl font-semibold text-gray-900">Partners Management</h1>
+          <p className="text-sm text-gray-500 mt-1">
+            Total: {partners.length} partners
+          </p>
+        </div>
+
+        <div className="bg-white rounded-lg shadow-sm border border-gray-200">
           <div className="overflow-x-auto">
             <table className="w-full">
               <thead className="bg-gray-50">

@@ -2,12 +2,22 @@ import { prisma } from '@/lib/prisma'
 import { getPartnerSession } from '@/lib/session'
 import { UserRole } from '@/types'
 import Link from 'next/link'
-import { ArrowLeft, Users, UserPlus, Mail, Shield } from 'lucide-react'
+import { Users, UserPlus, Mail, Shield } from 'lucide-react'
 import { InviteTeamMemberForm, RemoveTeamMemberButton, UpdateRoleButton } from './components/TeamActions'
+import PartnerDashboardHeader from '@/components/PartnerDashboardHeader'
+import PartnerSidebar from '@/components/PartnerSidebar'
 
 export default async function PartnerTeamPage() {
   const session = await getPartnerSession()
   const partnerId = session.user.partnerId!
+
+  const partner = await prisma.partner.findUnique({
+    where: { id: partnerId },
+  })
+
+  if (!partner) {
+    return <div>Partner not found</div>
+  }
 
   const teamMembers = await prisma.user.findMany({
     where: { partnerId },
@@ -45,36 +55,26 @@ export default async function PartnerTeamPage() {
 
   return (
     <div className="min-h-screen bg-gray-50">
-      <header className="bg-omniwallet-primary text-white shadow-lg">
-        <div className="container mx-auto px-6 py-6">
-          <Link
-            href="/partner"
-            className="inline-flex items-center gap-2 text-white hover:text-omniwallet-light mb-4"
-          >
-            <ArrowLeft className="w-4 h-4" />
-            Volver al Dashboard
-          </Link>
-          <div className="flex justify-between items-center">
-            <div>
-              <h1 className="text-3xl font-bold flex items-center gap-3">
-                <Users className="w-8 h-8" />
-                Mi Equipo
-              </h1>
-              <p className="text-omniwallet-light mt-2">
-                {teamMembers.length} miembros en el equipo
-              </p>
-            </div>
-          </div>
-        </div>
-      </header>
+      <PartnerDashboardHeader
+        userName={session.user.name || 'Partner'}
+        companyName={partner.companyName}
+      />
+      <PartnerSidebar />
 
-      <main className="container mx-auto px-6 py-8">
+      <main className="ml-64 pt-16 px-8 py-8">
+        {/* Page Title */}
+        <div className="mb-8">
+          <h1 className="text-2xl font-semibold text-gray-900">My Team</h1>
+          <p className="text-sm text-gray-500 mt-1">
+            {teamMembers.length} team members
+          </p>
+        </div>
         <div className="grid grid-cols-1 lg:grid-cols-3 gap-6">
           {/* Team Members List */}
           <div className="lg:col-span-2">
-            <div className="bg-white rounded-lg shadow-md">
-              <div className="px-6 py-4 border-b border-gray-200">
-                <h2 className="text-xl font-semibold text-gray-800">Miembros del Equipo</h2>
+            <div className="bg-white rounded-lg shadow-sm border border-gray-200">
+              <div className="px-6 py-4 border-b border-gray-100">
+                <h2 className="text-base font-semibold text-gray-900">Team Members</h2>
               </div>
               <div className="divide-y divide-gray-200">
                 {teamMembers.map((member) => (
@@ -125,25 +125,25 @@ export default async function PartnerTeamPage() {
           <div className="space-y-6">
             {/* Invite Form */}
             {isOwner ? (
-              <div className="bg-white rounded-lg shadow-md p-6">
-                <h3 className="text-lg font-semibold text-gray-800 mb-4 flex items-center gap-2">
+              <div className="bg-white rounded-lg shadow-sm border border-gray-200 p-6">
+                <h3 className="text-base font-semibold text-gray-900 mb-4 flex items-center gap-2">
                   <UserPlus className="w-5 h-5" />
-                  Invitar Miembro
+                  Invite Member
                 </h3>
                 <InviteTeamMemberForm />
               </div>
             ) : (
-              <div className="bg-blue-50 border border-blue-200 rounded-lg p-6">
+              <div className="bg-blue-50 border border-blue-200 rounded-md p-6">
                 <Shield className="w-8 h-8 text-blue-600 mb-3" />
                 <p className="text-sm text-blue-800">
-                  Solo el propietario del partner puede invitar nuevos miembros al equipo.
+                  Only the partner owner can invite new team members.
                 </p>
               </div>
             )}
 
             {/* Stats Card */}
-            <div className="bg-white rounded-lg shadow-md p-6">
-              <h3 className="text-lg font-semibold text-gray-800 mb-4">Estadísticas</h3>
+            <div className="bg-white rounded-lg shadow-sm border border-gray-200 p-6">
+              <h3 className="text-base font-semibold text-gray-900 mb-4">Statistics</h3>
               <div className="space-y-3">
                 <div className="flex justify-between items-center">
                   <span className="text-sm text-gray-600">Total Miembros</span>

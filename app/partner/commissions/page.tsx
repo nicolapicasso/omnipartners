@@ -1,11 +1,21 @@
 import { prisma } from '@/lib/prisma'
 import { getPartnerSession } from '@/lib/session'
 import Link from 'next/link'
-import { ArrowLeft, DollarSign, TrendingUp, FileText, Calendar } from 'lucide-react'
+import { DollarSign, TrendingUp, FileText, Calendar } from 'lucide-react'
+import PartnerDashboardHeader from '@/components/PartnerDashboardHeader'
+import PartnerSidebar from '@/components/PartnerSidebar'
 
 export default async function PartnerCommissionsPage() {
   const session = await getPartnerSession()
   const partnerId = session.user.partnerId!
+
+  const partner = await prisma.partner.findUnique({
+    where: { id: partnerId },
+  })
+
+  if (!partner) {
+    return <div>Partner not found</div>
+  }
 
   // Get all payments for this partner's leads
   const payments = await prisma.payment.findMany({
@@ -62,79 +72,51 @@ export default async function PartnerCommissionsPage() {
 
   return (
     <div className="min-h-screen bg-gray-50">
-      <header className="bg-omniwallet-primary text-white shadow-lg">
-        <div className="container mx-auto px-6 py-6">
-          <Link
-            href="/partner"
-            className="inline-flex items-center gap-2 text-white hover:text-omniwallet-light mb-4"
-          >
-            <ArrowLeft className="w-4 h-4" />
-            Volver al Dashboard
-          </Link>
-          <div className="flex justify-between items-center">
-            <div>
-              <h1 className="text-3xl font-bold">Mis Comisiones</h1>
-              <p className="text-omniwallet-light mt-2">
-                {payments.length} pagos · {invoices.length} facturas
-              </p>
-            </div>
-          </div>
-        </div>
-      </header>
+      <PartnerDashboardHeader
+        userName={session.user.name || 'Partner'}
+        companyName={partner.companyName}
+      />
+      <PartnerSidebar />
 
-      <main className="container mx-auto px-6 py-8">
+      <main className="ml-64 pt-16 px-8 py-8">
+        {/* Page Title */}
+        <div className="mb-8">
+          <h1 className="text-2xl font-semibold text-gray-900">My Commissions</h1>
+          <p className="text-sm text-gray-500 mt-1">
+            {payments.length} payments · {invoices.length} invoices
+          </p>
+        </div>
         {/* Stats Cards */}
         <div className="grid grid-cols-1 md:grid-cols-3 gap-6 mb-8">
-          <div className="bg-white rounded-lg shadow-md p-6">
-            <div className="flex items-center justify-between">
-              <div>
-                <p className="text-gray-600 text-sm font-medium">Total Comisiones</p>
-                <p className="text-3xl font-bold text-gray-900 mt-2">
-                  €{totalCommissions.toFixed(2)}
-                </p>
-              </div>
-              <div className="w-12 h-12 bg-omniwallet-primary bg-opacity-10 rounded-full flex items-center justify-center">
-                <DollarSign className="w-6 h-6 text-omniwallet-primary" />
-              </div>
-            </div>
+          <div className="bg-white rounded-lg shadow-sm border border-gray-200 p-6">
+            <p className="text-sm font-medium text-gray-500">Total Commissions</p>
+            <p className="text-2xl font-semibold text-gray-900 mt-2">
+              €{totalCommissions.toFixed(2)}
+            </p>
           </div>
 
-          <div className="bg-white rounded-lg shadow-md p-6">
-            <div className="flex items-center justify-between">
-              <div>
-                <p className="text-gray-600 text-sm font-medium">Pendientes</p>
-                <p className="text-3xl font-bold text-yellow-600 mt-2">
-                  €{pendingCommissions.toFixed(2)}
-                </p>
-              </div>
-              <div className="w-12 h-12 bg-yellow-100 rounded-full flex items-center justify-center">
-                <TrendingUp className="w-6 h-6 text-yellow-600" />
-              </div>
-            </div>
+          <div className="bg-white rounded-lg shadow-sm border border-gray-200 p-6">
+            <p className="text-sm font-medium text-gray-500">Pending</p>
+            <p className="text-2xl font-semibold text-gray-900 mt-2">
+              €{pendingCommissions.toFixed(2)}
+            </p>
           </div>
 
-          <div className="bg-white rounded-lg shadow-md p-6">
-            <div className="flex items-center justify-between">
-              <div>
-                <p className="text-gray-600 text-sm font-medium">Pagadas</p>
-                <p className="text-3xl font-bold text-green-600 mt-2">
-                  €{paidCommissions.toFixed(2)}
-                </p>
-              </div>
-              <div className="w-12 h-12 bg-green-100 rounded-full flex items-center justify-center">
-                <DollarSign className="w-6 h-6 text-green-600" />
-              </div>
-            </div>
+          <div className="bg-white rounded-lg shadow-sm border border-gray-200 p-6">
+            <p className="text-sm font-medium text-gray-500">Paid</p>
+            <p className="text-2xl font-semibold text-gray-900 mt-2">
+              €{paidCommissions.toFixed(2)}
+            </p>
           </div>
         </div>
 
         {/* Invoices Section */}
         {invoices.length > 0 && (
-          <div className="bg-white rounded-lg shadow-md mb-8">
-            <div className="px-6 py-4 border-b border-gray-200">
-              <h2 className="text-xl font-semibold text-gray-800 flex items-center gap-2">
+          <div className="bg-white rounded-lg shadow-sm border border-gray-200 mb-8">
+            <div className="px-6 py-4 border-b border-gray-100">
+              <h2 className="text-base font-semibold text-gray-900 flex items-center gap-2">
                 <FileText className="w-5 h-5" />
-                Facturas de Comisión
+                Commission Invoices
               </h2>
             </div>
             <div className="overflow-x-auto">
@@ -196,22 +178,22 @@ export default async function PartnerCommissionsPage() {
         )}
 
         {/* Payments Table */}
-        <div className="bg-white rounded-lg shadow-md">
-          <div className="px-6 py-4 border-b border-gray-200">
-            <h2 className="text-xl font-semibold text-gray-800 flex items-center gap-2">
+        <div className="bg-white rounded-lg shadow-sm border border-gray-200">
+          <div className="px-6 py-4 border-b border-gray-100">
+            <h2 className="text-base font-semibold text-gray-900 flex items-center gap-2">
               <DollarSign className="w-5 h-5" />
-              Detalle de Pagos y Comisiones
+              Payment Details
             </h2>
           </div>
           <div className="overflow-x-auto">
             {payments.length === 0 ? (
               <div className="text-center py-16">
-                <p className="text-gray-500 mb-4">No hay pagos registrados todavía</p>
+                <p className="text-gray-500 mb-4">No payments registered yet</p>
                 <Link
                   href="/partner/leads"
-                  className="text-omniwallet-primary hover:text-omniwallet-secondary font-semibold"
+                  className="text-omniwallet-primary hover:text-omniwallet-secondary text-sm font-medium"
                 >
-                  Ver tus leads →
+                  View your leads →
                 </Link>
               </div>
             ) : (

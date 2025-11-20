@@ -2,7 +2,9 @@ import { prisma } from '@/lib/prisma'
 import { getPartnerSession } from '@/lib/session'
 import { ContentType, ContentCategory, ContentStatus } from '@/types'
 import Link from 'next/link'
-import { ArrowLeft, FileText, Video, BookOpen, FileCheck, Award, Star, Search } from 'lucide-react'
+import { FileText, Video, BookOpen, FileCheck, Award, Star, Search } from 'lucide-react'
+import PartnerDashboardHeader from '@/components/PartnerDashboardHeader'
+import PartnerSidebar from '@/components/PartnerSidebar'
 
 export default async function PartnerResourcesPage({
   searchParams,
@@ -10,6 +12,15 @@ export default async function PartnerResourcesPage({
   searchParams: { category?: string; type?: string; search?: string }
 }) {
   const session = await getPartnerSession()
+  const partnerId = session.user.partnerId!
+
+  const partner = await prisma.partner.findUnique({
+    where: { id: partnerId },
+  })
+
+  if (!partner) {
+    return <div>Partner not found</div>
+  }
 
   const user = await prisma.user.findUnique({
     where: { email: session.user.email! },
@@ -87,32 +98,27 @@ export default async function PartnerResourcesPage({
 
   return (
     <div className="min-h-screen bg-gray-50">
-      <header className="bg-omniwallet-primary text-white shadow-lg">
-        <div className="container mx-auto px-6 py-6">
-          <Link
-            href="/partner"
-            className="inline-flex items-center gap-2 text-white hover:text-omniwallet-light mb-4"
-          >
-            <ArrowLeft className="w-4 h-4" />
-            Volver al Dashboard
-          </Link>
-          <div className="flex justify-between items-center">
-            <div>
-              <h1 className="text-3xl font-bold">Biblioteca de Recursos</h1>
-              <p className="text-omniwallet-light mt-2">{contents.length} recursos disponibles</p>
-            </div>
-            <Link
-              href="/partner/resources/favorites"
-              className="bg-white text-omniwallet-primary px-4 py-2 rounded-lg font-semibold hover:bg-omniwallet-light transition inline-flex items-center gap-2"
-            >
-              <Star className="w-4 h-4" />
-              Mis Favoritos
-            </Link>
-          </div>
-        </div>
-      </header>
+      <PartnerDashboardHeader
+        userName={session.user.name || 'Partner'}
+        companyName={partner.companyName}
+      />
+      <PartnerSidebar />
 
-      <main className="container mx-auto px-6 py-8">
+      <main className="ml-64 pt-16 px-8 py-8">
+        {/* Page Title */}
+        <div className="mb-8 flex justify-between items-start">
+          <div>
+            <h1 className="text-2xl font-semibold text-gray-900">Resource Library</h1>
+            <p className="text-sm text-gray-500 mt-1">{contents.length} resources available</p>
+          </div>
+          <Link
+            href="/partner/resources/favorites"
+            className="bg-omniwallet-primary text-white px-4 py-2 rounded-md text-sm font-medium hover:bg-omniwallet-secondary transition inline-flex items-center gap-2"
+          >
+            <Star className="w-4 h-4" />
+            My Favorites
+          </Link>
+        </div>
         {/* Search Bar */}
         <div className="mb-8">
           <form method="GET" className="max-w-2xl mx-auto">
@@ -129,9 +135,9 @@ export default async function PartnerResourcesPage({
               </div>
               <button
                 type="submit"
-                className="bg-omniwallet-primary text-white px-6 py-3 rounded-lg font-semibold hover:bg-omniwallet-secondary transition"
+                className="bg-omniwallet-primary text-white px-6 py-3 rounded-md text-sm font-medium hover:bg-omniwallet-secondary transition"
               >
-                Buscar
+                Search
               </button>
             </div>
           </form>
@@ -140,16 +146,16 @@ export default async function PartnerResourcesPage({
         {/* Featured Resources */}
         {featured.length > 0 && !searchParams.category && !searchParams.search && (
           <div className="mb-8">
-            <h2 className="text-2xl font-bold text-gray-800 mb-4 flex items-center gap-2">
-              <Star className="w-6 h-6 text-yellow-500" />
-              Recursos Destacados
+            <h2 className="text-lg font-semibold text-gray-900 mb-4 flex items-center gap-2">
+              <Star className="w-5 h-5 text-yellow-500" />
+              Featured Resources
             </h2>
             <div className="grid grid-cols-1 md:grid-cols-3 gap-6">
               {featured.map((content) => (
                 <Link
                   key={content.id}
                   href={`/partner/resources/${content.id}`}
-                  className="bg-white rounded-lg shadow-md p-6 hover:shadow-lg transition border-2 border-yellow-200"
+                  className="bg-white rounded-lg shadow-sm border border-gray-200 p-6 hover:shadow-md transition"
                 >
                   <div className="flex items-start gap-3 mb-3">
                     <div className="w-10 h-10 bg-omniwallet-primary bg-opacity-10 rounded-lg flex items-center justify-center text-omniwallet-primary">
@@ -180,26 +186,26 @@ export default async function PartnerResourcesPage({
 
         {/* Category Filter */}
         <div className="mb-8">
-          <h3 className="text-lg font-semibold text-gray-800 mb-4">Categorías</h3>
+          <h3 className="text-base font-semibold text-gray-900 mb-4">Categories</h3>
           <div className="flex flex-wrap gap-3">
             <Link
               href="/partner/resources"
-              className={`px-4 py-2 rounded-lg font-medium transition ${
+              className={`px-4 py-2 rounded-md text-sm font-medium transition ${
                 !searchParams.category
                   ? 'bg-omniwallet-primary text-white'
-                  : 'bg-white text-gray-700 border border-gray-300 hover:bg-gray-50'
+                  : 'bg-white text-gray-700 border border-gray-200 hover:bg-gray-50'
               }`}
             >
-              Todas
+              All
             </Link>
             {categories.map((cat) => (
               <Link
                 key={cat.value}
                 href={`/partner/resources?category=${cat.value}`}
-                className={`px-4 py-2 rounded-lg font-medium transition ${
+                className={`px-4 py-2 rounded-md text-sm font-medium transition ${
                   searchParams.category === cat.value
                     ? 'bg-omniwallet-primary text-white'
-                    : 'bg-white text-gray-700 border border-gray-300 hover:bg-gray-50'
+                    : 'bg-white text-gray-700 border border-gray-200 hover:bg-gray-50'
                 }`}
               >
                 {cat.label}
@@ -210,20 +216,20 @@ export default async function PartnerResourcesPage({
 
         {/* Resources Grid */}
         <div>
-          <h3 className="text-lg font-semibold text-gray-800 mb-4">
+          <h3 className="text-base font-semibold text-gray-900 mb-4">
             {searchParams.category
               ? `Recursos de ${categories.find((c) => c.value === searchParams.category)?.label}`
               : 'Todos los Recursos'}
           </h3>
           {contents.length === 0 ? (
-            <div className="text-center py-16 bg-white rounded-lg">
+            <div className="text-center py-16 bg-white rounded-lg shadow-sm border border-gray-200">
               <FileText className="w-16 h-16 text-gray-300 mx-auto mb-4" />
-              <p className="text-gray-500 mb-4">No hay recursos disponibles</p>
+              <p className="text-gray-500 mb-4">No resources available</p>
               <Link
                 href="/partner/resources"
-                className="text-omniwallet-primary hover:text-omniwallet-secondary font-semibold"
+                className="text-omniwallet-primary hover:text-omniwallet-secondary text-sm font-medium"
               >
-                Ver todos los recursos
+                View all resources
               </Link>
             </div>
           ) : (
@@ -232,7 +238,7 @@ export default async function PartnerResourcesPage({
                 <Link
                   key={content.id}
                   href={`/partner/resources/${content.id}`}
-                  className="bg-white rounded-lg shadow-md p-6 hover:shadow-lg transition"
+                  className="bg-white rounded-lg shadow-sm border border-gray-200 p-6 hover:shadow-md transition"
                 >
                   <div className="flex items-start gap-3 mb-3">
                     <div className="w-10 h-10 bg-omniwallet-primary bg-opacity-10 rounded-lg flex items-center justify-center text-omniwallet-primary">
