@@ -38,7 +38,7 @@ export default async function NewLeadPage() {
 
       <main className="container mx-auto px-6 py-8">
         <div className="max-w-3xl mx-auto">
-          <div className="bg-white rounded-lg shadow-md p-8">
+          <div className="bg-white rounded-lg shadow-sm border border-gray-200 p-8">
             {activePartners.length === 0 ? (
               <div className="text-center py-12">
                 <p className="text-gray-600 mb-4">

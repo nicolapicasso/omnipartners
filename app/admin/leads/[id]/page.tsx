@@ -89,7 +89,7 @@ export default async function LeadDetailPage({
           {/* Lead Info */}
           <div className="lg:col-span-2 space-y-6">
             {/* Main Info Card */}
-            <div className="bg-white rounded-lg shadow-md p-6">
+            <div className="bg-white rounded-lg shadow-sm border border-gray-200 p-6">
               <h2 className="text-xl font-semibold text-gray-800 mb-4">
                 Información del Lead
               </h2>
@@ -185,7 +185,7 @@ export default async function LeadDetailPage({
             </div>
 
             {/* Partner Info */}
-            <div className="bg-white rounded-lg shadow-md p-6">
+            <div className="bg-white rounded-lg shadow-sm border border-gray-200 p-6">
               <h2 className="text-xl font-semibold text-gray-800 mb-4">Partner Asignado</h2>
               <div className="flex items-center justify-between">
                 <div>
@@ -202,7 +202,7 @@ export default async function LeadDetailPage({
             </div>
 
             {/* Payments Table */}
-            <div className="bg-white rounded-lg shadow-md">
+            <div className="bg-white rounded-lg shadow-sm border border-gray-200">
               <div className="px-6 py-4 border-b border-gray-200 flex justify-between items-center">
                 <h2 className="text-xl font-semibold text-gray-800">
                   Pagos ({lead.payments.length})
@@ -264,7 +264,7 @@ export default async function LeadDetailPage({
           {/* Sidebar */}
           <div className="space-y-6">
             {/* Stats Card */}
-            <div className="bg-white rounded-lg shadow-md p-6">
+            <div className="bg-white rounded-lg shadow-sm border border-gray-200 p-6">
               <h3 className="text-lg font-semibold text-gray-800 mb-4">Resumen</h3>
               <div className="space-y-4">
                 <div className="flex items-center justify-between">
@@ -295,7 +295,7 @@ export default async function LeadDetailPage({
             </div>
 
             {/* Status Action */}
-            <div className="bg-white rounded-lg shadow-md p-6">
+            <div className="bg-white rounded-lg shadow-sm border border-gray-200 p-6">
               <h3 className="text-lg font-semibold text-gray-800 mb-4">
                 Cambiar Estado
               </h3>
@@ -303,7 +303,7 @@ export default async function LeadDetailPage({
             </div>
 
             {/* Commission Card */}
-            <div className="bg-white rounded-lg shadow-md p-6">
+            <div className="bg-white rounded-lg shadow-sm border border-gray-200 p-6">
               <h3 className="text-lg font-semibold text-gray-800 mb-4">
                 Configuración de Comisión
               </h3>

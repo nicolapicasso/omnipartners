@@ -49,7 +49,7 @@ export default async function EditContentPage({
 
       <main className="container mx-auto px-6 py-8">
         <div className="max-w-3xl mx-auto">
-          <div className="bg-white rounded-lg shadow-md p-8">
+          <div className="bg-white rounded-lg shadow-sm border border-gray-200 p-8">
             <ContentForm content={content} />
           </div>
         </div>

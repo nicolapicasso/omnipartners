@@ -4,13 +4,15 @@ import { PartnerStatus } from '@/types'
 import Link from 'next/link'
 import { ArrowLeft, Mail, Phone, Globe, MapPin, Calendar, Users, TrendingUp } from 'lucide-react'
 import { UpdateCategoryButton, ToggleStatusButton } from '../components/PartnerActions'
+import AdminDashboardHeader from '@/components/AdminDashboardHeader'
+import AdminSidebar from '@/components/AdminSidebar'
 
 export default async function PartnerDetailPage({
   params,
 }: {
   params: { id: string }
 }) {
-  await getAdminSession()
+  const session = await getAdminSession()
 
   const partner = await prisma.partner.findUnique({
     where: { id: params.id },
@@ -66,24 +68,28 @@ export default async function PartnerDetailPage({
 
   return (
     <div className="min-h-screen bg-gray-50">
-      <header className="bg-omniwallet-primary text-white shadow-lg">
-        <div className="container mx-auto px-6 py-6">
+      <AdminDashboardHeader userName={session.user.name || 'Admin'} />
+      <AdminSidebar />
+
+      <main className="ml-64 pt-20 px-8 py-8">
+        {/* Page Header */}
+        <div className="mb-8">
           <Link
             href="/admin/partners"
-            className="inline-flex items-center gap-2 text-white hover:text-omniwallet-light mb-4"
+            className="inline-flex items-center gap-2 text-sm text-gray-600 hover:text-omniwallet-primary mb-4 transition"
           >
             <ArrowLeft className="w-4 h-4" />
-            Volver a Partners
+            Back to Partners
           </Link>
           <div className="flex justify-between items-start">
             <div>
-              <h1 className="text-3xl font-bold">{partner.companyName}</h1>
-              <p className="text-omniwallet-light mt-2">
-                Contacto: {partner.contactName}
+              <h1 className="text-2xl font-semibold text-gray-900">{partner.companyName}</h1>
+              <p className="text-sm text-gray-500 mt-1">
+                Contact: {partner.contactName}
               </p>
             </div>
             <span
-              className={`px-4 py-2 rounded-lg font-semibold ${getStatusColor(
+              className={`px-3 py-1 rounded-full text-sm font-medium ${getStatusColor(
                 partner.status
               )}`}
             >
@@ -91,16 +97,13 @@ export default async function PartnerDetailPage({
             </span>
           </div>
         </div>
-      </header>
-
-      <main className="container mx-auto px-6 py-8">
         <div className="grid grid-cols-1 lg:grid-cols-3 gap-6">
           {/* Partner Info */}
           <div className="lg:col-span-2 space-y-6">
             {/* Main Info Card */}
-            <div className="bg-white rounded-lg shadow-md p-6">
-              <h2 className="text-xl font-semibold text-gray-800 mb-4">
-                Información del Partner
+            <div className="bg-white rounded-lg shadow-sm border border-gray-200 p-6">
+              <h2 className="text-base font-semibold text-gray-900 mb-4">
+                Partner Information
               </h2>
               <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
                 <div className="flex items-center gap-3">
@@ -178,7 +181,7 @@ export default async function PartnerDetailPage({
             </div>
 
             {/* Actions Card */}
-            <div className="bg-white rounded-lg shadow-md p-6">
+            <div className="bg-white rounded-lg shadow-sm border border-gray-200 p-6">
               <h2 className="text-xl font-semibold text-gray-800 mb-4">Acciones</h2>
               <div className="flex flex-wrap gap-4">
                 <UpdateCategoryButton
@@ -193,7 +196,7 @@ export default async function PartnerDetailPage({
             </div>
 
             {/* Leads Table */}
-            <div className="bg-white rounded-lg shadow-md">
+            <div className="bg-white rounded-lg shadow-sm border border-gray-200">
               <div className="px-6 py-4 border-b border-gray-200">
                 <h2 className="text-xl font-semibold text-gray-800">
                   Leads ({partner.leads.length})
@@ -256,7 +259,7 @@ export default async function PartnerDetailPage({
           {/* Sidebar */}
           <div className="space-y-6">
             {/* Stats Card */}
-            <div className="bg-white rounded-lg shadow-md p-6">
+            <div className="bg-white rounded-lg shadow-sm border border-gray-200 p-6">
               <h3 className="text-lg font-semibold text-gray-800 mb-4">Estadísticas</h3>
               <div className="space-y-4">
                 <div className="flex items-center justify-between">
@@ -281,7 +284,7 @@ export default async function PartnerDetailPage({
             </div>
 
             {/* Users Card */}
-            <div className="bg-white rounded-lg shadow-md p-6">
+            <div className="bg-white rounded-lg shadow-sm border border-gray-200 p-6">
               <h3 className="text-lg font-semibold text-gray-800 mb-4">
                 Usuarios ({partner.users.length})
               </h3>

@@ -4,6 +4,8 @@ import { LeadStatus } from '@/types'
 import Link from 'next/link'
 import { ArrowLeft, Mail, Phone, Globe, MapPin, Calendar, DollarSign, User, Pencil } from 'lucide-react'
 import { DeleteLeadButton } from '../components/LeadActions'
+import PartnerDashboardHeader from '@/components/PartnerDashboardHeader'
+import PartnerSidebar from '@/components/PartnerSidebar'
 
 export default async function PartnerLeadDetailPage({
   params,
@@ -12,6 +14,14 @@ export default async function PartnerLeadDetailPage({
 }) {
   const session = await getPartnerSession()
   const partnerId = session.user.partnerId!
+
+  const partner = await prisma.partner.findUnique({
+    where: { id: partnerId },
+  })
+
+  if (!partner) {
+    return <div>Partner not found</div>
+  }
 
   const lead = await prisma.lead.findUnique({
     where: { id: params.id },
@@ -29,12 +39,12 @@ export default async function PartnerLeadDetailPage({
     return (
       <div className="min-h-screen bg-gray-50 flex items-center justify-center">
         <div className="text-center">
-          <h1 className="text-2xl font-bold text-gray-800 mb-4">Lead no encontrado</h1>
+          <h1 className="text-2xl font-bold text-gray-800 mb-4">Lead not found</h1>
           <Link
             href="/partner/leads"
             className="text-omniwallet-primary hover:text-omniwallet-secondary"
           >
-            ← Volver a Mis Leads
+            ← Back to My Leads
           </Link>
         </div>
       </div>
@@ -59,24 +69,31 @@ export default async function PartnerLeadDetailPage({
 
   return (
     <div className="min-h-screen bg-gray-50">
-      <header className="bg-omniwallet-primary text-white shadow-lg">
-        <div className="container mx-auto px-6 py-6">
+      <PartnerDashboardHeader
+        userName={session.user.name || 'Partner'}
+        companyName={partner.companyName}
+      />
+      <PartnerSidebar />
+
+      <main className="ml-64 pt-20 px-8 py-8">
+        {/* Page Header */}
+        <div className="mb-8">
           <Link
             href="/partner/leads"
-            className="inline-flex items-center gap-2 text-white hover:text-omniwallet-light mb-4"
+            className="inline-flex items-center gap-2 text-sm text-gray-600 hover:text-omniwallet-primary mb-4 transition"
           >
             <ArrowLeft className="w-4 h-4" />
-            Volver a Mis Leads
+            Back to My Leads
           </Link>
           <div className="flex justify-between items-start">
             <div>
-              <h1 className="text-3xl font-bold">{lead.companyName}</h1>
-              <p className="text-omniwallet-light mt-2">
-                Creado por: {lead.createdBy.name}
+              <h1 className="text-2xl font-semibold text-gray-900">{lead.companyName}</h1>
+              <p className="text-sm text-gray-500 mt-1">
+                Created by: {lead.createdBy?.name || 'System'}
               </p>
             </div>
             <span
-              className={`px-4 py-2 rounded-lg font-semibold ${getStatusColor(
+              className={`px-3 py-1 rounded-full text-sm font-medium ${getStatusColor(
                 lead.status
               )}`}
             >
@@ -84,24 +101,21 @@ export default async function PartnerLeadDetailPage({
             </span>
           </div>
         </div>
-      </header>
-
-      <main className="container mx-auto px-6 py-8">
         <div className="grid grid-cols-1 lg:grid-cols-3 gap-6">
           {/* Lead Info */}
           <div className="lg:col-span-2 space-y-6">
             {/* Main Info Card */}
-            <div className="bg-white rounded-lg shadow-md p-6">
+            <div className="bg-white rounded-lg shadow-sm border border-gray-200 p-6">
               <div className="flex justify-between items-center mb-4">
-                <h2 className="text-xl font-semibold text-gray-800">
-                  Información del Lead
+                <h2 className="text-base font-semibold text-gray-900">
+                  Lead Information
                 </h2>
                 <Link
                   href={`/partner/leads/${lead.id}/edit`}
-                  className="text-omniwallet-primary hover:text-omniwallet-secondary inline-flex items-center gap-1 text-sm font-semibold"
+                  className="text-omniwallet-primary hover:text-omniwallet-secondary inline-flex items-center gap-1 text-sm font-medium"
                 >
                   <Pencil className="w-4 h-4" />
-                  Editar
+                  Edit
                 </Link>
               </div>
               <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
@@ -196,10 +210,10 @@ export default async function PartnerLeadDetailPage({
             </div>
 
             {/* Payments Table */}
-            <div className="bg-white rounded-lg shadow-md">
-              <div className="px-6 py-4 border-b border-gray-200 flex justify-between items-center">
-                <h2 className="text-xl font-semibold text-gray-800">
-                  Pagos ({lead.payments.length})
+            <div className="bg-white rounded-lg shadow-sm border border-gray-200">
+              <div className="px-6 py-4 border-b border-gray-100 flex justify-between items-center">
+                <h2 className="text-base font-semibold text-gray-900">
+                  Payments ({lead.payments.length})
                 </h2>
                 <div className="text-right">
                   <p className="text-sm text-gray-500">Total Pagado</p>
@@ -258,8 +272,8 @@ export default async function PartnerLeadDetailPage({
           {/* Sidebar */}
           <div className="space-y-6">
             {/* Stats Card */}
-            <div className="bg-white rounded-lg shadow-md p-6">
-              <h3 className="text-lg font-semibold text-gray-800 mb-4">Resumen</h3>
+            <div className="bg-white rounded-lg shadow-sm border border-gray-200 p-6">
+              <h3 className="text-base font-semibold text-gray-900 mb-4">Summary</h3>
               <div className="space-y-4">
                 <div className="flex items-center justify-between">
                   <div className="flex items-center gap-2">
@@ -289,9 +303,9 @@ export default async function PartnerLeadDetailPage({
             </div>
 
             {/* Commission Card */}
-            <div className="bg-white rounded-lg shadow-md p-6">
-              <h3 className="text-lg font-semibold text-gray-800 mb-4">
-                Configuración de Comisión
+            <div className="bg-white rounded-lg shadow-sm border border-gray-200 p-6">
+              <h3 className="text-base font-semibold text-gray-900 mb-4">
+                Commission Configuration
               </h3>
               <div className="space-y-3">
                 <div>
@@ -314,8 +328,8 @@ export default async function PartnerLeadDetailPage({
 
             {/* Actions */}
             {lead.status !== LeadStatus.CLIENT && (
-              <div className="bg-white rounded-lg shadow-md p-6">
-                <h3 className="text-lg font-semibold text-gray-800 mb-4">Acciones</h3>
+              <div className="bg-white rounded-lg shadow-sm border border-gray-200 p-6">
+                <h3 className="text-base font-semibold text-gray-900 mb-4">Actions</h3>
                 <DeleteLeadButton leadId={lead.id} />
               </div>
             )}
