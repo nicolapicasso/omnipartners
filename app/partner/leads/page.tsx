@@ -163,7 +163,7 @@ export default async function PartnerLeadsPage() {
                         {lead._count.payments}
                       </td>
                       <td className="px-6 py-4 whitespace-nowrap text-sm text-gray-500">
-                        {lead.createdBy.name}
+                        {lead.createdBy?.name || 'Admin'}
                       </td>
                       <td className="px-6 py-4 whitespace-nowrap text-sm font-medium">
                         <Link
