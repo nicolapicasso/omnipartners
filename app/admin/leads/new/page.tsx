@@ -4,9 +4,11 @@ import { PartnerStatus } from '@/types'
 import Link from 'next/link'
 import { ArrowLeft } from 'lucide-react'
 import CreateLeadForm from '../components/CreateLeadForm'
+import AdminDashboardHeader from '@/components/AdminDashboardHeader'
+import AdminSidebar from '@/components/AdminSidebar'
 
 export default async function NewLeadPage() {
-  await getAdminSession()
+  const session = await getAdminSession()
 
   const activePartners = await prisma.partner.findMany({
     where: { status: PartnerStatus.ACTIVE },
@@ -20,24 +22,25 @@ export default async function NewLeadPage() {
 
   return (
     <div className="min-h-screen bg-gray-50">
-      <header className="bg-omniwallet-primary text-white shadow-lg">
-        <div className="container mx-auto px-6 py-6">
-          <Link
-            href="/admin/leads"
-            className="inline-flex items-center gap-2 text-white hover:text-omniwallet-light mb-4"
-          >
-            <ArrowLeft className="w-4 h-4" />
-            Volver a Leads
-          </Link>
-          <h1 className="text-3xl font-bold">Crear Nuevo Lead</h1>
-          <p className="text-omniwallet-light mt-2">
-            Asigna un nuevo lead a un partner activo
-          </p>
-        </div>
-      </header>
+      <AdminDashboardHeader userName={session.user.name || 'Admin'} />
+      <AdminSidebar />
 
-      <main className="container mx-auto px-6 py-8">
-        <div className="max-w-3xl mx-auto">
+      <main className="ml-64 pt-20 px-8 py-8">
+        <div className="max-w-4xl mx-auto">
+          {/* Page Header */}
+          <div className="mb-8">
+            <Link
+              href="/admin/leads"
+              className="inline-flex items-center gap-2 text-sm text-gray-600 hover:text-omniwallet-primary mb-4 transition"
+            >
+              <ArrowLeft className="w-4 h-4" />
+              Back to Leads
+            </Link>
+            <h1 className="text-2xl font-semibold text-gray-900">Create New Lead</h1>
+            <p className="text-sm text-gray-500 mt-1">
+              Assign a new lead to an active partner
+            </p>
+          </div>
           <div className="bg-white rounded-lg shadow-sm border border-gray-200 p-8">
             {activePartners.length === 0 ? (
               <div className="text-center py-12">

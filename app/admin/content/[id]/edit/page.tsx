@@ -3,13 +3,15 @@ import { getAdminSession } from '@/lib/session'
 import Link from 'next/link'
 import { ArrowLeft } from 'lucide-react'
 import ContentForm from '../../components/ContentForm'
+import AdminDashboardHeader from '@/components/AdminDashboardHeader'
+import AdminSidebar from '@/components/AdminSidebar'
 
 export default async function EditContentPage({
   params,
 }: {
   params: { id: string }
 }) {
-  await getAdminSession()
+  const session = await getAdminSession()
 
   const content = await prisma.content.findUnique({
     where: { id: params.id },
@@ -33,22 +35,23 @@ export default async function EditContentPage({
 
   return (
     <div className="min-h-screen bg-gray-50">
-      <header className="bg-omniwallet-primary text-white shadow-lg">
-        <div className="container mx-auto px-6 py-6">
-          <Link
-            href="/admin/content"
-            className="inline-flex items-center gap-2 text-white hover:text-omniwallet-light mb-4"
-          >
-            <ArrowLeft className="w-4 h-4" />
-            Volver a Contenidos
-          </Link>
-          <h1 className="text-3xl font-bold">Editar Recurso</h1>
-          <p className="text-omniwallet-light mt-2">{content.title}</p>
-        </div>
-      </header>
+      <AdminDashboardHeader userName={session.user.name || 'Admin'} />
+      <AdminSidebar />
 
-      <main className="container mx-auto px-6 py-8">
-        <div className="max-w-3xl mx-auto">
+      <main className="ml-64 pt-20 px-8 py-8">
+        <div className="max-w-4xl mx-auto">
+          {/* Page Header */}
+          <div className="mb-8">
+            <Link
+              href="/admin/content"
+              className="inline-flex items-center gap-2 text-sm text-gray-600 hover:text-omniwallet-primary mb-4 transition"
+            >
+              <ArrowLeft className="w-4 h-4" />
+              Back to Content
+            </Link>
+            <h1 className="text-2xl font-semibold text-gray-900">Edit Resource</h1>
+            <p className="text-sm text-gray-500 mt-1">{content.title}</p>
+          </div>
           <div className="bg-white rounded-lg shadow-sm border border-gray-200 p-8">
             <ContentForm content={content} />
           </div>
