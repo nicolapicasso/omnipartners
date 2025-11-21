@@ -24,7 +24,7 @@ export default async function PartnerCommissionsPage() {
     },
     include: {
       lead: true,
-      invoicePayments: {
+      invoices: {
         include: {
           invoice: true,
         },
@@ -247,21 +247,21 @@ export default async function PartnerCommissionsPage() {
                         €{payment.commissionAmount.toFixed(2)}
                       </td>
                       <td className="px-6 py-4 whitespace-nowrap text-sm text-gray-500">
-                        {payment.invoicePayments.length > 0
-                          ? payment.invoicePayments[0].invoice.invoiceNumber
+                        {payment.invoices.length > 0
+                          ? payment.invoices[0].invoice.invoiceNumber
                           : 'Sin factura'}
                       </td>
                       <td className="px-6 py-4 whitespace-nowrap">
                         <span
                           className={`px-2 inline-flex text-xs leading-5 font-semibold rounded-full ${
-                            payment.invoicePayments.length > 0 &&
-                            payment.invoicePayments[0].invoice.status === 'PAID'
+                            payment.invoices.length > 0 &&
+                            payment.invoices[0].invoice.status === 'PAID'
                               ? 'bg-green-100 text-green-800'
                               : 'bg-yellow-100 text-yellow-800'
                           }`}
                         >
-                          {payment.invoicePayments.length > 0 &&
-                          payment.invoicePayments[0].invoice.status === 'PAID'
+                          {payment.invoices.length > 0 &&
+                          payment.invoices[0].invoice.status === 'PAID'
                             ? 'Pagada'
                             : 'Pendiente'}
                         </span>
