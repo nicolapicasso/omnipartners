@@ -47,9 +47,12 @@ export async function createPartnerLead(data: {
         partner: {
           connect: { id: partnerId }
         },
-        createdBy: user ? {
-          connect: { id: user.id }
-        } : undefined,
+        // Only include createdBy if user exists (omit field entirely if null)
+        ...(user && {
+          createdBy: {
+            connect: { id: user.id }
+          }
+        }),
         status: LeadStatus.LEAD,
         commissionType: partner.partnerCategory, // Use partner's category
         commissionRate: 10, // Default rate, admin can adjust
