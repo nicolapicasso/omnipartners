@@ -44,6 +44,9 @@ model Partner {
   // Omniwallet Account URL (uploaded by admin)
   omniwalletAccountUrl String?
 
+  // Yearly event completion (webinar/joint event)
+  hasCompletedYearlyEvent Boolean @default(false)
+
   // Relaciones
   users            User[]
   leads            Lead[]

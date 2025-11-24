@@ -5,6 +5,7 @@ import { TrendingUp, Users, DollarSign, CheckCircle, Clock, Target, FileText, Do
 import Link from 'next/link'
 import PartnerDashboardHeader from '@/components/PartnerDashboardHeader'
 import PartnerSidebar from '@/components/PartnerSidebar'
+import RequirementsSummary from '@/components/RequirementsSummary'
 
 async function getPartnerStats(partnerId: string): Promise<PartnerDashboardStats> {
   const [totalLeads, totalProspects, totalClients] = await Promise.all([
@@ -353,8 +354,19 @@ export default async function PartnerDashboard() {
           )}
         </div>
 
+        {/* Partner Requirements Summary */}
+        <RequirementsSummary
+          contractUrl={partner.contractUrl}
+          omniwalletAccountUrl={partner.omniwalletAccountUrl}
+          hasCompletedYearlyEvent={partner.hasCompletedYearlyEvent}
+          leads={partner.leads.map((lead) => ({
+            status: lead.status,
+            createdAt: lead.createdAt,
+          }))}
+        />
+
         {/* Quick Actions */}
-        <div className="bg-white rounded-lg shadow-sm border border-gray-200 p-6">
+        <div className="bg-white rounded-lg shadow-sm border border-gray-200 p-6 mt-8">
           <h3 className="text-base font-semibold text-gray-900 mb-4">Quick Actions</h3>
           <div className="grid grid-cols-1 md:grid-cols-3 gap-4">
             <Link
