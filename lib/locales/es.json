@@ -206,6 +206,22 @@
     "updateSuccess": "URL del contrato actualizada exitosamente",
     "updateError": "Error al actualizar el contrato"
   },
+  "omniwalletAccount": {
+    "title": "Tu Cuenta Omniwallet",
+    "ready": "Tu cuenta está lista",
+    "accessDescription": "Accede a tu panel de Omniwallet para gestionar tu wallet y transacciones",
+    "accessAccount": "Acceder a la Cuenta",
+    "notConfigured": "Cuenta aún no configurada",
+    "willBeSetup": "Tu cuenta de Omniwallet será configurada por nuestro equipo pronto. Serás notificado cuando esté lista.",
+    "configured": "Cuenta de Omniwallet Configurada",
+    "noAccountYet": "Aún no se ha configurado ninguna cuenta",
+    "addAccountUrl": "Añadir URL de Cuenta",
+    "updateAccountUrl": "Actualizar URL de Cuenta",
+    "accountUrl": "URL de la Cuenta Omniwallet",
+    "pasteAccountUrl": "Pega la URL del panel de la cuenta de Omniwallet del partner",
+    "updateSuccess": "URL de la cuenta actualizada exitosamente",
+    "updateError": "Error al actualizar la cuenta"
+  },
   "partner": {
     "myLeads": "Mis Leads"
   },

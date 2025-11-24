@@ -1,7 +1,7 @@
 import { prisma } from '@/lib/prisma'
 import { getPartnerSession } from '@/lib/session'
 import { PartnerDashboardStats, LeadStatus } from '@/types'
-import { TrendingUp, Users, DollarSign, CheckCircle, Clock, Target, FileText, Download } from 'lucide-react'
+import { TrendingUp, Users, DollarSign, CheckCircle, Clock, Target, FileText, Download, Wallet, ExternalLink } from 'lucide-react'
 import Link from 'next/link'
 import PartnerDashboardHeader from '@/components/PartnerDashboardHeader'
 import PartnerSidebar from '@/components/PartnerSidebar'
@@ -308,6 +308,45 @@ export default async function PartnerDashboard() {
                 <p className="text-sm font-medium text-gray-900 mb-1">Contract not available yet</p>
                 <p className="text-xs text-gray-600">
                   Your partnership contract will be uploaded by our team soon. You will be notified when it's available.
+                </p>
+              </div>
+            </div>
+          )}
+        </div>
+
+        {/* Omniwallet Account */}
+        <div className="bg-white rounded-lg shadow-sm border border-gray-200 p-6 mb-8">
+          <h3 className="text-base font-semibold text-gray-900 mb-4">Your Omniwallet Account</h3>
+          {partner.omniwalletAccountUrl ? (
+            <div className="flex items-start gap-4 p-4 bg-blue-50 border border-blue-200 rounded-lg">
+              <div className="bg-blue-100 p-2.5 rounded-lg">
+                <Wallet className="w-6 h-6 text-blue-700" />
+              </div>
+              <div className="flex-1">
+                <p className="text-sm font-medium text-gray-900 mb-1">Your account is ready</p>
+                <p className="text-xs text-gray-600 mb-3">
+                  Access your Omniwallet dashboard to manage your wallet and transactions
+                </p>
+                <a
+                  href={partner.omniwalletAccountUrl}
+                  target="_blank"
+                  rel="noopener noreferrer"
+                  className="inline-flex items-center gap-2 bg-blue-600 text-white px-4 py-2 rounded-md text-sm font-medium hover:bg-blue-700 transition"
+                >
+                  <ExternalLink className="w-4 h-4" />
+                  Access Account
+                </a>
+              </div>
+            </div>
+          ) : (
+            <div className="flex items-start gap-4 p-4 bg-gray-50 border border-gray-200 rounded-lg">
+              <div className="bg-gray-100 p-2.5 rounded-lg">
+                <Wallet className="w-6 h-6 text-gray-500" />
+              </div>
+              <div className="flex-1">
+                <p className="text-sm font-medium text-gray-900 mb-1">Account not configured yet</p>
+                <p className="text-xs text-gray-600">
+                  Your Omniwallet account will be set up by our team soon. You will be notified when it's ready.
                 </p>
               </div>
             </div>

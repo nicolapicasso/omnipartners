@@ -76,3 +76,21 @@ export async function updatePartnerContract(partnerId: string, contractUrl: stri
     return { success: false, error: 'Failed to update contract' }
   }
 }
+
+export async function updatePartnerOmniwalletAccount(partnerId: string, accountUrl: string) {
+  try {
+    await getAdminSession() // Verify admin
+
+    await prisma.partner.update({
+      where: { id: partnerId },
+      data: { omniwalletAccountUrl: accountUrl || null },
+    })
+
+    revalidatePath('/admin/partners')
+    revalidatePath(`/admin/partners/${partnerId}`)
+    return { success: true }
+  } catch (error) {
+    console.error('Error updating partner Omniwallet account:', error)
+    return { success: false, error: 'Failed to update Omniwallet account' }
+  }
+}

@@ -206,6 +206,22 @@
     "updateSuccess": "Contract URL updated successfully",
     "updateError": "Failed to update contract"
   },
+  "omniwalletAccount": {
+    "title": "Your Omniwallet Account",
+    "ready": "Your account is ready",
+    "accessDescription": "Access your Omniwallet dashboard to manage your wallet and transactions",
+    "accessAccount": "Access Account",
+    "notConfigured": "Account not configured yet",
+    "willBeSetup": "Your Omniwallet account will be set up by our team soon. You will be notified when it's ready.",
+    "configured": "Omniwallet Account Configured",
+    "noAccountYet": "No account configured yet",
+    "addAccountUrl": "Add Account URL",
+    "updateAccountUrl": "Update Account URL",
+    "accountUrl": "Omniwallet Account URL",
+    "pasteAccountUrl": "Paste the URL to the partner's Omniwallet account dashboard",
+    "updateSuccess": "Account URL updated successfully",
+    "updateError": "Failed to update account"
+  },
   "partner": {
     "myLeads": "My Leads"
   },

@@ -41,6 +41,9 @@ model Partner {
   // Contract URL (uploaded by admin)
   contractUrl      String?
 
+  // Omniwallet Account URL (uploaded by admin)
+  omniwalletAccountUrl String?
+
   // Relaciones
   users            User[]
   leads            Lead[]
