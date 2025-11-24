@@ -58,3 +58,21 @@ export async function activatePartner(partnerId: string) {
     return { success: false, error: 'Failed to activate partner' }
   }
 }
+
+export async function updatePartnerContract(partnerId: string, contractUrl: string) {
+  try {
+    await getAdminSession() // Verify admin
+
+    await prisma.partner.update({
+      where: { id: partnerId },
+      data: { contractUrl: contractUrl || null },
+    })
+
+    revalidatePath('/admin/partners')
+    revalidatePath(`/admin/partners/${partnerId}`)
+    return { success: true }
+  } catch (error) {
+    console.error('Error updating partner contract:', error)
+    return { success: false, error: 'Failed to update contract' }
+  }
+}

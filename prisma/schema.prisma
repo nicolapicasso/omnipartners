@@ -38,6 +38,9 @@ model Partner {
   updatedAt        DateTime @updatedAt
   approvedAt       DateTime?
 
+  // Contract URL (uploaded by admin)
+  contractUrl      String?
+
   // Relaciones
   users            User[]
   leads            Lead[]

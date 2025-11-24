@@ -1,7 +1,7 @@
 import { prisma } from '@/lib/prisma'
 import { getPartnerSession } from '@/lib/session'
 import { PartnerDashboardStats, LeadStatus } from '@/types'
-import { TrendingUp, Users, DollarSign, CheckCircle, Clock, Target } from 'lucide-react'
+import { TrendingUp, Users, DollarSign, CheckCircle, Clock, Target, FileText, Download } from 'lucide-react'
 import Link from 'next/link'
 import PartnerDashboardHeader from '@/components/PartnerDashboardHeader'
 import PartnerSidebar from '@/components/PartnerSidebar'
@@ -273,6 +273,45 @@ export default async function PartnerDashboard() {
               )}
             </div>
           </div>
+        </div>
+
+        {/* Partner Contract */}
+        <div className="bg-white rounded-lg shadow-sm border border-gray-200 p-6 mb-8">
+          <h3 className="text-base font-semibold text-gray-900 mb-4">Partner Contract</h3>
+          {partner.contractUrl ? (
+            <div className="flex items-start gap-4 p-4 bg-green-50 border border-green-200 rounded-lg">
+              <div className="bg-green-100 p-2.5 rounded-lg">
+                <FileText className="w-6 h-6 text-green-700" />
+              </div>
+              <div className="flex-1">
+                <p className="text-sm font-medium text-gray-900 mb-1">Your contract is available</p>
+                <p className="text-xs text-gray-600 mb-3">
+                  Download and review your partnership agreement
+                </p>
+                <a
+                  href={partner.contractUrl}
+                  target="_blank"
+                  rel="noopener noreferrer"
+                  className="inline-flex items-center gap-2 bg-green-600 text-white px-4 py-2 rounded-md text-sm font-medium hover:bg-green-700 transition"
+                >
+                  <Download className="w-4 h-4" />
+                  Download Contract
+                </a>
+              </div>
+            </div>
+          ) : (
+            <div className="flex items-start gap-4 p-4 bg-gray-50 border border-gray-200 rounded-lg">
+              <div className="bg-gray-100 p-2.5 rounded-lg">
+                <FileText className="w-6 h-6 text-gray-500" />
+              </div>
+              <div className="flex-1">
+                <p className="text-sm font-medium text-gray-900 mb-1">Contract not available yet</p>
+                <p className="text-xs text-gray-600">
+                  Your partnership contract will be uploaded by our team soon. You will be notified when it's available.
+                </p>
+              </div>
+            </div>
+          )}
         </div>
 
         {/* Quick Actions */}
