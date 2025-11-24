@@ -51,6 +51,14 @@ export default async function PartnerDashboard() {
 
   const partner = await prisma.partner.findUnique({
     where: { id: partnerId },
+    include: {
+      leads: {
+        select: {
+          status: true,
+          createdAt: true,
+        },
+      },
+    },
   })
 
   if (!partner) {
@@ -359,10 +367,7 @@ export default async function PartnerDashboard() {
           contractUrl={partner.contractUrl}
           omniwalletAccountUrl={partner.omniwalletAccountUrl}
           hasCompletedYearlyEvent={partner.hasCompletedYearlyEvent}
-          leads={partner.leads.map((lead) => ({
-            status: lead.status,
-            createdAt: lead.createdAt,
-          }))}
+          leads={partner.leads}
         />
 
         {/* Quick Actions */}
