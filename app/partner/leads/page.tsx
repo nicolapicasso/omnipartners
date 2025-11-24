@@ -5,6 +5,7 @@ import Link from 'next/link'
 import { Eye, Plus } from 'lucide-react'
 import PartnerDashboardHeader from '@/components/PartnerDashboardHeader'
 import PartnerSidebar from '@/components/PartnerSidebar'
+import LeadStatusLegend from '@/components/LeadStatusLegend'
 
 export default async function PartnerLeadsPage() {
   const session = await getPartnerSession()
@@ -87,6 +88,11 @@ export default async function PartnerLeadsPage() {
             <p className="text-sm font-medium text-gray-500">Clients</p>
             <p className="text-2xl font-semibold text-gray-900 mt-2">{clientCount}</p>
           </div>
+        </div>
+
+        {/* Lead Status Legend */}
+        <div className="mb-8">
+          <LeadStatusLegend />
         </div>
 
         {/* Leads Table */}

@@ -6,6 +6,8 @@ import Link from 'next/link'
 import { UserPlus, Loader2, CheckCircle } from 'lucide-react'
 import Logo from '@/components/Logo'
 import LanguageSelector from '@/components/LanguageSelector'
+import CountrySelect from '@/components/CountrySelect'
+import PhoneInput from '@/components/PhoneInput'
 import { useLanguage } from '@/lib/i18n/LanguageContext'
 
 export default function RegisterPage() {
@@ -182,14 +184,9 @@ export default function RegisterPage() {
               <label htmlFor="phone" className="block text-sm font-medium text-gray-700 mb-2">
                 {t.register.phone}
               </label>
-              <input
-                id="phone"
-                name="phone"
-                type="tel"
+              <PhoneInput
                 value={formData.phone}
-                onChange={handleChange}
-                className="w-full px-3.5 py-2.5 text-sm border border-gray-300 rounded-md focus:ring-1 focus:ring-omniwallet-primary focus:border-omniwallet-primary transition"
-                placeholder="+34 600 000 000"
+                onChange={(value) => setFormData({ ...formData, phone: value })}
               />
             </div>
 
@@ -198,15 +195,10 @@ export default function RegisterPage() {
               <label htmlFor="country" className="block text-sm font-medium text-gray-700 mb-2">
                 {t.register.country} *
               </label>
-              <input
-                id="country"
-                name="country"
-                type="text"
+              <CountrySelect
                 value={formData.country}
-                onChange={handleChange}
+                onChange={(value) => setFormData({ ...formData, country: value })}
                 required
-                className="w-full px-3.5 py-2.5 text-sm border border-gray-300 rounded-md focus:ring-1 focus:ring-omniwallet-primary focus:border-omniwallet-primary transition"
-                placeholder="España"
               />
             </div>
 
