@@ -12,25 +12,25 @@ export default function AdminSidebar() {
   const navItems = [
     {
       href: '/admin',
-      label: t.nav.dashboard,
+      label: t('nav.dashboard'),
       icon: LayoutDashboard,
       active: pathname === '/admin'
     },
     {
       href: '/admin/partners',
-      label: t.admin.managePartners,
+      label: t('admin.managePartners'),
       icon: Users,
       active: pathname?.startsWith('/admin/partners')
     },
     {
       href: '/admin/leads',
-      label: t.admin.manageLeads,
+      label: t('admin.manageLeads'),
       icon: TrendingUp,
       active: pathname?.startsWith('/admin/leads')
     },
     {
       href: '/admin/content',
-      label: t.nav.content,
+      label: t('nav.content'),
       icon: FileText,
       active: pathname?.startsWith('/admin/content')
     }

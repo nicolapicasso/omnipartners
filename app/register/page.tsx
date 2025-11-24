@@ -42,7 +42,7 @@ export default function RegisterPage() {
 
     // Validate passwords match
     if (formData.password !== formData.confirmPassword) {
-      setError(t.login.error)
+      setError(t('login.error'))
       setLoading(false)
       return
     }
@@ -66,7 +66,7 @@ export default function RegisterPage() {
       const data = await response.json()
 
       if (!response.ok) {
-        setError(data.error || t.login.error)
+        setError(data.error || t('login.error'))
         setLoading(false)
         return
       }
@@ -79,7 +79,7 @@ export default function RegisterPage() {
         router.push('/login')
       }, 3000)
     } catch (err) {
-      setError(t.login.error)
+      setError(t('login.error'))
       setLoading(false)
     }
   }
@@ -93,13 +93,13 @@ export default function RegisterPage() {
           </div>
           <CheckCircle className="w-16 h-16 text-green-500 mx-auto mb-4" />
           <h2 className="text-2xl font-semibold text-gray-900 mb-2">
-            {t.register.success}
+            {t('register.success')}
           </h2>
           <p className="text-sm text-gray-600 mb-4">
-            {t.register.pending}
+            {t('register.pending')}
           </p>
           <p className="text-xs text-gray-500">
-            {t.common.loading}
+            {t('common.loading')}
           </p>
         </div>
       </div>
@@ -115,9 +115,9 @@ export default function RegisterPage() {
             <Logo variant="dark" size="lg" />
           </div>
           <h1 className="text-2xl font-semibold text-gray-900 mb-2">
-            {t.register.title}
+            {t('register.title')}
           </h1>
-          <p className="text-sm text-gray-500">{t.register.subtitle}</p>
+          <p className="text-sm text-gray-500">{t('register.subtitle')}</p>
         </div>
 
         {/* Language Selector */}
@@ -131,7 +131,7 @@ export default function RegisterPage() {
             {/* Company Name */}
             <div className="md:col-span-2">
               <label htmlFor="companyName" className="block text-sm font-medium text-gray-700 mb-1.5">
-                {t.register.companyName} *
+                {t('register.companyName')} *
               </label>
               <input
                 id="companyName"
@@ -148,7 +148,7 @@ export default function RegisterPage() {
             {/* Contact Name */}
             <div>
               <label htmlFor="contactName" className="block text-sm font-medium text-gray-700 mb-2">
-                {t.register.contactName} *
+                {t('register.contactName')} *
               </label>
               <input
                 id="contactName"
@@ -165,7 +165,7 @@ export default function RegisterPage() {
             {/* Email */}
             <div>
               <label htmlFor="email" className="block text-sm font-medium text-gray-700 mb-2">
-                {t.login.email} *
+                {t('login.email')} *
               </label>
               <input
                 id="email"
@@ -182,7 +182,7 @@ export default function RegisterPage() {
             {/* Phone */}
             <div>
               <label htmlFor="phone" className="block text-sm font-medium text-gray-700 mb-2">
-                {t.register.phone}
+                {t('register.phone')}
               </label>
               <PhoneInput
                 value={formData.phone}
@@ -193,7 +193,7 @@ export default function RegisterPage() {
             {/* Country */}
             <div>
               <label htmlFor="country" className="block text-sm font-medium text-gray-700 mb-2">
-                {t.register.country} *
+                {t('register.country')} *
               </label>
               <CountrySelect
                 value={formData.country}
@@ -205,7 +205,7 @@ export default function RegisterPage() {
             {/* Website */}
             <div className="md:col-span-2">
               <label htmlFor="website" className="block text-sm font-medium text-gray-700 mb-2">
-                {t.register.website}
+                {t('register.website')}
               </label>
               <input
                 id="website"
@@ -221,7 +221,7 @@ export default function RegisterPage() {
             {/* Address */}
             <div className="md:col-span-2">
               <label htmlFor="address" className="block text-sm font-medium text-gray-700 mb-2">
-                {t.register.address}
+                {t('register.address')}
               </label>
               <textarea
                 id="address"
@@ -237,7 +237,7 @@ export default function RegisterPage() {
             {/* Password */}
             <div>
               <label htmlFor="password" className="block text-sm font-medium text-gray-700 mb-2">
-                {t.login.password} *
+                {t('login.password')} *
               </label>
               <input
                 id="password"
@@ -255,7 +255,7 @@ export default function RegisterPage() {
             {/* Confirm Password */}
             <div>
               <label htmlFor="confirmPassword" className="block text-sm font-medium text-gray-700 mb-2">
-                {t.login.password} *
+                {t('login.password')} *
               </label>
               <input
                 id="confirmPassword"
@@ -285,10 +285,10 @@ export default function RegisterPage() {
             {loading ? (
               <>
                 <Loader2 className="w-4 h-4 animate-spin" />
-                {t.common.loading}
+                {t('common.loading')}
               </>
             ) : (
-              t.register.submit
+              t('register.submit')
             )}
           </button>
         </form>
@@ -296,12 +296,12 @@ export default function RegisterPage() {
         {/* Footer */}
         <div className="mt-6 text-center">
           <p className="text-gray-600 text-sm">
-            {t.register.hasAccount}{' '}
+            {t('register.hasAccount')}{' '}
             <Link
               href="/login"
               className="text-omniwallet-primary font-medium hover:text-omniwallet-secondary transition"
             >
-              {t.register.login}
+              {t('register.login')}
             </Link>
           </p>
         </div>

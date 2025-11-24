@@ -26,7 +26,31 @@
     "status": "Status",
     "actions": "Actions",
     "date": "Date",
-    "download": "Download"
+    "download": "Download",
+    "logout": "Logout"
+  },
+  "login": {
+    "title": "Login",
+    "submit": "Login",
+    "subtitle": "Access your partner account",
+    "email": "Email",
+    "password": "Password",
+    "error": "Invalid email or password",
+    "noAccount": "Don't have an account?",
+    "register": "Register here"
+  },
+  "register": {
+    "title": "Partner Registration",
+    "subtitle": "Join our partner program",
+    "submit": "Register",
+    "companyName": "Company Name",
+    "contactName": "Contact Name",
+    "confirmPassword": "Confirm Password",
+    "success": "Registration successful! Your account is pending approval.",
+    "error": "Error creating account. Please try again.",
+    "passwordMismatch": "Passwords do not match",
+    "alreadyHaveAccount": "Already have an account?",
+    "loginHere": "Login here"
   },
   "auth": {
     "login": "Login",
@@ -36,6 +60,19 @@
     "signIn": "Sign In",
     "signUp": "Sign Up",
     "welcomeBack": "Welcome back"
+  },
+  "nav": {
+    "dashboard": "Dashboard",
+    "leads": "Leads",
+    "myLeads": "My Leads",
+    "commissions": "Commissions",
+    "team": "Team",
+    "myTeam": "My Team",
+    "resources": "Resources",
+    "partners": "Partners",
+    "settings": "Settings",
+    "profile": "Profile",
+    "content": "Content"
   },
   "navigation": {
     "dashboard": "Dashboard",
@@ -144,6 +181,9 @@
     "updateSuccess": "Contract URL updated successfully",
     "updateError": "Failed to update contract"
   },
+  "partner": {
+    "myLeads": "My Leads"
+  },
   "partners": {
     "title": "Partners",
     "partnerInformation": "Partner Information",
@@ -159,6 +199,8 @@
   },
   "admin": {
     "title": "Admin Panel",
-    "overview": "System overview"
+    "overview": "System overview",
+    "managePartners": "Manage Partners",
+    "manageLeads": "Manage Leads"
   }
 }

@@ -21,7 +21,7 @@ export default function LogoutButton({ className }: { className?: string }) {
       className={className || 'flex items-center gap-2 text-white hover:text-omniwallet-light transition disabled:opacity-50'}
     >
       <LogOut className="w-4 h-4" />
-      {loading ? `${t.common.loading}` : t.common.logout}
+      {loading ? `${t('common.loading')}` : t('common.logout')}
     </button>
   )
 }

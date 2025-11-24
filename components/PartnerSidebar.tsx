@@ -12,31 +12,31 @@ export default function PartnerSidebar() {
   const navItems = [
     {
       href: '/partner',
-      label: t.nav.dashboard,
+      label: t('nav.dashboard'),
       icon: LayoutDashboard,
       active: pathname === '/partner'
     },
     {
       href: '/partner/leads',
-      label: t.partner.myLeads,
+      label: t('partner.myLeads'),
       icon: TrendingUp,
       active: pathname?.startsWith('/partner/leads')
     },
     {
       href: '/partner/commissions',
-      label: t.nav.commissions,
+      label: t('nav.commissions'),
       icon: DollarSign,
       active: pathname?.startsWith('/partner/commissions')
     },
     {
       href: '/partner/resources',
-      label: t.nav.resources,
+      label: t('nav.resources'),
       icon: FileText,
       active: pathname?.startsWith('/partner/resources')
     },
     {
       href: '/partner/team',
-      label: t.nav.team,
+      label: t('nav.team'),
       icon: Users,
       active: pathname?.startsWith('/partner/team')
     }

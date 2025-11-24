@@ -26,7 +26,31 @@
     "status": "Estado",
     "actions": "Acciones",
     "date": "Fecha",
-    "download": "Descargar"
+    "download": "Descargar",
+    "logout": "Cerrar Sesión"
+  },
+  "login": {
+    "title": "Iniciar Sesión",
+    "submit": "Iniciar Sesión",
+    "subtitle": "Accede a tu cuenta de partner",
+    "email": "Email",
+    "password": "Contraseña",
+    "error": "Email o contraseña incorrectos",
+    "noAccount": "¿No tienes una cuenta?",
+    "register": "Regístrate aquí"
+  },
+  "register": {
+    "title": "Registro de Partner",
+    "subtitle": "Únete a nuestro programa de partners",
+    "submit": "Registrarse",
+    "companyName": "Nombre de la Empresa",
+    "contactName": "Nombre de Contacto",
+    "confirmPassword": "Confirmar Contraseña",
+    "success": "¡Registro exitoso! Tu cuenta está pendiente de aprobación.",
+    "error": "Error al crear la cuenta. Por favor intenta de nuevo.",
+    "passwordMismatch": "Las contraseñas no coinciden",
+    "alreadyHaveAccount": "¿Ya tienes una cuenta?",
+    "loginHere": "Inicia sesión aquí"
   },
   "auth": {
     "login": "Iniciar Sesión",
@@ -36,6 +60,19 @@
     "signIn": "Entrar",
     "signUp": "Registrarse",
     "welcomeBack": "Bienvenido de nuevo"
+  },
+  "nav": {
+    "dashboard": "Dashboard",
+    "leads": "Leads",
+    "myLeads": "Mis Leads",
+    "commissions": "Comisiones",
+    "team": "Equipo",
+    "myTeam": "Mi Equipo",
+    "resources": "Recursos",
+    "partners": "Partners",
+    "settings": "Configuración",
+    "profile": "Perfil",
+    "content": "Contenido"
   },
   "navigation": {
     "dashboard": "Dashboard",
@@ -144,6 +181,9 @@
     "updateSuccess": "URL del contrato actualizada exitosamente",
     "updateError": "Error al actualizar el contrato"
   },
+  "partner": {
+    "myLeads": "Mis Leads"
+  },
   "partners": {
     "title": "Partners",
     "partnerInformation": "Información del Partner",
@@ -159,6 +199,8 @@
   },
   "admin": {
     "title": "Panel de Administración",
-    "overview": "Vista general del sistema"
+    "overview": "Vista general del sistema",
+    "managePartners": "Gestionar Partners",
+    "manageLeads": "Gestionar Leads"
   }
 }

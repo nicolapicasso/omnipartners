@@ -41,7 +41,7 @@ export default function LoginPage() {
         router.refresh()
       }
     } catch (err) {
-      setError(t.login.error)
+      setError(t('login.error'))
       setLoading(false)
     }
   }
@@ -54,8 +54,8 @@ export default function LoginPage() {
           <div className="flex justify-center mb-6">
             <Logo variant="dark" size="lg" />
           </div>
-          <h1 className="text-2xl font-semibold text-gray-900 mb-2">{t.login.submit}</h1>
-          <p className="text-sm text-gray-500">{t.login.subtitle}</p>
+          <h1 className="text-2xl font-semibold text-gray-900 mb-2">{t('login.submit')}</h1>
+          <p className="text-sm text-gray-500">{t('login.subtitle')}</p>
         </div>
 
         {/* Language Selector */}
@@ -67,7 +67,7 @@ export default function LoginPage() {
         <form onSubmit={handleSubmit} className="space-y-5">
           <div>
             <label htmlFor="email" className="block text-sm font-medium text-gray-700 mb-1.5">
-              {t.login.email}
+              {t('login.email')}
             </label>
             <input
               id="email"
@@ -82,7 +82,7 @@ export default function LoginPage() {
 
           <div>
             <label htmlFor="password" className="block text-sm font-medium text-gray-700 mb-1.5">
-              {t.login.password}
+              {t('login.password')}
             </label>
             <input
               id="password"
@@ -109,10 +109,10 @@ export default function LoginPage() {
             {loading ? (
               <>
                 <Loader2 className="w-4 h-4 animate-spin" />
-                {t.common.loading}
+                {t('common.loading')}
               </>
             ) : (
-              t.login.submit
+              t('login.submit')
             )}
           </button>
         </form>
@@ -120,12 +120,12 @@ export default function LoginPage() {
         {/* Footer */}
         <div className="mt-6 text-center">
           <p className="text-gray-600 text-sm">
-            {t.login.noAccount}{' '}
+            {t('login.noAccount')}{' '}
             <Link
               href="/register"
               className="text-omniwallet-primary font-medium hover:text-omniwallet-secondary transition"
             >
-              {t.login.register}
+              {t('login.register')}
             </Link>
           </p>
         </div>
