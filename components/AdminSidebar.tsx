@@ -2,7 +2,7 @@
 
 import Link from 'next/link'
 import { usePathname } from 'next/navigation'
-import { LayoutDashboard, Users, TrendingUp, FileText } from 'lucide-react'
+import { LayoutDashboard, Users, TrendingUp, FileText, Award } from 'lucide-react'
 import { useTranslation } from '@/lib/contexts/LanguageContext'
 
 export default function AdminSidebar() {
@@ -33,6 +33,12 @@ export default function AdminSidebar() {
       label: t('nav.content'),
       icon: FileText,
       active: pathname?.startsWith('/admin/content')
+    },
+    {
+      href: '/admin/certification',
+      label: t('admin.manageCertification'),
+      icon: Award,
+      active: pathname?.startsWith('/admin/certification')
     }
   ]
 

@@ -47,11 +47,16 @@ model Partner {
   // Yearly event completion (webinar/joint event)
   hasCompletedYearlyEvent Boolean @default(false)
 
+  // Certification
+  isCertified      Boolean  @default(false)
+  certifiedAt      DateTime?
+
   // Relaciones
-  users            User[]
-  leads            Lead[]
-  invoices         Invoice[]
-  notifications    Notification[]
+  users                 User[]
+  leads                 Lead[]
+  invoices              Invoice[]
+  notifications         Notification[]
+  certificationAttempts CertificationAttempt[]
 
   @@map("partners")
 }
@@ -333,4 +338,85 @@ model Notification {
   createdAt DateTime @default(now())
 
   @@map("notifications")
+}
+
+// ============================================
+// CERTIFICATION SYSTEM
+// ============================================
+
+model CertificationContent {
+  id          String   @id @default(cuid())
+
+  title       String
+  content     String   // Markdown or rich text content
+  description String?
+
+  // Type: VIDEO, DOCUMENT, TEXT, EXTERNAL_LINK
+  type        String
+
+  // URL for videos or documents
+  url         String?
+
+  // Order for displaying content
+  order       Int      @default(0)
+
+  // Visibility
+  isPublished Boolean  @default(false)
+
+  createdAt   DateTime @default(now())
+  updatedAt   DateTime @updatedAt
+
+  @@map("certification_contents")
+}
+
+model CertificationQuestion {
+  id            String   @id @default(cuid())
+
+  question      String
+
+  // Options stored as JSON array: ["Option A", "Option B", "Option C", "Option D"]
+  options       String
+
+  // Correct answer index (0-based)
+  correctAnswer Int
+
+  // Optional explanation shown after answering
+  explanation   String?
+
+  // Order for displaying questions
+  order         Int      @default(0)
+
+  // Visibility
+  isActive      Boolean  @default(true)
+
+  createdAt     DateTime @default(now())
+  updatedAt     DateTime @updatedAt
+
+  @@map("certification_questions")
+}
+
+model CertificationAttempt {
+  id              String   @id @default(cuid())
+
+  partnerId       String
+  partner         Partner  @relation(fields: [partnerId], references: [id], onDelete: Cascade)
+
+  // Total questions in this attempt
+  totalQuestions  Int
+
+  // Correct answers
+  correctAnswers  Int
+
+  // Score percentage
+  score           Float
+
+  // Passed or failed (typically 70% or higher to pass)
+  passed          Boolean
+
+  // Answers stored as JSON: [{"questionId": "...", "answer": 0, "correct": true}, ...]
+  answers         String
+
+  completedAt     DateTime @default(now())
+
+  @@map("certification_attempts")
 }
