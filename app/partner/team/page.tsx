@@ -24,7 +24,7 @@ export default async function PartnerTeamPage() {
     orderBy: { createdAt: 'asc' },
     include: {
       _count: {
-        select: { createdLeads: true },
+        select: { leadsCreated: true },
       },
     },
   })
@@ -103,7 +103,7 @@ export default async function PartnerTeamPage() {
                             {getRoleLabel(member.role)}
                           </span>
                           <span className="text-sm text-gray-500">
-                            {member._count.createdLeads} leads creados
+                            {member._count.leadsCreated} leads creados
                           </span>
                         </div>
                       </div>
