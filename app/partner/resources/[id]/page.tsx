@@ -23,16 +23,16 @@ export default async function ResourceDetailPage({
     return <div>Partner not found</div>
   }
 
+  // Try to find user (for team members) or use empty favorites for partner owners
   const user = await prisma.user.findUnique({
-    where: { email: session.user.email! },
+    where: { id: session.user.id },
     include: {
       contentFavorites: true,
     },
   })
 
-  if (!user) {
-    return <div>Error loading user</div>
-  }
+  // Partner owners logged via Partner model won't have a User record
+  const contentFavorites = user?.contentFavorites || []
 
   const content = await prisma.content.findUnique({
     where: { id: params.id },
@@ -54,7 +54,7 @@ export default async function ResourceDetailPage({
     )
   }
 
-  const isFavorite = user.contentFavorites.some((f) => f.contentId === content.id)
+  const isFavorite = contentFavorites.some((f) => f.contentId === content.id)
 
   // Get related content
   const relatedContent = await prisma.content.findMany({
