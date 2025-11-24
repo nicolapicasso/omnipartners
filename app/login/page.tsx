@@ -7,11 +7,11 @@ import Link from 'next/link'
 import { LogIn, Loader2 } from 'lucide-react'
 import Logo from '@/components/Logo'
 import LanguageSelector from '@/components/LanguageSelector'
-import { useLanguage } from '@/lib/i18n/LanguageContext'
+import { useTranslation } from '@/lib/contexts/LanguageContext'
 
 export default function LoginPage() {
   const router = useRouter()
-  const { t } = useLanguage()
+  const { t } = useTranslation()
   const [email, setEmail] = useState('')
   const [password, setPassword] = useState('')
   const [error, setError] = useState('')

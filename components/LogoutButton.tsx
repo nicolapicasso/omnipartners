@@ -3,11 +3,11 @@
 import { signOut } from 'next-auth/react'
 import { LogOut } from 'lucide-react'
 import { useState } from 'react'
-import { useLanguage } from '@/lib/i18n/LanguageContext'
+import { useTranslation } from '@/lib/contexts/LanguageContext'
 
 export default function LogoutButton({ className }: { className?: string }) {
   const [loading, setLoading] = useState(false)
-  const { t } = useLanguage()
+  const { t } = useTranslation()
 
   const handleLogout = async () => {
     setLoading(true)

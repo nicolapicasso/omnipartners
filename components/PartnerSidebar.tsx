@@ -3,11 +3,11 @@
 import Link from 'next/link'
 import { usePathname } from 'next/navigation'
 import { LayoutDashboard, TrendingUp, DollarSign, FileText, Users } from 'lucide-react'
-import { useLanguage } from '@/lib/i18n/LanguageContext'
+import { useTranslation } from '@/lib/contexts/LanguageContext'
 
 export default function PartnerSidebar() {
   const pathname = usePathname()
-  const { t } = useLanguage()
+  const { t } = useTranslation()
 
   const navItems = [
     {

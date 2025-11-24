@@ -8,11 +8,11 @@ import Logo from '@/components/Logo'
 import LanguageSelector from '@/components/LanguageSelector'
 import CountrySelect from '@/components/CountrySelect'
 import PhoneInput from '@/components/PhoneInput'
-import { useLanguage } from '@/lib/i18n/LanguageContext'
+import { useTranslation } from '@/lib/contexts/LanguageContext'
 
 export default function RegisterPage() {
   const router = useRouter()
-  const { t } = useLanguage()
+  const { t } = useTranslation()
   const [formData, setFormData] = useState({
     email: '',
     password: '',
