@@ -21,7 +21,7 @@ export default function PartnerDashboardHeader({ userName, companyName }: Partne
               {companyName}
             </span>
             <LanguageSelector />
-            <LogoutButton className="text-sm text-gray-600 hover:text-gray-900 transition" />
+            <LogoutButton className="flex items-center gap-2 px-3 py-2 text-sm text-gray-700 hover:bg-gray-100 rounded-md transition" />
           </div>
         </div>
       </div>

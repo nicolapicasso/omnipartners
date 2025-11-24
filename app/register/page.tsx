@@ -22,7 +22,6 @@ export default function RegisterPage() {
     phone: '',
     country: '',
     website: '',
-    address: '',
   })
   const [error, setError] = useState('')
   const [loading, setLoading] = useState(false)
@@ -59,7 +58,6 @@ export default function RegisterPage() {
           phone: formData.phone || undefined,
           country: formData.country,
           website: formData.website || undefined,
-          address: formData.address || undefined,
         }),
       })
 
@@ -218,22 +216,6 @@ export default function RegisterPage() {
               />
             </div>
 
-            {/* Address */}
-            <div className="md:col-span-2">
-              <label htmlFor="address" className="block text-sm font-medium text-gray-700 mb-2">
-                {t('register.address')}
-              </label>
-              <textarea
-                id="address"
-                name="address"
-                value={formData.address}
-                onChange={handleChange}
-                rows={2}
-                className="w-full px-3.5 py-2.5 text-sm border border-gray-300 rounded-md focus:ring-1 focus:ring-omniwallet-primary focus:border-omniwallet-primary transition"
-                placeholder="Calle Principal 123, Barcelona"
-              />
-            </div>
-
             {/* Password */}
             <div>
               <label htmlFor="password" className="block text-sm font-medium text-gray-700 mb-2">
@@ -255,7 +237,7 @@ export default function RegisterPage() {
             {/* Confirm Password */}
             <div>
               <label htmlFor="confirmPassword" className="block text-sm font-medium text-gray-700 mb-2">
-                {t('login.password')} *
+                {t('register.confirmPassword')} *
               </label>
               <input
                 id="confirmPassword"
