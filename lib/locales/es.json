@@ -300,6 +300,57 @@
       "order": "Orden",
       "active": "Activa",
       "noQuestions": "No hay preguntas disponibles"
-    }
+    },
+    "getCertified": "Obtén tu Certificación",
+    "getCertifiedDescription": "Completa el examen de certificación para convertirte en un Omniwallet Loyalty Partner oficial",
+    "studyDescription": "Estudia los materiales a continuación y realiza el examen cuando estés listo. Necesitas 70% o más para aprobar.",
+    "youAreCertified": "¡Estás Certificado!",
+    "resourcesAvailable": "recursos disponibles",
+    "reviewContent": "Revisa el contenido educativo y prepárate para el examen de certificación",
+    "testKnowledge": "Pon a prueba tus conocimientos y obtén tu insignia de certificación",
+    "questions": "preguntas",
+    "backToOverview": "Volver al Resumen",
+    "noStudyMaterials": "Aún no hay materiales de estudio disponibles",
+    "answerAllQuestions": "Por favor responde todas las preguntas antes de enviar",
+    "answered": "respondidas",
+    "previous": "Anterior"
+  },
+  "requirements": {
+    "title": "Requisitos del Partner",
+    "subtitle": "Sigue tu progreso para cumplir con los requisitos del programa de partners de Omniwallet",
+    "overallProgress": "Progreso General",
+    "requirementsCompleted": "requisitos completados",
+    "complete": "Completado",
+    "congratulations": "🎉 ¡Felicitaciones! ¡Has cumplido con todos los requisitos del partner!",
+    "completed": "Completado",
+    "inProgress": "En Progreso",
+    "progress": "Progreso",
+    "contract": {
+      "title": "Firmar Contrato de Partnership",
+      "description": "Revisa y firma el acuerdo oficial de partnership con Omniwallet"
+    },
+    "account": {
+      "title": "Cuenta Omniwallet Partner",
+      "description": "Tener una cuenta activa de partner de Omniwallet configurada"
+    },
+    "leads": {
+      "title": "Crear 10+ Leads por Año",
+      "description": "Generar al menos 10 leads de calidad para Omniwallet anualmente"
+    },
+    "prospects": {
+      "title": "Convertir 5+ Leads a Prospects",
+      "description": "Tener al menos 5 leads que reciban demostraciones del producto anualmente"
+    },
+    "clients": {
+      "title": "Cerrar 2+ Clientes por Año",
+      "description": "Convertir exitosamente al menos 2 prospects en clientes de pago anualmente"
+    },
+    "event": {
+      "title": "Organizar/Asistir a Evento Conjunto",
+      "description": "Participar en al menos un webinar o evento conjunto con Omniwallet por año"
+    },
+    "helpTitle": "¿Necesitas Ayuda?",
+    "helpDescription": "Si tienes preguntas sobre algún requisito o necesitas asistencia, contacta a tu gerente de partnership de Omniwallet o comunícate con nuestro equipo de soporte.",
+    "contactSupport": "Contactar Soporte"
   }
 }
