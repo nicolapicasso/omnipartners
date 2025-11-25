@@ -3,6 +3,7 @@
 import { useState } from 'react'
 import { Award, BookOpen, CheckCircle, XCircle, ExternalLink, FileText, Video, Link as LinkIcon } from 'lucide-react'
 import { submitCertificationExam } from './actions'
+import { useTranslation } from '@/lib/contexts/LanguageContext'
 
 type ContentItem = {
   id: string
@@ -43,6 +44,7 @@ export default function CertificationPortal({
   questions: QuestionItem[]
   attempts: AttemptItem[]
 }) {
+  const { t } = useTranslation()
   const [view, setView] = useState<'overview' | 'content' | 'exam' | 'results'>('overview')
   const [currentQuestion, setCurrentQuestion] = useState(0)
   const [answers, setAnswers] = useState<{ [key: number]: number }>({})
@@ -78,7 +80,7 @@ export default function CertificationPortal({
   const handleSubmitExam = async () => {
     // Check all questions answered
     if (Object.keys(answers).length < questions.length) {
-      alert('Please answer all questions before submitting')
+      alert(t('certification.answerAllQuestions'))
       return
     }
 
@@ -116,8 +118,8 @@ export default function CertificationPortal({
             <div className="flex items-center gap-4 mb-4">
               <Award className="w-12 h-12 text-omniwallet-primary" />
               <div>
-                <h1 className="text-3xl font-bold text-gray-900">Loyalty Partner Certification</h1>
-                <p className="text-gray-600">Become a certified Omniwallet Loyalty Partner</p>
+                <h1 className="text-3xl font-bold text-gray-900">{t('certification.title')}</h1>
+                <p className="text-gray-600">{t('certification.getCertifiedDescription')}</p>
               </div>
             </div>
 
@@ -126,27 +128,27 @@ export default function CertificationPortal({
               <div className="bg-gradient-to-r from-green-50 to-emerald-50 border-2 border-green-200 rounded-lg p-6">
                 <div className="flex items-center gap-3 mb-2">
                   <CheckCircle className="w-6 h-6 text-green-600" />
-                  <h2 className="text-xl font-bold text-green-900">You are Certified!</h2>
+                  <h2 className="text-xl font-bold text-green-900">{t('certification.youAreCertified')}</h2>
                 </div>
                 <p className="text-green-700">
-                  Certified since {certifiedAt ? new Date(certifiedAt).toLocaleDateString() : 'N/A'}
+                  {t('certification.certifiedSince')} {certifiedAt ? new Date(certifiedAt).toLocaleDateString() : 'N/A'}
                 </p>
                 <div className="mt-4 inline-flex items-center gap-2 bg-white px-4 py-2 rounded-lg shadow-sm border border-green-200">
                   <Award className="w-5 h-5 text-green-600" />
-                  <span className="font-semibold text-green-900">Certified Loyalty Partner</span>
+                  <span className="font-semibold text-green-900">{t('certification.badge')}</span>
                 </div>
               </div>
             ) : (
               <div className="bg-gradient-to-r from-blue-50 to-indigo-50 border-2 border-blue-200 rounded-lg p-6">
                 <div className="flex items-center gap-3 mb-2">
                   <Award className="w-6 h-6 text-blue-600" />
-                  <h2 className="text-xl font-bold text-blue-900">Get Certified</h2>
+                  <h2 className="text-xl font-bold text-blue-900">{t('certification.getCertified')}</h2>
                 </div>
                 <p className="text-blue-700 mb-4">
-                  Complete the certification exam to become an official Omniwallet Loyalty Partner
+                  {t('certification.getCertifiedDescription')}
                 </p>
                 <p className="text-sm text-blue-600">
-                  Study the materials below and take the exam when you're ready. You need 70% or higher to pass.
+                  {t('certification.studyDescription')}
                 </p>
               </div>
             )}
@@ -163,12 +165,12 @@ export default function CertificationPortal({
                   <BookOpen className="w-6 h-6 text-blue-600" />
                 </div>
                 <div>
-                  <h3 className="text-lg font-semibold text-gray-900">Study Materials</h3>
-                  <p className="text-sm text-gray-600">{contents.length} resources available</p>
+                  <h3 className="text-lg font-semibold text-gray-900">{t('certification.studyMaterials')}</h3>
+                  <p className="text-sm text-gray-600">{contents.length} {t('certification.resourcesAvailable')}</p>
                 </div>
               </div>
               <p className="text-sm text-gray-600">
-                Review educational content and prepare for the certification exam
+                {t('certification.reviewContent')}
               </p>
             </button>
 
@@ -183,13 +185,13 @@ export default function CertificationPortal({
                 </div>
                 <div>
                   <h3 className="text-lg font-semibold text-white">
-                    {isCertified ? 'Retake Exam' : 'Take Certification Exam'}
+                    {isCertified ? t('certification.retakeExam') : t('certification.takeExam')}
                   </h3>
-                  <p className="text-sm text-white/90">{questions.length} questions</p>
+                  <p className="text-sm text-white/90">{questions.length} {t('certification.questions')}</p>
                 </div>
               </div>
               <p className="text-sm text-white/90">
-                Test your knowledge and earn your certification badge
+                {t('certification.testKnowledge')}
               </p>
             </button>
           </div>
@@ -197,7 +199,7 @@ export default function CertificationPortal({
           {/* Previous Attempts */}
           {attempts.length > 0 && (
             <div className="bg-white rounded-lg shadow-sm border border-gray-200 p-6">
-              <h3 className="text-lg font-semibold text-gray-900 mb-4">Previous Attempts</h3>
+              <h3 className="text-lg font-semibold text-gray-900 mb-4">{t('certification.previousAttempts')}</h3>
               <div className="space-y-3">
                 {attempts.map((attempt) => (
                   <div
@@ -216,7 +218,7 @@ export default function CertificationPortal({
                           {new Date(attempt.completedAt).toLocaleTimeString()}
                         </p>
                         <p className="text-xs text-gray-600">
-                          {attempt.correctAnswers} / {attempt.totalQuestions} correct
+                          {attempt.correctAnswers} / {attempt.totalQuestions} {t('certification.answered')}
                         </p>
                       </div>
                     </div>
@@ -224,7 +226,7 @@ export default function CertificationPortal({
                       <p className={`text-lg font-bold ${attempt.passed ? 'text-green-600' : 'text-red-600'}`}>
                         {attempt.score.toFixed(1)}%
                       </p>
-                      <p className="text-xs text-gray-600">{attempt.passed ? 'Passed' : 'Failed'}</p>
+                      <p className="text-xs text-gray-600">{attempt.passed ? t('certification.passed') : t('certification.failed')}</p>
                     </div>
                   </div>
                 ))}
@@ -242,16 +244,16 @@ export default function CertificationPortal({
               onClick={() => setView('overview')}
               className="text-omniwallet-primary hover:text-omniwallet-secondary font-medium text-sm mb-4"
             >
-              ← Back to Overview
+              ← {t('certification.backToOverview')}
             </button>
-            <h1 className="text-3xl font-bold text-gray-900 mb-2">Study Materials</h1>
-            <p className="text-gray-600">Review these materials to prepare for your certification exam</p>
+            <h1 className="text-3xl font-bold text-gray-900 mb-2">{t('certification.studyMaterials')}</h1>
+            <p className="text-gray-600">{t('certification.reviewContent')}</p>
           </div>
 
           <div className="space-y-6">
             {contents.length === 0 ? (
               <div className="bg-white rounded-lg shadow-sm border border-gray-200 p-8 text-center">
-                <p className="text-gray-500">No study materials available yet</p>
+                <p className="text-gray-500">{t('certification.noStudyMaterials')}</p>
               </div>
             ) : (
               contents.map((content) => (
@@ -291,7 +293,7 @@ export default function CertificationPortal({
                           rel="noopener noreferrer"
                           className="inline-flex items-center gap-2 text-omniwallet-primary hover:text-omniwallet-secondary font-medium text-sm"
                         >
-                          View Resource
+                          {t('certification.viewContent')}
                           <ExternalLink className="w-4 h-4" />
                         </a>
                       )}
@@ -309,7 +311,7 @@ export default function CertificationPortal({
               className="inline-flex items-center gap-2 bg-omniwallet-primary text-white px-6 py-3 rounded-md font-medium hover:bg-omniwallet-secondary transition disabled:opacity-50"
             >
               <Award className="w-5 h-5" />
-              {isCertified ? 'Retake Certification Exam' : 'Take Certification Exam'}
+              {isCertified ? t('certification.retakeExam') : t('certification.takeExam')}
             </button>
           </div>
         </div>
@@ -320,12 +322,12 @@ export default function CertificationPortal({
         <div>
           <div className="mb-6">
             <div className="flex items-center justify-between mb-4">
-              <h1 className="text-3xl font-bold text-gray-900">Certification Exam</h1>
+              <h1 className="text-3xl font-bold text-gray-900">{t('certification.examTitle')}</h1>
               <div className="text-right">
                 <p className="text-sm text-gray-600">
-                  Question {currentQuestion + 1} of {questions.length}
+                  {t('certification.question')} {currentQuestion + 1} {t('certification.of')} {questions.length}
                 </p>
-                <p className="text-xs text-gray-500">Passing score: 70%</p>
+                <p className="text-xs text-gray-500">{t('certification.passingScore')}</p>
               </div>
             </div>
 
@@ -386,11 +388,11 @@ export default function CertificationPortal({
               disabled={currentQuestion === 0}
               className="px-6 py-3 bg-gray-200 text-gray-700 rounded-md font-medium hover:bg-gray-300 transition disabled:opacity-50 disabled:cursor-not-allowed"
             >
-              Previous
+              {t('certification.previous')}
             </button>
 
             <div className="text-sm text-gray-600">
-              {Object.keys(answers).length} / {questions.length} answered
+              {Object.keys(answers).length} / {questions.length} {t('certification.answered')}
             </div>
 
             {currentQuestion === questions.length - 1 ? (
@@ -399,7 +401,7 @@ export default function CertificationPortal({
                 disabled={submitting || Object.keys(answers).length < questions.length}
                 className="px-6 py-3 bg-omniwallet-primary text-white rounded-md font-medium hover:bg-omniwallet-secondary transition disabled:opacity-50 disabled:cursor-not-allowed"
               >
-                {submitting ? 'Submitting...' : 'Submit Exam'}
+                {submitting ? t('common.submitting') : t('certification.finishExam')}
               </button>
             ) : (
               <button
@@ -407,7 +409,7 @@ export default function CertificationPortal({
                 disabled={currentQuestion === questions.length - 1}
                 className="px-6 py-3 bg-omniwallet-primary text-white rounded-md font-medium hover:bg-omniwallet-secondary transition disabled:opacity-50 disabled:cursor-not-allowed"
               >
-                Next
+                {t('certification.nextQuestion')}
               </button>
             )}
           </div>
@@ -428,9 +430,9 @@ export default function CertificationPortal({
               )}
             </div>
 
-            <h1 className="text-3xl font-bold text-gray-900 mb-2">Exam Results</h1>
+            <h1 className="text-3xl font-bold text-gray-900 mb-2">{t('certification.examResults')}</h1>
             <p className={`text-lg ${examResults.passed ? 'text-green-600' : 'text-red-600'}`}>
-              {examResults.passed ? 'Congratulations! You passed!' : 'You did not pass this time'}
+              {examResults.passed ? t('certification.passed') : t('certification.failed')}
             </p>
           </div>
 
@@ -444,16 +446,16 @@ export default function CertificationPortal({
               {examResults.score.toFixed(1)}%
             </div>
             <p className={`text-lg mb-4 ${examResults.passed ? 'text-green-700' : 'text-red-700'}`}>
-              {examResults.correctAnswers} out of {examResults.totalQuestions} correct
+              {examResults.correctAnswers} {t('certification.of')} {examResults.totalQuestions} {t('certification.answered')}
             </p>
             {examResults.passed ? (
               <div className="inline-flex items-center gap-2 bg-white px-4 py-2 rounded-lg shadow-sm border border-green-200">
                 <Award className="w-5 h-5 text-green-600" />
-                <span className="font-semibold text-green-900">Certified Loyalty Partner</span>
+                <span className="font-semibold text-green-900">{t('certification.badge')}</span>
               </div>
             ) : (
               <p className="text-sm text-red-600">
-                You need 70% or higher to pass. Review the study materials and try again.
+                {t('certification.studyDescription')}
               </p>
             )}
           </div>
@@ -464,14 +466,14 @@ export default function CertificationPortal({
               onClick={() => setView('overview')}
               className="px-6 py-3 bg-gray-200 text-gray-700 rounded-md font-medium hover:bg-gray-300 transition"
             >
-              Back to Overview
+              {t('certification.backToCertification')}
             </button>
             {!examResults.passed && (
               <button
                 onClick={handleStartExam}
                 className="px-6 py-3 bg-omniwallet-primary text-white rounded-md font-medium hover:bg-omniwallet-secondary transition"
               >
-                Try Again
+                {t('certification.tryAgain')}
               </button>
             )}
           </div>

@@ -10,6 +10,7 @@ import {
   updateCertificationQuestion,
   deleteCertificationQuestion,
 } from './actions'
+import { useTranslation } from '@/lib/contexts/LanguageContext'
 
 type ContentItem = {
   id: string
@@ -43,11 +44,12 @@ export default function CertificationManagement({
   contents: ContentItem[]
   questions: QuestionItem[]
 }) {
+  const { t } = useTranslation()
   const [activeTab, setActiveTab] = useState<'content' | 'questions'>('content')
 
   return (
     <div>
-      <h1 className="text-3xl font-bold text-gray-900 mb-6">Manage Certification</h1>
+      <h1 className="text-3xl font-bold text-gray-900 mb-6">{t('admin.manageCertification')}</h1>
 
       {/* Tabs */}
       <div className="flex border-b border-gray-200 mb-6">
@@ -59,7 +61,7 @@ export default function CertificationManagement({
               : 'text-gray-600 hover:text-gray-900'
           }`}
         >
-          Study Materials
+          {t('certification.studyMaterials')}
         </button>
         <button
           onClick={() => setActiveTab('questions')}
@@ -69,7 +71,7 @@ export default function CertificationManagement({
               : 'text-gray-600 hover:text-gray-900'
           }`}
         >
-          Exam Questions
+          {t('certification.adminQuestions.title')}
         </button>
       </div>
 
@@ -84,6 +86,7 @@ export default function CertificationManagement({
 
 // Content Management Component
 function ContentManagement({ contents }: { contents: ContentItem[] }) {
+  const { t } = useTranslation()
   const [showForm, setShowForm] = useState(false)
   const [editingId, setEditingId] = useState<string | null>(null)
   const [loading, setLoading] = useState(false)
@@ -144,7 +147,7 @@ function ContentManagement({ contents }: { contents: ContentItem[] }) {
   }
 
   const handleDelete = async (id: string) => {
-    if (!confirm('Are you sure you want to delete this content?')) return
+    if (!confirm(t('common.delete') + '?')) return
 
     setLoading(true)
     const result = await deleteCertificationContent(id)
@@ -161,14 +164,14 @@ function ContentManagement({ contents }: { contents: ContentItem[] }) {
   return (
     <div>
       <div className="flex justify-between items-center mb-6">
-        <h2 className="text-xl font-semibold text-gray-900">Study Materials</h2>
+        <h2 className="text-xl font-semibold text-gray-900">{t('certification.studyMaterials')}</h2>
         {!showForm && (
           <button
             onClick={() => setShowForm(true)}
             className="inline-flex items-center gap-2 bg-omniwallet-primary text-white px-4 py-2 rounded-md text-sm font-medium hover:bg-omniwallet-secondary transition"
           >
             <Plus className="w-4 h-4" />
-            Add Content
+            {t('certification.adminContent.addContent')}
           </button>
         )}
       </div>
@@ -177,12 +180,12 @@ function ContentManagement({ contents }: { contents: ContentItem[] }) {
       {showForm && (
         <form onSubmit={handleSubmit} className="bg-white rounded-lg shadow-sm border border-gray-200 p-6 mb-6">
           <h3 className="text-lg font-semibold text-gray-900 mb-4">
-            {editingId ? 'Edit Content' : 'Add New Content'}
+            {editingId ? t('certification.adminContent.editContent') : t('certification.adminContent.addContent')}
           </h3>
 
           <div className="space-y-4">
             <div>
-              <label className="block text-sm font-medium text-gray-700 mb-1">Title *</label>
+              <label className="block text-sm font-medium text-gray-700 mb-1">{t('certification.adminContent.contentTitle')} *</label>
               <input
                 type="text"
                 value={formData.title}
@@ -193,7 +196,7 @@ function ContentManagement({ contents }: { contents: ContentItem[] }) {
             </div>
 
             <div>
-              <label className="block text-sm font-medium text-gray-700 mb-1">Description</label>
+              <label className="block text-sm font-medium text-gray-700 mb-1">{t('certification.adminContent.contentDescription')}</label>
               <input
                 type="text"
                 value={formData.description}
@@ -203,7 +206,7 @@ function ContentManagement({ contents }: { contents: ContentItem[] }) {
             </div>
 
             <div>
-              <label className="block text-sm font-medium text-gray-700 mb-1">Type *</label>
+              <label className="block text-sm font-medium text-gray-700 mb-1">{t('certification.adminContent.contentType')} *</label>
               <select
                 value={formData.type}
                 onChange={(e) => setFormData({ ...formData, type: e.target.value })}
@@ -218,7 +221,7 @@ function ContentManagement({ contents }: { contents: ContentItem[] }) {
 
             {(formData.type === 'VIDEO' || formData.type === 'DOCUMENT' || formData.type === 'EXTERNAL_LINK') && (
               <div>
-                <label className="block text-sm font-medium text-gray-700 mb-1">URL</label>
+                <label className="block text-sm font-medium text-gray-700 mb-1">{t('certification.adminContent.contentUrl')}</label>
                 <input
                   type="url"
                   value={formData.url}
@@ -230,7 +233,7 @@ function ContentManagement({ contents }: { contents: ContentItem[] }) {
             )}
 
             <div>
-              <label className="block text-sm font-medium text-gray-700 mb-1">Content *</label>
+              <label className="block text-sm font-medium text-gray-700 mb-1">{t('certification.adminContent.content')} *</label>
               <textarea
                 value={formData.content}
                 onChange={(e) => setFormData({ ...formData, content: e.target.value })}
@@ -243,7 +246,7 @@ function ContentManagement({ contents }: { contents: ContentItem[] }) {
 
             <div className="grid grid-cols-2 gap-4">
               <div>
-                <label className="block text-sm font-medium text-gray-700 mb-1">Order</label>
+                <label className="block text-sm font-medium text-gray-700 mb-1">{t('certification.adminContent.order')}</label>
                 <input
                   type="number"
                   value={formData.order}
@@ -261,7 +264,7 @@ function ContentManagement({ contents }: { contents: ContentItem[] }) {
                     onChange={(e) => setFormData({ ...formData, isPublished: e.target.checked })}
                     className="w-4 h-4 text-omniwallet-primary focus:ring-omniwallet-primary"
                   />
-                  <span className="text-sm font-medium text-gray-700">Published</span>
+                  <span className="text-sm font-medium text-gray-700">{t('certification.adminContent.published')}</span>
                 </label>
               </div>
             </div>
@@ -274,7 +277,7 @@ function ContentManagement({ contents }: { contents: ContentItem[] }) {
               className="inline-flex items-center gap-2 bg-omniwallet-primary text-white px-4 py-2 rounded-md text-sm font-medium hover:bg-omniwallet-secondary transition disabled:opacity-50"
             >
               <Save className="w-4 h-4" />
-              {loading ? 'Saving...' : 'Save'}
+              {loading ? t('common.submitting') : t('common.save')}
             </button>
             <button
               type="button"
@@ -283,7 +286,7 @@ function ContentManagement({ contents }: { contents: ContentItem[] }) {
               className="inline-flex items-center gap-2 bg-gray-200 text-gray-700 px-4 py-2 rounded-md text-sm font-medium hover:bg-gray-300 transition"
             >
               <X className="w-4 h-4" />
-              Cancel
+              {t('common.cancel')}
             </button>
           </div>
         </form>
@@ -293,7 +296,7 @@ function ContentManagement({ contents }: { contents: ContentItem[] }) {
       <div className="space-y-4">
         {contents.length === 0 ? (
           <div className="bg-white rounded-lg shadow-sm border border-gray-200 p-8 text-center">
-            <p className="text-gray-500">No content available</p>
+            <p className="text-gray-500">{t('certification.adminContent.noContent')}</p>
           </div>
         ) : (
           contents.map((content) => (
@@ -307,7 +310,7 @@ function ContentManagement({ contents }: { contents: ContentItem[] }) {
                     </span>
                     {content.isPublished ? (
                       <span className="text-xs px-2 py-1 rounded-full bg-green-100 text-green-700">
-                        Published
+                        {t('certification.adminContent.published')}
                       </span>
                     ) : (
                       <span className="text-xs px-2 py-1 rounded-full bg-gray-100 text-gray-700">
@@ -318,7 +321,7 @@ function ContentManagement({ contents }: { contents: ContentItem[] }) {
                   {content.description && (
                     <p className="text-sm text-gray-600 mb-2">{content.description}</p>
                   )}
-                  <p className="text-sm text-gray-500">Order: {content.order}</p>
+                  <p className="text-sm text-gray-500">{t('certification.adminContent.order')}: {content.order}</p>
                 </div>
 
                 <div className="flex gap-2">
@@ -346,6 +349,7 @@ function ContentManagement({ contents }: { contents: ContentItem[] }) {
 
 // Question Management Component
 function QuestionManagement({ questions }: { questions: QuestionItem[] }) {
+  const { t } = useTranslation()
   const [showForm, setShowForm] = useState(false)
   const [editingId, setEditingId] = useState<string | null>(null)
   const [loading, setLoading] = useState(false)
@@ -403,7 +407,7 @@ function QuestionManagement({ questions }: { questions: QuestionItem[] }) {
   }
 
   const handleDelete = async (id: string) => {
-    if (!confirm('Are you sure you want to delete this question?')) return
+    if (!confirm(t('common.delete') + '?')) return
 
     setLoading(true)
     const result = await deleteCertificationQuestion(id)
@@ -426,14 +430,14 @@ function QuestionManagement({ questions }: { questions: QuestionItem[] }) {
   return (
     <div>
       <div className="flex justify-between items-center mb-6">
-        <h2 className="text-xl font-semibold text-gray-900">Exam Questions</h2>
+        <h2 className="text-xl font-semibold text-gray-900">{t('certification.adminQuestions.title')}</h2>
         {!showForm && (
           <button
             onClick={() => setShowForm(true)}
             className="inline-flex items-center gap-2 bg-omniwallet-primary text-white px-4 py-2 rounded-md text-sm font-medium hover:bg-omniwallet-secondary transition"
           >
             <Plus className="w-4 h-4" />
-            Add Question
+            {t('certification.adminQuestions.addQuestion')}
           </button>
         )}
       </div>
@@ -442,12 +446,12 @@ function QuestionManagement({ questions }: { questions: QuestionItem[] }) {
       {showForm && (
         <form onSubmit={handleSubmit} className="bg-white rounded-lg shadow-sm border border-gray-200 p-6 mb-6">
           <h3 className="text-lg font-semibold text-gray-900 mb-4">
-            {editingId ? 'Edit Question' : 'Add New Question'}
+            {editingId ? t('certification.adminQuestions.editQuestion') : t('certification.adminQuestions.addQuestion')}
           </h3>
 
           <div className="space-y-4">
             <div>
-              <label className="block text-sm font-medium text-gray-700 mb-1">Question *</label>
+              <label className="block text-sm font-medium text-gray-700 mb-1">{t('certification.adminQuestions.questionText')} *</label>
               <textarea
                 value={formData.question}
                 onChange={(e) => setFormData({ ...formData, question: e.target.value })}
@@ -458,7 +462,7 @@ function QuestionManagement({ questions }: { questions: QuestionItem[] }) {
             </div>
 
             <div>
-              <label className="block text-sm font-medium text-gray-700 mb-2">Options *</label>
+              <label className="block text-sm font-medium text-gray-700 mb-2">{t('certification.adminQuestions.options')} *</label>
               <div className="space-y-2">
                 {formData.options.map((option, index) => (
                   <div key={index} className="flex items-center gap-2">
@@ -478,7 +482,7 @@ function QuestionManagement({ questions }: { questions: QuestionItem[] }) {
             </div>
 
             <div>
-              <label className="block text-sm font-medium text-gray-700 mb-1">Correct Answer *</label>
+              <label className="block text-sm font-medium text-gray-700 mb-1">{t('certification.adminQuestions.correctAnswer')} *</label>
               <select
                 value={formData.correctAnswer}
                 onChange={(e) => setFormData({ ...formData, correctAnswer: parseInt(e.target.value) })}
@@ -486,26 +490,26 @@ function QuestionManagement({ questions }: { questions: QuestionItem[] }) {
               >
                 {formData.options.map((_, index) => (
                   <option key={index} value={index}>
-                    {String.fromCharCode(65 + index)}. {formData.options[index] || `Option ${index + 1}`}
+                    {String.fromCharCode(65 + index)}. {formData.options[index] || `${t('certification.adminQuestions.option')} ${index + 1}`}
                   </option>
                 ))}
               </select>
             </div>
 
             <div>
-              <label className="block text-sm font-medium text-gray-700 mb-1">Explanation (Optional)</label>
+              <label className="block text-sm font-medium text-gray-700 mb-1">{t('certification.adminQuestions.explanation')}</label>
               <textarea
                 value={formData.explanation}
                 onChange={(e) => setFormData({ ...formData, explanation: e.target.value })}
                 rows={3}
                 className="w-full border border-gray-300 rounded-md px-3 py-2 text-sm focus:ring-2 focus:ring-omniwallet-primary focus:border-transparent"
-                placeholder="Explain why this is the correct answer"
+                placeholder={t('certification.adminQuestions.explanation')}
               />
             </div>
 
             <div className="grid grid-cols-2 gap-4">
               <div>
-                <label className="block text-sm font-medium text-gray-700 mb-1">Order</label>
+                <label className="block text-sm font-medium text-gray-700 mb-1">{t('certification.adminQuestions.order')}</label>
                 <input
                   type="number"
                   value={formData.order}
@@ -523,7 +527,7 @@ function QuestionManagement({ questions }: { questions: QuestionItem[] }) {
                     onChange={(e) => setFormData({ ...formData, isActive: e.target.checked })}
                     className="w-4 h-4 text-omniwallet-primary focus:ring-omniwallet-primary"
                   />
-                  <span className="text-sm font-medium text-gray-700">Active</span>
+                  <span className="text-sm font-medium text-gray-700">{t('certification.adminQuestions.active')}</span>
                 </label>
               </div>
             </div>
@@ -536,7 +540,7 @@ function QuestionManagement({ questions }: { questions: QuestionItem[] }) {
               className="inline-flex items-center gap-2 bg-omniwallet-primary text-white px-4 py-2 rounded-md text-sm font-medium hover:bg-omniwallet-secondary transition disabled:opacity-50"
             >
               <Save className="w-4 h-4" />
-              {loading ? 'Saving...' : 'Save'}
+              {loading ? t('common.submitting') : t('common.save')}
             </button>
             <button
               type="button"
@@ -545,7 +549,7 @@ function QuestionManagement({ questions }: { questions: QuestionItem[] }) {
               className="inline-flex items-center gap-2 bg-gray-200 text-gray-700 px-4 py-2 rounded-md text-sm font-medium hover:bg-gray-300 transition"
             >
               <X className="w-4 h-4" />
-              Cancel
+              {t('common.cancel')}
             </button>
           </div>
         </form>
@@ -555,7 +559,7 @@ function QuestionManagement({ questions }: { questions: QuestionItem[] }) {
       <div className="space-y-4">
         {questions.length === 0 ? (
           <div className="bg-white rounded-lg shadow-sm border border-gray-200 p-8 text-center">
-            <p className="text-gray-500">No questions available</p>
+            <p className="text-gray-500">{t('certification.adminQuestions.noQuestions')}</p>
           </div>
         ) : (
           questions.map((question) => {
@@ -568,7 +572,7 @@ function QuestionManagement({ questions }: { questions: QuestionItem[] }) {
                       <h3 className="text-lg font-semibold text-gray-900">{question.question}</h3>
                       {question.isActive ? (
                         <span className="text-xs px-2 py-1 rounded-full bg-green-100 text-green-700">
-                          Active
+                          {t('certification.adminQuestions.active')}
                         </span>
                       ) : (
                         <span className="text-xs px-2 py-1 rounded-full bg-gray-100 text-gray-700">
@@ -594,10 +598,10 @@ function QuestionManagement({ questions }: { questions: QuestionItem[] }) {
                     </div>
 
                     {question.explanation && (
-                      <p className="text-sm text-gray-500 italic">Explanation: {question.explanation}</p>
+                      <p className="text-sm text-gray-500 italic">{t('certification.adminQuestions.explanation')}: {question.explanation}</p>
                     )}
 
-                    <p className="text-sm text-gray-500 mt-2">Order: {question.order}</p>
+                    <p className="text-sm text-gray-500 mt-2">{t('certification.adminQuestions.order')}: {question.order}</p>
                   </div>
 
                   <div className="flex gap-2">

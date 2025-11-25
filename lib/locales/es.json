@@ -27,7 +27,9 @@
     "actions": "Acciones",
     "date": "Fecha",
     "download": "Descargar",
-    "logout": "Cerrar Sesión"
+    "logout": "Cerrar Sesión",
+    "of": "de",
+    "submitting": "Enviando..."
   },
   "login": {
     "title": "Iniciar Sesión",

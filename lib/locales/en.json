@@ -27,7 +27,9 @@
     "actions": "Actions",
     "date": "Date",
     "download": "Download",
-    "logout": "Logout"
+    "logout": "Logout",
+    "of": "of",
+    "submitting": "Submitting..."
   },
   "login": {
     "title": "Login",
