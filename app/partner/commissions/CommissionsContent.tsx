@@ -28,10 +28,10 @@ interface Payment {
 interface InvoiceWithPayments {
   id: string
   invoiceNumber: string
-  issueDate: Date
+  createdAt: Date
   totalAmount: number
   status: string
-  invoicePayments: Array<{ payment: { lead: Lead } }>
+  payments: Array<{ payment: { lead: Lead } }>
 }
 
 interface CommissionsContentProps {
@@ -163,7 +163,7 @@ export default function CommissionsContent({
                     <td className="px-6 py-4 whitespace-nowrap">
                       <div className="flex items-center gap-2 text-sm text-gray-900">
                         <Calendar className="w-4 h-4 text-gray-400" />
-                        {new Date(invoice.issueDate).toLocaleDateString()}
+                        {new Date(invoice.createdAt).toLocaleDateString()}
                       </div>
                     </td>
                     <td className="px-6 py-4 whitespace-nowrap text-sm font-bold text-gray-900">
@@ -181,7 +181,7 @@ export default function CommissionsContent({
                       </span>
                     </td>
                     <td className="px-6 py-4 whitespace-nowrap text-sm text-gray-500">
-                      {invoice.invoicePayments.length} {t('commissions.paymentsCount')}
+                      {invoice.payments.length} {t('commissions.paymentsCount')}
                     </td>
                   </tr>
                 ))}

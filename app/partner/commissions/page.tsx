@@ -36,7 +36,7 @@ export default async function PartnerCommissionsPage() {
   const invoices = await prisma.invoice.findMany({
     where: { partnerId },
     include: {
-      invoicePayments: {
+      payments: {
         include: {
           payment: {
             include: {
@@ -46,7 +46,7 @@ export default async function PartnerCommissionsPage() {
         },
       },
     },
-    orderBy: { issueDate: 'desc' },
+    orderBy: { createdAt: 'desc' },
   })
 
   // Calculate stats
