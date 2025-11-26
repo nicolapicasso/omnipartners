@@ -106,22 +106,15 @@ export default async function PartnerResourcesPage({
 
       <main className="lg:ml-64 pt-28 lg:pt-28 px-4 sm:px-6 lg:px-8 py-6 lg:py-8">
         {/* Page Title */}
-        <div className="mb-8 flex justify-between items-start">
-          <div>
-            <h1 className="text-2xl font-semibold text-gray-900">Resource Library</h1>
-            <p className="text-sm text-gray-500 mt-1">{contents.length} resources available</p>
-          </div>
-          <Link
-            href="/partner/resources/favorites"
-            className="bg-omniwallet-primary text-white px-4 py-2 rounded-md text-sm font-medium hover:bg-omniwallet-secondary transition inline-flex items-center gap-2"
-          >
-            <Star className="w-4 h-4" />
-            My Favorites
-          </Link>
+        <div className="mb-6">
+          <h1 className="text-2xl font-semibold text-gray-900">Resource Library</h1>
+          <p className="text-sm text-gray-500 mt-1">{contents.length} resources available</p>
         </div>
-        {/* Search Bar */}
-        <div className="mb-8">
-          <form method="GET" className="max-w-2xl mx-auto">
+
+        {/* Search, Categories and Favorites Row */}
+        <div className="mb-8 flex flex-col lg:flex-row lg:items-center gap-4">
+          {/* Search Bar */}
+          <form method="GET" className="flex-1">
             <div className="flex gap-2">
               <div className="flex-1 relative">
                 <Search className="w-5 h-5 absolute left-3 top-1/2 -translate-y-1/2 text-gray-400" />
@@ -130,17 +123,55 @@ export default async function PartnerResourcesPage({
                   name="search"
                   defaultValue={searchParams.search}
                   placeholder="Buscar recursos..."
-                  className="w-full border border-gray-300 rounded-lg pl-10 pr-3 py-3 focus:ring-2 focus:ring-omniwallet-primary focus:border-transparent"
+                  className="w-full border border-gray-300 rounded-lg pl-10 pr-3 py-2.5 focus:ring-2 focus:ring-omniwallet-primary focus:border-transparent"
                 />
               </div>
               <button
                 type="submit"
-                className="bg-omniwallet-primary text-white px-6 py-3 rounded-md text-sm font-medium hover:bg-omniwallet-secondary transition"
+                className="bg-omniwallet-primary text-white px-4 py-2.5 rounded-md text-sm font-medium hover:bg-omniwallet-secondary transition"
               >
                 Search
               </button>
             </div>
           </form>
+
+          {/* Favorites Button */}
+          <Link
+            href="/partner/resources/favorites"
+            className="bg-omniwallet-primary text-white px-4 py-2.5 rounded-md text-sm font-medium hover:bg-omniwallet-secondary transition inline-flex items-center justify-center gap-2 whitespace-nowrap"
+          >
+            <Star className="w-4 h-4" />
+            My Favorites
+          </Link>
+        </div>
+
+        {/* Category Filter */}
+        <div className="mb-8">
+          <div className="flex flex-wrap gap-2">
+            <Link
+              href="/partner/resources"
+              className={`px-4 py-2 rounded-md text-sm font-medium transition ${
+                !searchParams.category
+                  ? 'bg-omniwallet-primary text-white'
+                  : 'bg-white text-gray-700 border border-gray-200 hover:bg-gray-50'
+              }`}
+            >
+              All
+            </Link>
+            {categories.map((cat) => (
+              <Link
+                key={cat.value}
+                href={`/partner/resources?category=${cat.value}`}
+                className={`px-4 py-2 rounded-md text-sm font-medium transition ${
+                  searchParams.category === cat.value
+                    ? 'bg-omniwallet-primary text-white'
+                    : 'bg-white text-gray-700 border border-gray-200 hover:bg-gray-50'
+                }`}
+              >
+                {cat.label}
+              </Link>
+            ))}
+          </div>
         </div>
 
         {/* Featured Resources */}
@@ -183,36 +214,6 @@ export default async function PartnerResourcesPage({
             </div>
           </div>
         )}
-
-        {/* Category Filter */}
-        <div className="mb-8">
-          <h3 className="text-base font-semibold text-gray-900 mb-4">Categories</h3>
-          <div className="flex flex-wrap gap-3">
-            <Link
-              href="/partner/resources"
-              className={`px-4 py-2 rounded-md text-sm font-medium transition ${
-                !searchParams.category
-                  ? 'bg-omniwallet-primary text-white'
-                  : 'bg-white text-gray-700 border border-gray-200 hover:bg-gray-50'
-              }`}
-            >
-              All
-            </Link>
-            {categories.map((cat) => (
-              <Link
-                key={cat.value}
-                href={`/partner/resources?category=${cat.value}`}
-                className={`px-4 py-2 rounded-md text-sm font-medium transition ${
-                  searchParams.category === cat.value
-                    ? 'bg-omniwallet-primary text-white'
-                    : 'bg-white text-gray-700 border border-gray-200 hover:bg-gray-50'
-                }`}
-              >
-                {cat.label}
-              </Link>
-            ))}
-          </div>
-        </div>
 
         {/* Resources Grid */}
         <div>
