@@ -107,8 +107,8 @@ export default async function PartnerResourcesPage({
       <main className="lg:ml-64 pt-28 lg:pt-28 px-4 sm:px-6 lg:px-8 py-6 lg:py-8">
         {/* Page Title */}
         <div className="mb-6">
-          <h1 className="text-2xl font-semibold text-gray-900">Resource Library</h1>
-          <p className="text-sm text-gray-500 mt-1">{contents.length} resources available</p>
+          <h1 className="text-2xl font-semibold text-gray-900">Biblioteca de Recursos</h1>
+          <p className="text-sm text-gray-500 mt-1">{contents.length} recursos disponibles</p>
         </div>
 
         {/* Search, Categories and Favorites Row */}
@@ -130,7 +130,7 @@ export default async function PartnerResourcesPage({
                 type="submit"
                 className="bg-omniwallet-primary text-white px-4 py-2.5 rounded-md text-sm font-medium hover:bg-omniwallet-secondary transition"
               >
-                Search
+                Buscar
               </button>
             </div>
           </form>
@@ -141,7 +141,7 @@ export default async function PartnerResourcesPage({
             className="bg-omniwallet-primary text-white px-4 py-2.5 rounded-md text-sm font-medium hover:bg-omniwallet-secondary transition inline-flex items-center justify-center gap-2 whitespace-nowrap"
           >
             <Star className="w-4 h-4" />
-            My Favorites
+            Mis Favoritos
           </Link>
         </div>
 
@@ -156,7 +156,7 @@ export default async function PartnerResourcesPage({
                   : 'bg-white text-gray-700 border border-gray-200 hover:bg-gray-50'
               }`}
             >
-              All
+              Todos
             </Link>
             {categories.map((cat) => (
               <Link
@@ -179,7 +179,7 @@ export default async function PartnerResourcesPage({
           <div className="mb-8">
             <h2 className="text-lg font-semibold text-gray-900 mb-4 flex items-center gap-2">
               <Star className="w-5 h-5 text-yellow-500" />
-              Featured Resources
+              Recursos Destacados
             </h2>
             <div className="grid grid-cols-1 md:grid-cols-3 gap-6">
               {featured.map((content) => (
@@ -225,12 +225,12 @@ export default async function PartnerResourcesPage({
           {contents.length === 0 ? (
             <div className="text-center py-16 bg-white rounded-lg shadow-sm border border-gray-200">
               <FileText className="w-16 h-16 text-gray-300 mx-auto mb-4" />
-              <p className="text-gray-500 mb-4">No resources available</p>
+              <p className="text-gray-500 mb-4">No hay recursos disponibles</p>
               <Link
                 href="/partner/resources"
                 className="text-omniwallet-primary hover:text-omniwallet-secondary text-sm font-medium"
               >
-                View all resources
+                Ver todos los recursos
               </Link>
             </div>
           ) : (

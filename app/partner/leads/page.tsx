@@ -59,7 +59,7 @@ export default async function PartnerLeadsPage() {
         {/* Page Title */}
         <div className="mb-8 flex justify-between items-start">
           <div>
-            <h1 className="text-2xl font-semibold text-gray-900">My Leads</h1>
+            <h1 className="text-2xl font-semibold text-gray-900">Mis Leads</h1>
             <p className="text-sm text-gray-500 mt-1">
               {leadCount} Leads · {prospectCount} Prospects · {clientCount} Clients
             </p>
@@ -69,7 +69,7 @@ export default async function PartnerLeadsPage() {
             className="bg-omniwallet-primary text-white px-4 py-2 rounded-md text-sm font-medium hover:bg-omniwallet-secondary transition inline-flex items-center gap-2"
           >
             <Plus className="w-4 h-4" />
-            Create Lead
+            Crear Lead
           </Link>
         </div>
         {/* Stats Cards */}
@@ -100,13 +100,13 @@ export default async function PartnerLeadsPage() {
           <div className="overflow-x-auto">
             {leads.length === 0 ? (
               <div className="text-center py-16">
-                <p className="text-gray-500 mb-4">No leads yet</p>
+                <p className="text-gray-500 mb-4">Aún no hay leads</p>
                 <Link
                   href="/partner/leads/new"
                   className="inline-flex items-center gap-2 bg-omniwallet-primary text-white px-4 py-2 rounded-md text-sm font-medium hover:bg-omniwallet-secondary transition"
                 >
                   <Plus className="w-4 h-4" />
-                  Create your first lead
+                  Crea tu primer lead
                 </Link>
               </div>
             ) : (

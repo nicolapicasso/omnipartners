@@ -35,11 +35,11 @@ export default async function NewPartnerLeadPage() {
               className="inline-flex items-center gap-2 text-sm text-gray-600 hover:text-omniwallet-primary mb-4 transition"
             >
               <ArrowLeft className="w-4 h-4" />
-              Back to Leads
+              Volver a Leads
             </Link>
-            <h1 className="text-2xl font-semibold text-gray-900">Create New Lead</h1>
+            <h1 className="text-2xl font-semibold text-gray-900">Crear Nuevo Lead</h1>
             <p className="text-sm text-gray-500 mt-1">
-              Add a new potential contact to your pipeline
+              Agrega un nuevo contacto potencial a tu pipeline
             </p>
           </div>
 

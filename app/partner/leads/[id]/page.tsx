@@ -39,12 +39,12 @@ export default async function PartnerLeadDetailPage({
     return (
       <div className="min-h-screen bg-gray-50 flex items-center justify-center">
         <div className="text-center">
-          <h1 className="text-2xl font-bold text-gray-800 mb-4">Lead not found</h1>
+          <h1 className="text-2xl font-bold text-gray-800 mb-4">Lead no encontrado</h1>
           <Link
             href="/partner/leads"
             className="text-omniwallet-primary hover:text-omniwallet-secondary"
           >
-            ← Back to My Leads
+            ← Volver a Mis Leads
           </Link>
         </div>
       </div>
@@ -83,13 +83,13 @@ export default async function PartnerLeadDetailPage({
             className="inline-flex items-center gap-2 text-sm text-gray-600 hover:text-omniwallet-primary mb-4 transition"
           >
             <ArrowLeft className="w-4 h-4" />
-            Back to My Leads
+            Volver a Mis Leads
           </Link>
           <div className="flex justify-between items-start">
             <div>
               <h1 className="text-2xl font-semibold text-gray-900">{lead.companyName}</h1>
               <p className="text-sm text-gray-500 mt-1">
-                Created by: {lead.createdBy?.name || 'System'}
+                Creado por: {lead.createdBy?.name || 'Sistema'}
               </p>
             </div>
             <span
@@ -108,14 +108,14 @@ export default async function PartnerLeadDetailPage({
             <div className="bg-white rounded-lg shadow-sm border border-gray-200 p-6">
               <div className="flex justify-between items-center mb-4">
                 <h2 className="text-base font-semibold text-gray-900">
-                  Lead Information
+                  Información del Lead
                 </h2>
                 <Link
                   href={`/partner/leads/${lead.id}/edit`}
                   className="text-omniwallet-primary hover:text-omniwallet-secondary inline-flex items-center gap-1 text-sm font-medium"
                 >
                   <Pencil className="w-4 h-4" />
-                  Edit
+                  Editar
                 </Link>
               </div>
               <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
@@ -213,7 +213,7 @@ export default async function PartnerLeadDetailPage({
             <div className="bg-white rounded-lg shadow-sm border border-gray-200">
               <div className="px-6 py-4 border-b border-gray-100 flex justify-between items-center">
                 <h2 className="text-base font-semibold text-gray-900">
-                  Payments ({lead.payments.length})
+                  Pagos ({lead.payments.length})
                 </h2>
                 <div className="text-right">
                   <p className="text-sm text-gray-500">Total Pagado</p>
@@ -273,7 +273,7 @@ export default async function PartnerLeadDetailPage({
           <div className="space-y-6">
             {/* Stats Card */}
             <div className="bg-white rounded-lg shadow-sm border border-gray-200 p-6">
-              <h3 className="text-base font-semibold text-gray-900 mb-4">Summary</h3>
+              <h3 className="text-base font-semibold text-gray-900 mb-4">Resumen</h3>
               <div className="space-y-4">
                 <div className="flex items-center justify-between">
                   <div className="flex items-center gap-2">
@@ -305,7 +305,7 @@ export default async function PartnerLeadDetailPage({
             {/* Commission Card */}
             <div className="bg-white rounded-lg shadow-sm border border-gray-200 p-6">
               <h3 className="text-base font-semibold text-gray-900 mb-4">
-                Commission Configuration
+                Configuración de Comisión
               </h3>
               <div className="space-y-3">
                 <div>
@@ -329,7 +329,7 @@ export default async function PartnerLeadDetailPage({
             {/* Actions */}
             {lead.status !== LeadStatus.CLIENT && (
               <div className="bg-white rounded-lg shadow-sm border border-gray-200 p-6">
-                <h3 className="text-base font-semibold text-gray-900 mb-4">Actions</h3>
+                <h3 className="text-base font-semibold text-gray-900 mb-4">Acciones</h3>
                 <DeleteLeadButton leadId={lead.id} />
               </div>
             )}

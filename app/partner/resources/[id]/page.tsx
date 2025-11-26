@@ -114,7 +114,7 @@ export default async function ResourceDetailPage({
             className="inline-flex items-center gap-2 text-sm text-gray-600 hover:text-omniwallet-primary mb-4 transition"
           >
             <ArrowLeft className="w-4 h-4" />
-            Back to Resources
+            Volver a Recursos
           </Link>
           <div className="flex justify-between items-start">
             <div>
@@ -179,7 +179,7 @@ export default async function ResourceDetailPage({
                   className="w-full bg-omniwallet-primary text-white px-4 py-3 rounded-md text-sm font-medium hover:bg-omniwallet-secondary transition inline-flex items-center justify-center gap-2"
                 >
                   <Download className="w-4 h-4" />
-                  {content.type === ContentType.VIDEO ? 'Watch Video' : 'Download Resource'}
+                  {content.type === ContentType.VIDEO ? 'Ver Video' : 'Descargar Recurso'}
                 </a>
               )}
             </div>
@@ -187,7 +187,7 @@ export default async function ResourceDetailPage({
             {/* Description */}
             {content.description && (
               <div className="bg-white rounded-lg shadow-sm border border-gray-200 p-6">
-                <h2 className="text-base font-semibold text-gray-900 mb-4">Description</h2>
+                <h2 className="text-base font-semibold text-gray-900 mb-4">Descripción</h2>
                 <p className="text-gray-700 whitespace-pre-wrap">{content.description}</p>
               </div>
             )}
@@ -197,7 +197,7 @@ export default async function ResourceDetailPage({
               <div className="bg-white rounded-lg shadow-sm border border-gray-200 p-6">
                 <h3 className="text-base font-semibold text-gray-900 mb-3 flex items-center gap-2">
                   <Tag className="w-5 h-5" />
-                  Tags
+                  Etiquetas
                 </h3>
                 <div className="flex flex-wrap gap-2">
                   {tags.map((tag: string) => (
@@ -216,7 +216,7 @@ export default async function ResourceDetailPage({
             {relatedContent.length > 0 && (
               <div className="bg-white rounded-lg shadow-sm border border-gray-200 p-6">
                 <h3 className="text-base font-semibold text-gray-900 mb-4">
-                  Related Resources
+                  Recursos Relacionados
                 </h3>
                 <div className="space-y-3">
                   {relatedContent.map((related) => (
@@ -247,7 +247,7 @@ export default async function ResourceDetailPage({
           <div className="space-y-6">
             {/* Stats Card */}
             <div className="bg-white rounded-lg shadow-sm border border-gray-200 p-6">
-              <h3 className="text-base font-semibold text-gray-900 mb-4">Statistics</h3>
+              <h3 className="text-base font-semibold text-gray-900 mb-4">Estadísticas</h3>
               <div className="space-y-3">
                 <div className="flex items-center justify-between">
                   <div className="flex items-center gap-2 text-gray-600">
@@ -270,7 +270,7 @@ export default async function ResourceDetailPage({
 
             {/* Info Card */}
             <div className="bg-white rounded-lg shadow-sm border border-gray-200 p-6">
-              <h3 className="text-base font-semibold text-gray-900 mb-4">Information</h3>
+              <h3 className="text-base font-semibold text-gray-900 mb-4">Información</h3>
               <div className="space-y-3 text-sm">
                 <div>
                   <p className="text-gray-500">Tipo</p>

@@ -97,7 +97,7 @@ export default async function PartnerDashboard() {
         {/* Page Title */}
         <div className="mb-8">
           <h1 className="text-2xl font-semibold text-gray-900">Dashboard</h1>
-          <p className="text-sm text-gray-500 mt-1">Overview of your partner performance</p>
+          <p className="text-sm text-gray-500 mt-1">Vista general de tu rendimiento como partner</p>
         </div>
 
         {/* Stats Cards */}
@@ -144,7 +144,7 @@ export default async function PartnerDashboard() {
                 <DollarSign className="w-5 h-5 text-omniwallet-primary" />
               </div>
             </div>
-            <p className="text-sm font-medium text-gray-500">Total Commissions</p>
+            <p className="text-sm font-medium text-gray-500">Comisiones Totales</p>
             <p className="text-2xl font-semibold text-gray-900 mt-1">
               €{stats.totalCommissions.toFixed(2)}
             </p>
@@ -156,7 +156,7 @@ export default async function PartnerDashboard() {
                 <Clock className="w-5 h-5 text-yellow-600" />
               </div>
             </div>
-            <p className="text-sm font-medium text-gray-500">Pending Payment</p>
+            <p className="text-sm font-medium text-gray-500">Pago Pendiente</p>
             <p className="text-2xl font-semibold text-gray-900 mt-1">
               €{stats.pendingCommissions.toFixed(2)}
             </p>
@@ -168,7 +168,7 @@ export default async function PartnerDashboard() {
                 <Users className="w-5 h-5 text-omniwallet-accent" />
               </div>
             </div>
-            <p className="text-sm font-medium text-gray-500">Team Members</p>
+            <p className="text-sm font-medium text-gray-500">Miembros del Equipo</p>
             <p className="text-2xl font-semibold text-gray-900 mt-1">
               {teamMembers.length}
             </p>
@@ -179,24 +179,24 @@ export default async function PartnerDashboard() {
           {/* Recent Leads */}
           <div className="bg-white rounded-lg shadow-sm border border-gray-200">
             <div className="px-6 py-4 border-b border-gray-100 flex justify-between items-center">
-              <h2 className="text-base font-semibold text-gray-900">Recent Leads</h2>
+              <h2 className="text-base font-semibold text-gray-900">Leads Recientes</h2>
               <Link
                 href="/partner/leads"
                 className="text-omniwallet-primary hover:text-omniwallet-secondary text-sm font-medium transition"
               >
-                View all
+                Ver todos
               </Link>
             </div>
             <div className="p-6">
               {recentLeads.length === 0 ? (
                 <div className="text-center py-12 text-gray-500">
                   <TrendingUp className="w-12 h-12 mx-auto text-gray-300 mb-4" />
-                  <p className="text-sm mb-4">No leads yet</p>
+                  <p className="text-sm mb-4">Aún no hay leads</p>
                   <Link
                     href="/partner/leads/new"
                     className="inline-flex items-center gap-2 bg-omniwallet-primary text-white px-4 py-2 rounded-md text-sm font-medium hover:bg-omniwallet-secondary transition"
                   >
-                    Create your first lead
+                    Crea tu primer lead
                   </Link>
                 </div>
               ) : (
@@ -236,24 +236,24 @@ export default async function PartnerDashboard() {
           {/* Team Members */}
           <div className="bg-white rounded-lg shadow-sm border border-gray-200">
             <div className="px-6 py-4 border-b border-gray-100 flex justify-between items-center">
-              <h2 className="text-base font-semibold text-gray-900">Team</h2>
+              <h2 className="text-base font-semibold text-gray-900">Equipo</h2>
               <Link
                 href="/partner/team"
                 className="text-omniwallet-primary hover:text-omniwallet-secondary text-sm font-medium transition"
               >
-                Manage
+                Gestionar
               </Link>
             </div>
             <div className="p-6">
               {teamMembers.length === 0 ? (
                 <div className="text-center py-12 text-gray-500">
                   <Users className="w-12 h-12 mx-auto text-gray-300 mb-4" />
-                  <p className="text-sm mb-4">No team members</p>
+                  <p className="text-sm mb-4">No hay miembros en el equipo</p>
                   <Link
                     href="/partner/team"
                     className="inline-flex items-center gap-2 bg-omniwallet-primary text-white px-4 py-2 rounded-md text-sm font-medium hover:bg-omniwallet-secondary transition"
                   >
-                    Invite members
+                    Invitar miembros
                   </Link>
                 </div>
               ) : (
@@ -274,7 +274,7 @@ export default async function PartnerDashboard() {
                             : 'bg-blue-50 text-blue-700'
                         }`}
                       >
-                        {member.role === 'PARTNER_OWNER' ? 'Owner' : 'User'}
+                        {member.role === 'PARTNER_OWNER' ? 'Propietario' : 'Usuario'}
                       </span>
                     </div>
                   ))}
@@ -286,16 +286,16 @@ export default async function PartnerDashboard() {
 
         {/* Partner Contract */}
         <div className="bg-white rounded-lg shadow-sm border border-gray-200 p-6 mb-8">
-          <h3 className="text-base font-semibold text-gray-900 mb-4">Partner Contract</h3>
+          <h3 className="text-base font-semibold text-gray-900 mb-4">Contrato del Partner</h3>
           {partner.contractUrl ? (
             <div className="flex items-start gap-4 p-4 bg-green-50 border border-green-200 rounded-lg">
               <div className="bg-green-100 p-2.5 rounded-lg">
                 <FileText className="w-6 h-6 text-green-700" />
               </div>
               <div className="flex-1">
-                <p className="text-sm font-medium text-gray-900 mb-1">Your contract is available</p>
+                <p className="text-sm font-medium text-gray-900 mb-1">Tu contrato está disponible</p>
                 <p className="text-xs text-gray-600 mb-3">
-                  Download and review your partnership agreement
+                  Descarga y revisa tu acuerdo de partnership
                 </p>
                 <a
                   href={partner.contractUrl}
@@ -304,7 +304,7 @@ export default async function PartnerDashboard() {
                   className="inline-flex items-center gap-2 bg-green-600 text-white px-4 py-2 rounded-md text-sm font-medium hover:bg-green-700 transition"
                 >
                   <Download className="w-4 h-4" />
-                  Download Contract
+                  Descargar Contrato
                 </a>
               </div>
             </div>
@@ -314,9 +314,9 @@ export default async function PartnerDashboard() {
                 <FileText className="w-6 h-6 text-gray-500" />
               </div>
               <div className="flex-1">
-                <p className="text-sm font-medium text-gray-900 mb-1">Contract not available yet</p>
+                <p className="text-sm font-medium text-gray-900 mb-1">Contrato aún no disponible</p>
                 <p className="text-xs text-gray-600">
-                  Your partnership contract will be uploaded by our team soon. You will be notified when it's available.
+                  Tu contrato de partnership será subido por nuestro equipo pronto. Serás notificado cuando esté disponible.
                 </p>
               </div>
             </div>
@@ -325,16 +325,16 @@ export default async function PartnerDashboard() {
 
         {/* Omniwallet Account */}
         <div className="bg-white rounded-lg shadow-sm border border-gray-200 p-6 mb-8">
-          <h3 className="text-base font-semibold text-gray-900 mb-4">Your Omniwallet Account</h3>
+          <h3 className="text-base font-semibold text-gray-900 mb-4">Tu Cuenta Omniwallet</h3>
           {partner.omniwalletAccountUrl ? (
             <div className="flex items-start gap-4 p-4 bg-omniwallet-primary/10 border border-omniwallet-primary/30 rounded-lg">
               <div className="bg-omniwallet-primary/20 p-2.5 rounded-lg">
                 <Wallet className="w-6 h-6 text-omniwallet-primary" />
               </div>
               <div className="flex-1">
-                <p className="text-sm font-medium text-gray-900 mb-1">Your account is ready</p>
+                <p className="text-sm font-medium text-gray-900 mb-1">Tu cuenta está lista</p>
                 <p className="text-xs text-gray-600 mb-3">
-                  Access your Omniwallet dashboard to manage your wallet and transactions
+                  Accede a tu panel de Omniwallet para gestionar tu wallet y transacciones
                 </p>
                 <a
                   href={partner.omniwalletAccountUrl}
@@ -343,7 +343,7 @@ export default async function PartnerDashboard() {
                   className="inline-flex items-center gap-2 bg-omniwallet-primary text-white px-4 py-2 rounded-md text-sm font-medium hover:bg-omniwallet-secondary transition"
                 >
                   <ExternalLink className="w-4 h-4" />
-                  Access Account
+                  Acceder a la Cuenta
                 </a>
               </div>
             </div>
@@ -353,9 +353,9 @@ export default async function PartnerDashboard() {
                 <Wallet className="w-6 h-6 text-gray-500" />
               </div>
               <div className="flex-1">
-                <p className="text-sm font-medium text-gray-900 mb-1">Account not configured yet</p>
+                <p className="text-sm font-medium text-gray-900 mb-1">Cuenta aún no configurada</p>
                 <p className="text-xs text-gray-600">
-                  Your Omniwallet account will be set up by our team soon. You will be notified when it's ready.
+                  Tu cuenta de Omniwallet será configurada por nuestro equipo pronto. Serás notificado cuando esté lista.
                 </p>
               </div>
             </div>
@@ -372,7 +372,7 @@ export default async function PartnerDashboard() {
 
         {/* Quick Actions */}
         <div className="bg-white rounded-lg shadow-sm border border-gray-200 p-6 mt-8">
-          <h3 className="text-base font-semibold text-gray-900 mb-4">Quick Actions</h3>
+          <h3 className="text-base font-semibold text-gray-900 mb-4">Acciones Rápidas</h3>
           <div className="grid grid-cols-1 md:grid-cols-3 gap-4">
             <Link
               href="/partner/leads/new"
@@ -382,8 +382,8 @@ export default async function PartnerDashboard() {
                 <TrendingUp className="w-5 h-5 text-omniwallet-primary" />
               </div>
               <div>
-                <p className="text-sm font-medium text-gray-900">Create Lead</p>
-                <p className="text-xs text-gray-500 mt-1">Add a new lead to your pipeline</p>
+                <p className="text-sm font-medium text-gray-900">Crear Lead</p>
+                <p className="text-xs text-gray-500 mt-1">Añadir un nuevo lead a tu pipeline</p>
               </div>
             </Link>
             <Link
@@ -394,8 +394,8 @@ export default async function PartnerDashboard() {
                 <DollarSign className="w-5 h-5 text-green-600" />
               </div>
               <div>
-                <p className="text-sm font-medium text-gray-900">View Commissions</p>
-                <p className="text-xs text-gray-500 mt-1">Check your earnings</p>
+                <p className="text-sm font-medium text-gray-900">Ver Comisiones</p>
+                <p className="text-xs text-gray-500 mt-1">Consulta tus ganancias</p>
               </div>
             </Link>
             <Link
@@ -406,8 +406,8 @@ export default async function PartnerDashboard() {
                 <Users className="w-5 h-5 text-omniwallet-accent" />
               </div>
               <div>
-                <p className="text-sm font-medium text-gray-900">Manage Team</p>
-                <p className="text-xs text-gray-500 mt-1">Invite and manage members</p>
+                <p className="text-sm font-medium text-gray-900">Gestionar Equipo</p>
+                <p className="text-xs text-gray-500 mt-1">Invitar y gestionar miembros</p>
               </div>
             </Link>
           </div>

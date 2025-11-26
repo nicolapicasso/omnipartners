@@ -64,9 +64,9 @@ export default async function PartnerTeamPage() {
       <main className="lg:ml-64 pt-28 lg:pt-28 px-4 sm:px-6 lg:px-8 py-6 lg:py-8">
         {/* Page Title */}
         <div className="mb-8">
-          <h1 className="text-2xl font-semibold text-gray-900">My Team</h1>
+          <h1 className="text-2xl font-semibold text-gray-900">Mi Equipo</h1>
           <p className="text-sm text-gray-500 mt-1">
-            {teamMembers.length} team members
+            {teamMembers.length} miembros del equipo
           </p>
         </div>
         <div className="grid grid-cols-1 lg:grid-cols-3 gap-6">
@@ -74,7 +74,7 @@ export default async function PartnerTeamPage() {
           <div className="lg:col-span-2">
             <div className="bg-white rounded-lg shadow-sm border border-gray-200">
               <div className="px-6 py-4 border-b border-gray-100">
-                <h2 className="text-base font-semibold text-gray-900">Team Members</h2>
+                <h2 className="text-base font-semibold text-gray-900">Miembros del Equipo</h2>
               </div>
               <div className="divide-y divide-gray-200">
                 {teamMembers.map((member) => (
@@ -128,7 +128,7 @@ export default async function PartnerTeamPage() {
               <div className="bg-white rounded-lg shadow-sm border border-gray-200 p-6">
                 <h3 className="text-base font-semibold text-gray-900 mb-4 flex items-center gap-2">
                   <UserPlus className="w-5 h-5" />
-                  Invite Member
+                  Invitar Miembro
                 </h3>
                 <InviteTeamMemberForm />
               </div>
@@ -136,14 +136,14 @@ export default async function PartnerTeamPage() {
               <div className="bg-omniwallet-primary/10 border border-omniwallet-primary/30 rounded-md p-6">
                 <Shield className="w-8 h-8 text-omniwallet-primary mb-3" />
                 <p className="text-sm text-omniwallet-secondary">
-                  Only the partner owner can invite new team members.
+                  Solo el propietario del partner puede invitar nuevos miembros al equipo.
                 </p>
               </div>
             )}
 
             {/* Stats Card */}
             <div className="bg-white rounded-lg shadow-sm border border-gray-200 p-6">
-              <h3 className="text-base font-semibold text-gray-900 mb-4">Statistics</h3>
+              <h3 className="text-base font-semibold text-gray-900 mb-4">Estadísticas</h3>
               <div className="space-y-3">
                 <div className="flex justify-between items-center">
                   <span className="text-sm text-gray-600">Total Miembros</span>

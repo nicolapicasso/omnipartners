@@ -79,25 +79,25 @@ export default async function FavoritesPage() {
             className="inline-flex items-center gap-2 text-sm text-gray-600 hover:text-omniwallet-primary mb-4 transition"
           >
             <ArrowLeft className="w-4 h-4" />
-            Back to Resources
+            Volver a Recursos
           </Link>
           <div className="flex items-center gap-3">
             <Star className="w-6 h-6 text-yellow-500 fill-yellow-500" />
             <div>
-              <h1 className="text-2xl font-semibold text-gray-900">My Favorites</h1>
-              <p className="text-sm text-gray-500 mt-1">{favorites.length} saved resources</p>
+              <h1 className="text-2xl font-semibold text-gray-900">Mis Favoritos</h1>
+              <p className="text-sm text-gray-500 mt-1">{favorites.length} recursos guardados</p>
             </div>
           </div>
         </div>
         {favorites.length === 0 ? (
           <div className="text-center py-16 bg-white rounded-lg shadow-sm border border-gray-200">
             <Star className="w-16 h-16 text-gray-300 mx-auto mb-4" />
-            <p className="text-gray-500 mb-4">You don't have any favorite resources yet</p>
+            <p className="text-gray-500 mb-4">Aún no tienes recursos favoritos</p>
             <Link
               href="/partner/resources"
               className="text-omniwallet-primary hover:text-omniwallet-secondary text-sm font-medium"
             >
-              Explore resources →
+              Explorar recursos →
             </Link>
           </div>
         ) : (
