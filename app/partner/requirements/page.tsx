@@ -102,7 +102,7 @@ export default async function RequirementsPage({
   const session = await getPartnerSession()
   const partnerId = session.user.partnerId!
   const resolvedParams = await params
-  const locale = resolvedParams?.locale || 'en'
+  const locale = resolvedParams?.locale || 'es'
 
   const partner = await prisma.partner.findUnique({
     where: { id: partnerId },

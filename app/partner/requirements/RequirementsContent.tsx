@@ -44,7 +44,7 @@ export default function RequirementsContent({
       {/* Page Header */}
       <div className="mb-8">
         <h1 className="text-2xl font-semibold text-gray-900">
-          {t('requirements.title')} {currentYear}
+          {t('requirements.title')}
         </h1>
         <p className="text-gray-600 mt-1">{t('requirements.subtitle')}</p>
       </div>
