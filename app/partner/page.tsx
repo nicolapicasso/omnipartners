@@ -334,7 +334,7 @@ export default async function PartnerDashboard() {
               <div className="flex-1">
                 <p className="text-sm font-medium text-gray-900 mb-1">Tu cuenta está lista</p>
                 <p className="text-xs text-gray-600 mb-3">
-                  Accede a tu panel de Omniwallet para gestionar tu wallet y transacciones
+                  Accede a tu panel de Omniwallet para conocer al 100% nuestra herramienta y hacer demos a tus clientes
                 </p>
                 <a
                   href={partner.omniwalletAccountUrl}

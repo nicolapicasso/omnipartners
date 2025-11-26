@@ -2,8 +2,8 @@
 
 import { useState } from 'react'
 import { PartnerStatus, PartnerCategory } from '@/types'
-import { updatePartnerCategory, suspendPartner, activatePartner, updatePartnerContract, updatePartnerOmniwalletAccount } from '../actions'
-import { Shield, ShieldOff, Tag, FileText, Save, X, Wallet } from 'lucide-react'
+import { updatePartnerCategory, suspendPartner, activatePartner, updatePartnerContract, updatePartnerOmniwalletAccount, updatePartnerYearlyEvent } from '../actions'
+import { Shield, ShieldOff, Tag, FileText, Save, X, Wallet, Presentation, CheckCircle, Circle } from 'lucide-react'
 
 export function UpdateCategoryButton({
   partnerId,
@@ -337,5 +337,70 @@ export function UpdateOmniwalletAccountForm({
         </button>
       </div>
     </form>
+  )
+}
+
+export function ToggleYearlyEventButton({
+  partnerId,
+  hasCompletedYearlyEvent,
+}: {
+  partnerId: string
+  hasCompletedYearlyEvent: boolean
+}) {
+  const [loading, setLoading] = useState(false)
+  const [completed, setCompleted] = useState(hasCompletedYearlyEvent)
+
+  const handleToggle = async () => {
+    setLoading(true)
+    const newValue = !completed
+    const result = await updatePartnerYearlyEvent(partnerId, newValue)
+    if (result.success) {
+      setCompleted(newValue)
+    }
+    setLoading(false)
+  }
+
+  return (
+    <div className="space-y-3">
+      <div className="flex items-start gap-3">
+        <div className={`p-2 rounded-lg ${completed ? 'bg-green-100' : 'bg-gray-100'}`}>
+          <Presentation className={`w-5 h-5 ${completed ? 'text-green-600' : 'text-gray-500'}`} />
+        </div>
+        <div className="flex-1">
+          <p className="text-sm font-medium text-gray-900 mb-1">
+            Evento/Webinar Conjunto
+          </p>
+          <p className="text-xs text-gray-500 mb-3">
+            Indica si el partner ha participado o creado un evento o webinar conjunto este año
+          </p>
+          <div className="flex items-center gap-3">
+            <button
+              onClick={handleToggle}
+              disabled={loading}
+              className={`inline-flex items-center gap-2 px-4 py-2 rounded-md text-sm font-medium transition disabled:opacity-50 ${
+                completed
+                  ? 'bg-green-100 text-green-700 hover:bg-green-200'
+                  : 'bg-gray-100 text-gray-700 hover:bg-gray-200'
+              }`}
+            >
+              {completed ? (
+                <>
+                  <CheckCircle className="w-4 h-4" />
+                  {loading ? 'Actualizando...' : 'Completado'}
+                </>
+              ) : (
+                <>
+                  <Circle className="w-4 h-4" />
+                  {loading ? 'Actualizando...' : 'Pendiente'}
+                </>
+              )}
+            </button>
+            <span className="text-xs text-gray-500">
+              Click para {completed ? 'marcar como pendiente' : 'marcar como completado'}
+            </span>
+          </div>
+        </div>
+      </div>
+    </div>
   )
 }

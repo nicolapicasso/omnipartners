@@ -109,7 +109,7 @@ export default async function RequirementsPage({
   })
 
   if (!partner) {
-    return <div>Partner not found</div>
+    return <div>Partner no encontrado</div>
   }
 
   const { requirements, completedCount, totalCount, completionPercentage } =

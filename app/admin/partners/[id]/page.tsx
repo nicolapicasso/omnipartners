@@ -3,7 +3,7 @@ import { getAdminSession } from '@/lib/session'
 import { PartnerStatus } from '@/types'
 import Link from 'next/link'
 import { ArrowLeft, Mail, Phone, Globe, MapPin, Calendar, Users, TrendingUp } from 'lucide-react'
-import { UpdateCategoryButton, ToggleStatusButton, UpdateContractForm, UpdateOmniwalletAccountForm } from '../components/PartnerActions'
+import { UpdateCategoryButton, ToggleStatusButton, UpdateContractForm, UpdateOmniwalletAccountForm, ToggleYearlyEventButton } from '../components/PartnerActions'
 import AdminDashboardHeader from '@/components/AdminDashboardHeader'
 import AdminSidebar from '@/components/AdminSidebar'
 
@@ -79,13 +79,13 @@ export default async function PartnerDetailPage({
             className="inline-flex items-center gap-2 text-sm text-gray-600 hover:text-omniwallet-primary mb-4 transition"
           >
             <ArrowLeft className="w-4 h-4" />
-            Back to Partners
+            Volver a Partners
           </Link>
           <div className="flex justify-between items-start">
             <div>
               <h1 className="text-2xl font-semibold text-gray-900">{partner.companyName}</h1>
               <p className="text-sm text-gray-500 mt-1">
-                Contact: {partner.contactName}
+                Contacto: {partner.contactName}
               </p>
             </div>
             <span
@@ -103,7 +103,7 @@ export default async function PartnerDetailPage({
             {/* Main Info Card */}
             <div className="bg-white rounded-lg shadow-sm border border-gray-200 p-6">
               <h2 className="text-base font-semibold text-gray-900 mb-4">
-                Partner Information
+                Información del Partner
               </h2>
               <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
                 <div className="flex items-center gap-3">
@@ -285,14 +285,20 @@ export default async function PartnerDetailPage({
 
             {/* Contract Card */}
             <div className="bg-white rounded-lg shadow-sm border border-gray-200 p-6">
-              <h3 className="text-lg font-semibold text-gray-800 mb-4">Partner Contract</h3>
+              <h3 className="text-lg font-semibold text-gray-800 mb-4">Contrato del Partner</h3>
               <UpdateContractForm partnerId={partner.id} currentContractUrl={partner.contractUrl} />
             </div>
 
             {/* Omniwallet Account Card */}
             <div className="bg-white rounded-lg shadow-sm border border-gray-200 p-6">
-              <h3 className="text-lg font-semibold text-gray-800 mb-4">Omniwallet Account</h3>
+              <h3 className="text-lg font-semibold text-gray-800 mb-4">Cuenta Omniwallet</h3>
               <UpdateOmniwalletAccountForm partnerId={partner.id} currentAccountUrl={partner.omniwalletAccountUrl} />
+            </div>
+
+            {/* Yearly Event Card */}
+            <div className="bg-white rounded-lg shadow-sm border border-gray-200 p-6">
+              <h3 className="text-lg font-semibold text-gray-800 mb-4">Requisitos Anuales</h3>
+              <ToggleYearlyEventButton partnerId={partner.id} hasCompletedYearlyEvent={partner.hasCompletedYearlyEvent} />
             </div>
 
             {/* Users Card */}

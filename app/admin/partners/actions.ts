@@ -94,3 +94,21 @@ export async function updatePartnerOmniwalletAccount(partnerId: string, accountU
     return { success: false, error: 'Failed to update Omniwallet account' }
   }
 }
+
+export async function updatePartnerYearlyEvent(partnerId: string, hasCompletedYearlyEvent: boolean) {
+  try {
+    await getAdminSession() // Verify admin
+
+    await prisma.partner.update({
+      where: { id: partnerId },
+      data: { hasCompletedYearlyEvent },
+    })
+
+    revalidatePath('/admin/partners')
+    revalidatePath(`/admin/partners/${partnerId}`)
+    return { success: true }
+  } catch (error) {
+    console.error('Error updating partner yearly event:', error)
+    return { success: false, error: 'Failed to update yearly event status' }
+  }
+}
