@@ -1,7 +1,17 @@
 'use client'
 
-import { CheckCircle2, Circle, FileText, Wallet, TrendingUp, Users, Presentation, Calendar } from 'lucide-react'
+import { CheckCircle2, Circle, FileText, Wallet, TrendingUp, Users, Presentation, Calendar, LucideIcon } from 'lucide-react'
 import { useTranslation } from '@/lib/contexts/LanguageContext'
+
+// Map icon names to components
+const iconMap: Record<string, LucideIcon> = {
+  FileText,
+  Wallet,
+  TrendingUp,
+  Users,
+  CheckCircle2,
+  Presentation,
+}
 
 interface Requirement {
   id: string
@@ -9,7 +19,7 @@ interface Requirement {
   description: string
   completed: boolean
   progress?: { current: number; target: number }
-  icon: any
+  icon: string
 }
 
 interface RequirementsContentProps {
@@ -75,7 +85,7 @@ export default function RequirementsContent({
       {/* Requirements List */}
       <div className="space-y-4">
         {requirements.map((requirement) => {
-          const Icon = requirement.icon
+          const Icon = iconMap[requirement.icon] || FileText
           return (
             <div
               key={requirement.id}

@@ -1,7 +1,6 @@
 import { prisma } from '@/lib/prisma'
 import { getPartnerSession } from '@/lib/session'
 import { LeadStatus } from '@/types'
-import { FileText, Wallet, TrendingUp, Users, CheckCircle2, Presentation } from 'lucide-react'
 import PartnerDashboardHeader from '@/components/PartnerDashboardHeader'
 import PartnerSidebar from '@/components/PartnerSidebar'
 import RequirementsContent from './RequirementsContent'
@@ -118,21 +117,6 @@ export default async function RequirementsPage({
 
   const currentYear = new Date().getFullYear()
 
-  // Map icon names to components
-  const iconMap = {
-    FileText,
-    Wallet,
-    TrendingUp,
-    Users,
-    CheckCircle2,
-    Presentation,
-  }
-
-  const requirementsWithIcons = requirements.map((req) => ({
-    ...req,
-    icon: iconMap[req.icon as keyof typeof iconMap],
-  }))
-
   return (
     <div className="min-h-screen bg-gray-50">
       <PartnerDashboardHeader
@@ -143,7 +127,7 @@ export default async function RequirementsPage({
 
       <main className="ml-64 pt-20 px-8 py-8">
         <RequirementsContent
-          requirements={requirementsWithIcons}
+          requirements={requirements}
           completedCount={completedCount}
           totalCount={totalCount}
           completionPercentage={completionPercentage}
