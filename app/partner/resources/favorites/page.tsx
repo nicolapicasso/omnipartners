@@ -71,7 +71,7 @@ export default async function FavoritesPage() {
       />
       <PartnerSidebar />
 
-      <main className="lg:ml-64 pt-20 px-4 sm:px-6 lg:px-8 py-6 lg:py-8">
+      <main className="lg:ml-64 pt-24 px-4 sm:px-6 lg:px-8 py-6 lg:py-8">
         {/* Page Header */}
         <div className="mb-8">
           <Link
