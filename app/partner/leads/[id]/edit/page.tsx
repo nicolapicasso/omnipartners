@@ -36,7 +36,7 @@ export default async function EditPartnerLeadPage({
   return (
     <div className="min-h-screen bg-gray-50">
       <header className="bg-omniwallet-primary text-white shadow-lg">
-        <div className="container mx-auto px-6 py-6">
+        <div className="container mx-auto px-4 sm:px-6 py-4 sm:py-6">
           <Link
             href={`/partner/leads/${lead.id}`}
             className="inline-flex items-center gap-2 text-white hover:text-omniwallet-light mb-4"
@@ -49,7 +49,7 @@ export default async function EditPartnerLeadPage({
         </div>
       </header>
 
-      <main className="container mx-auto px-6 py-8">
+      <main className="container mx-auto px-4 sm:px-6 py-6 lg:py-8">
         <div className="max-w-3xl mx-auto">
           <div className="bg-white rounded-lg shadow-md p-8">
             <EditPartnerLeadForm lead={lead} />
