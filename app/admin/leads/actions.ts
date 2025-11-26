@@ -4,6 +4,8 @@ import { prisma } from '@/lib/prisma'
 import { revalidatePath } from 'next/cache'
 import { getAdminSession } from '@/lib/session'
 import { LeadStatus, CommissionType, NotificationType } from '@/types'
+import { notifyPartnerUsers, NotificationType as NotifType } from '@/lib/notifications'
+import { sendLeadWebhook, WebhookEventType } from '@/lib/webhooks'
 
 export async function createLead(data: {
   companyName: string
@@ -115,14 +117,42 @@ export async function updateLeadStatus(leadId: string, status: LeadStatus) {
     if (status === LeadStatus.CLIENT && !lead.convertedAt) {
       updateData.convertedAt = new Date()
 
-      // Notify partner of conversion
-      await prisma.notification.create({
-        data: {
-          partnerId: lead.partnerId,
-          type: NotificationType.LEAD_CONVERTED,
-          title: '¡Lead Convertido a Cliente!',
-          message: `${lead.companyName} ha sido convertido a cliente.`,
-        },
+      // Notify partner users of conversion
+      await notifyPartnerUsers(lead.partnerId, NotifType.LEAD_TO_CLIENT, {
+        companyName: lead.companyName,
+      })
+
+      // Send webhook for client conversion
+      await sendLeadWebhook(WebhookEventType.LEAD_TO_CLIENT, {
+        id: lead.id,
+        companyName: lead.companyName,
+        contactName: lead.contactName,
+        email: lead.email,
+        phone: lead.phone || undefined,
+        country: lead.country,
+        status: LeadStatus.CLIENT,
+        partnerId: lead.partnerId,
+        partnerName: lead.partner.companyName,
+      })
+    }
+
+    if (status === LeadStatus.PROSPECT && lead.status === LeadStatus.LEAD) {
+      // Notify partner users of prospect conversion
+      await notifyPartnerUsers(lead.partnerId, NotifType.LEAD_TO_PROSPECT, {
+        companyName: lead.companyName,
+      })
+
+      // Send webhook for prospect conversion
+      await sendLeadWebhook(WebhookEventType.LEAD_TO_PROSPECT, {
+        id: lead.id,
+        companyName: lead.companyName,
+        contactName: lead.contactName,
+        email: lead.email,
+        phone: lead.phone || undefined,
+        country: lead.country,
+        status: LeadStatus.PROSPECT,
+        partnerId: lead.partnerId,
+        partnerName: lead.partner.companyName,
       })
     }
 

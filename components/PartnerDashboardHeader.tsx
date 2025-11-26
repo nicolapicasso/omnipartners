@@ -4,6 +4,7 @@ import { Menu } from 'lucide-react'
 import Logo from './Logo'
 import LogoutButton from './LogoutButton'
 import LanguageSelector from './LanguageSelector'
+import NotificationBell from './NotificationBell'
 import { useSidebar } from '@/lib/contexts/SidebarContext'
 
 interface PartnerDashboardHeaderProps {
@@ -33,6 +34,7 @@ export default function PartnerDashboardHeader({ userName, companyName }: Partne
             <span className="text-sm text-gray-600 hidden md:block">
               {companyName}
             </span>
+            <NotificationBell />
             <LanguageSelector />
             <LogoutButton className="flex items-center gap-2 px-2 sm:px-3 py-2 text-sm text-gray-700 hover:bg-gray-100 rounded-md transition" />
           </div>

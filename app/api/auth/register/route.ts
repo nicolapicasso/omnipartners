@@ -3,6 +3,7 @@ import { prisma } from '@/lib/prisma'
 import { hashPassword } from '@/lib/auth'
 import { registerPartnerSchema } from '@/lib/validations'
 import { PartnerStatus, PartnerCategory, NotificationType } from '@/types'
+import { sendPartnerWebhook, WebhookEventType } from '@/lib/webhooks'
 
 export async function POST(request: NextRequest) {
   try {
@@ -77,7 +78,18 @@ export async function POST(request: NextRequest) {
       )
     )
 
-    // TODO: Send email notification to admins (Hubspot integration)
+    // Send webhook to Make for Hubspot/email integration
+    await sendPartnerWebhook(WebhookEventType.PARTNER_REGISTERED, {
+      id: partner.id,
+      companyName: partner.companyName,
+      contactName: partner.contactName,
+      email: partner.email,
+      phone: partner.phone || undefined,
+      country: partner.country,
+      website: partner.website || undefined,
+      status: partner.status,
+      category: partner.partnerCategory,
+    })
 
     return NextResponse.json(
       {

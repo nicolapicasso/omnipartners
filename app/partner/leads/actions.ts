@@ -4,6 +4,8 @@ import { prisma } from '@/lib/prisma'
 import { revalidatePath } from 'next/cache'
 import { getPartnerSession } from '@/lib/session'
 import { LeadStatus } from '@/types'
+import { notifyAdmins, NotificationType } from '@/lib/notifications'
+import { sendLeadWebhook, WebhookEventType } from '@/lib/webhooks'
 
 export async function createPartnerLead(data: {
   companyName: string
@@ -57,6 +59,25 @@ export async function createPartnerLead(data: {
         commissionType: partner.partnerCategory, // Use partner's category
         commissionRate: 10, // Default rate, admin can adjust
       },
+    })
+
+    // Notify admins about new lead
+    await notifyAdmins(NotificationType.LEAD_CREATED, {
+      companyName: lead.companyName,
+      partnerName: partner.companyName,
+    })
+
+    // Send webhook to Make
+    await sendLeadWebhook(WebhookEventType.LEAD_CREATED, {
+      id: lead.id,
+      companyName: lead.companyName,
+      contactName: lead.contactName,
+      email: lead.email,
+      phone: lead.phone || undefined,
+      country: lead.country,
+      status: lead.status,
+      partnerId: partner.id,
+      partnerName: partner.companyName,
     })
 
     revalidatePath('/partner/leads')
