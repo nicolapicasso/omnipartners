@@ -1,6 +1,6 @@
 'use client'
 
-import { CheckCircle2, Circle, FileText, Wallet, TrendingUp, Users, Presentation, Calendar, LucideIcon } from 'lucide-react'
+import { CheckCircle2, Circle, FileText, Wallet, TrendingUp, Users, Presentation, LucideIcon } from 'lucide-react'
 import { useTranslation } from '@/lib/contexts/LanguageContext'
 
 // Map icon names to components
@@ -43,13 +43,10 @@ export default function RequirementsContent({
     <>
       {/* Page Header */}
       <div className="mb-8">
-        <div className="flex items-center gap-3 mb-2">
-          <Calendar className="w-8 h-8 text-omniwallet-primary" />
-          <h1 className="text-2xl font-semibold text-gray-900">
-            {t('requirements.title')} {currentYear}
-          </h1>
-        </div>
-        <p className="text-gray-600">{t('requirements.subtitle')}</p>
+        <h1 className="text-2xl font-semibold text-gray-900">
+          {t('requirements.title')} {currentYear}
+        </h1>
+        <p className="text-gray-600 mt-1">{t('requirements.subtitle')}</p>
       </div>
 
       {/* Overall Progress Card */}

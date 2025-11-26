@@ -5,6 +5,7 @@ import { usePathname } from 'next/navigation'
 import { LayoutDashboard, Users, TrendingUp, FileText, Award, X } from 'lucide-react'
 import { useTranslation } from '@/lib/contexts/LanguageContext'
 import { useSidebar } from '@/lib/contexts/SidebarContext'
+import Logo from './Logo'
 
 export default function AdminSidebar() {
   const pathname = usePathname()
@@ -56,20 +57,23 @@ export default function AdminSidebar() {
 
       {/* Sidebar */}
       <aside className={`
-        w-64 bg-white border-r border-gray-200 min-h-screen fixed left-0 top-16 bottom-0 overflow-y-auto z-30
+        w-64 bg-white border-r border-gray-200 min-h-screen fixed left-0 top-0 lg:top-16 bottom-0 overflow-y-auto z-30
         transform transition-transform duration-300 ease-in-out
         ${isOpen ? 'translate-x-0' : '-translate-x-full'}
         lg:translate-x-0
       `}>
-        {/* Close button for mobile */}
-        <button
-          onClick={close}
-          className="lg:hidden absolute top-4 right-4 p-2 text-gray-500 hover:text-gray-700"
-        >
-          <X className="w-5 h-5" />
-        </button>
+        {/* Mobile header with logo and close button */}
+        <div className="lg:hidden flex items-center justify-between p-4 border-b border-gray-200">
+          <Logo variant="dark" size="sm" href="/admin" />
+          <button
+            onClick={close}
+            className="p-2 text-gray-500 hover:text-gray-700"
+          >
+            <X className="w-5 h-5" />
+          </button>
+        </div>
 
-        <nav className="p-4 space-y-1 mt-8 lg:mt-0">
+        <nav className="p-4 space-y-1">
           {navItems.map((item) => {
             const Icon = item.icon
             return (

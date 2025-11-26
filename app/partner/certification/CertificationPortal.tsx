@@ -113,15 +113,13 @@ export default function CertificationPortal({
       {/* Overview */}
       {view === 'overview' && (
         <div>
-          {/* Header with certification badge */}
+          {/* Page Header */}
           <div className="mb-8">
-            <div className="flex items-center gap-4 mb-4">
-              <Award className="w-12 h-12 text-omniwallet-primary" />
-              <div>
-                <h1 className="text-2xl font-semibold text-gray-900">{t('certification.title')}</h1>
-                <p className="text-gray-600">{t('certification.getCertifiedDescription')}</p>
-              </div>
-            </div>
+            <h1 className="text-2xl font-semibold text-gray-900">{t('certification.title')}</h1>
+            <p className="text-gray-600 mt-1">{t('certification.getCertifiedDescription')}</p>
+          </div>
+
+          <div className="mb-8">
 
             {/* Certification Status */}
             {isCertified ? (

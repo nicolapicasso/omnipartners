@@ -29,7 +29,10 @@
     "download": "Download",
     "logout": "Logout",
     "of": "of",
-    "submitting": "Submitting..."
+    "submitting": "Submitting...",
+    "totalPaid": "Total Paid",
+    "yourCommissions": "Your Commissions",
+    "backToLeads": "Back to Leads"
   },
   "login": {
     "title": "Login",
@@ -188,10 +191,12 @@
     "featuredResources": "Featured Resources",
     "categories": "Categories",
     "allResources": "All Resources",
+    "resourcesOf": "Resources of",
     "noResources": "No resources available",
     "viewAllResources": "View all resources",
     "views": "views",
-    "downloads": "downloads"
+    "downloads": "downloads",
+    "backToResources": "Back to Resources"
   },
   "contract": {
     "title": "Partner Contract",
@@ -246,7 +251,24 @@
     "overview": "System overview",
     "managePartners": "Manage Partners",
     "manageLeads": "Manage Leads",
-    "manageCertification": "Manage Certification"
+    "manageCertification": "Manage Certification",
+    "activePartners": "Active Partners",
+    "pendingRequests": "Pending Requests",
+    "totalLeads": "Total Leads",
+    "totalCommissions": "Total Commissions",
+    "recentPartners": "Recent Partners",
+    "createNewLead": "Create New Lead",
+    "createNewResource": "Create New Resource",
+    "editResource": "Edit Resource",
+    "contentManagement": "Content Management",
+    "totalResources": "Total Resources",
+    "allResources": "All Resources",
+    "partnersManagement": "Partners Management",
+    "leadsManagement": "Leads Management",
+    "partnerContract": "Partner Contract",
+    "omniwalletAccount": "Omniwallet Account",
+    "partnerInformation": "Partner Information",
+    "assignedPartner": "Assigned Partner"
   },
   "certification": {
     "title": "Loyalty Partner Certification",

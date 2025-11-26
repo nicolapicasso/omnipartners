@@ -29,7 +29,10 @@
     "download": "Descargar",
     "logout": "Cerrar Sesión",
     "of": "de",
-    "submitting": "Enviando..."
+    "submitting": "Enviando...",
+    "totalPaid": "Total Pagado",
+    "yourCommissions": "Tus Comisiones",
+    "backToLeads": "Volver a Leads"
   },
   "login": {
     "title": "Iniciar Sesión",
@@ -188,10 +191,12 @@
     "featuredResources": "Recursos Destacados",
     "categories": "Categorías",
     "allResources": "Todos los Recursos",
+    "resourcesOf": "Recursos de",
     "noResources": "No hay recursos disponibles",
     "viewAllResources": "Ver todos los recursos",
     "views": "vistas",
-    "downloads": "descargas"
+    "downloads": "descargas",
+    "backToResources": "Volver a Recursos"
   },
   "contract": {
     "title": "Contrato de Partner",
@@ -246,7 +251,24 @@
     "overview": "Vista general del sistema",
     "managePartners": "Gestionar Partners",
     "manageLeads": "Gestionar Leads",
-    "manageCertification": "Gestionar Certificación"
+    "manageCertification": "Gestionar Certificación",
+    "activePartners": "Partners Activos",
+    "pendingRequests": "Solicitudes Pendientes",
+    "totalLeads": "Total de Leads",
+    "totalCommissions": "Comisiones Totales",
+    "recentPartners": "Partners Recientes",
+    "createNewLead": "Crear Nuevo Lead",
+    "createNewResource": "Crear Nuevo Recurso",
+    "editResource": "Editar Recurso",
+    "contentManagement": "Gestión de Contenido",
+    "totalResources": "Total de Recursos",
+    "allResources": "Todos los Recursos",
+    "partnersManagement": "Gestión de Partners",
+    "leadsManagement": "Gestión de Leads",
+    "partnerContract": "Contrato del Partner",
+    "omniwalletAccount": "Cuenta Omniwallet",
+    "partnerInformation": "Información del Partner",
+    "assignedPartner": "Partner Asignado"
   },
   "certification": {
     "title": "Certificación Loyalty Partner",
