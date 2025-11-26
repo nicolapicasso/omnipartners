@@ -13,7 +13,7 @@ export default async function NewContentPage() {
       <AdminDashboardHeader userName={session.user.name || 'Admin'} />
       <AdminSidebar />
 
-      <main className="lg:ml-64 pt-28 px-4 sm:px-6 lg:px-8 py-6 lg:py-8">
+      <main className="lg:ml-64 pt-28 lg:pt-32 px-4 sm:px-6 lg:px-8 py-6 lg:py-8">
         <div className="max-w-4xl mx-auto">
           {/* Page Header */}
           <div className="mb-8">
