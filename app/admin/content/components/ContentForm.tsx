@@ -294,7 +294,7 @@ export default function ContentForm({ content }: { content?: Content }) {
             <option value={ContentStatus.PUBLISHED}>Publicado</option>
           </select>
           {formData.status === ContentStatus.PUBLISHED && (
-            <p className="text-xs text-blue-600 mt-1">
+            <p className="text-xs text-omniwallet-primary mt-1">
               Al publicar, se notificará a todos los partners activos
             </p>
           )}

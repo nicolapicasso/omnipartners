@@ -118,7 +118,7 @@ export default function CertificationPortal({
             <div className="flex items-center gap-4 mb-4">
               <Award className="w-12 h-12 text-omniwallet-primary" />
               <div>
-                <h1 className="text-3xl font-bold text-gray-900">{t('certification.title')}</h1>
+                <h1 className="text-2xl font-semibold text-gray-900">{t('certification.title')}</h1>
                 <p className="text-gray-600">{t('certification.getCertifiedDescription')}</p>
               </div>
             </div>
@@ -139,15 +139,15 @@ export default function CertificationPortal({
                 </div>
               </div>
             ) : (
-              <div className="bg-gradient-to-r from-blue-50 to-indigo-50 border-2 border-blue-200 rounded-lg p-6">
+              <div className="bg-gradient-to-r from-omniwallet-primary/10 to-omniwallet-secondary/10 border-2 border-omniwallet-primary/30 rounded-lg p-6">
                 <div className="flex items-center gap-3 mb-2">
-                  <Award className="w-6 h-6 text-blue-600" />
-                  <h2 className="text-xl font-bold text-blue-900">{t('certification.getCertified')}</h2>
+                  <Award className="w-6 h-6 text-omniwallet-primary" />
+                  <h2 className="text-xl font-bold text-omniwallet-secondary">{t('certification.getCertified')}</h2>
                 </div>
-                <p className="text-blue-700 mb-4">
+                <p className="text-omniwallet-secondary mb-4">
                   {t('certification.getCertifiedDescription')}
                 </p>
-                <p className="text-sm text-blue-600">
+                <p className="text-sm text-omniwallet-primary">
                   {t('certification.studyDescription')}
                 </p>
               </div>
@@ -161,8 +161,8 @@ export default function CertificationPortal({
               className="bg-white rounded-lg shadow-sm border-2 border-gray-200 p-6 hover:border-omniwallet-primary transition text-left"
             >
               <div className="flex items-center gap-4 mb-3">
-                <div className="p-3 bg-blue-100 rounded-lg">
-                  <BookOpen className="w-6 h-6 text-blue-600" />
+                <div className="p-3 bg-omniwallet-primary/10 rounded-lg">
+                  <BookOpen className="w-6 h-6 text-omniwallet-primary" />
                 </div>
                 <div>
                   <h3 className="text-lg font-semibold text-gray-900">{t('certification.studyMaterials')}</h3>
@@ -246,7 +246,7 @@ export default function CertificationPortal({
             >
               ← {t('certification.backToOverview')}
             </button>
-            <h1 className="text-3xl font-bold text-gray-900 mb-2">{t('certification.studyMaterials')}</h1>
+            <h1 className="text-2xl font-semibold text-gray-900 mb-2">{t('certification.studyMaterials')}</h1>
             <p className="text-gray-600">{t('certification.reviewContent')}</p>
           </div>
 
@@ -322,7 +322,7 @@ export default function CertificationPortal({
         <div>
           <div className="mb-6">
             <div className="flex items-center justify-between mb-4">
-              <h1 className="text-3xl font-bold text-gray-900">{t('certification.examTitle')}</h1>
+              <h1 className="text-2xl font-semibold text-gray-900">{t('certification.examTitle')}</h1>
               <div className="text-right">
                 <p className="text-sm text-gray-600">
                   {t('certification.question')} {currentQuestion + 1} {t('certification.of')} {questions.length}
@@ -430,7 +430,7 @@ export default function CertificationPortal({
               )}
             </div>
 
-            <h1 className="text-3xl font-bold text-gray-900 mb-2">{t('certification.examResults')}</h1>
+            <h1 className="text-2xl font-semibold text-gray-900 mb-2">{t('certification.examResults')}</h1>
             <p className={`text-lg ${examResults.passed ? 'text-green-600' : 'text-red-600'}`}>
               {examResults.passed ? t('certification.passed') : t('certification.failed')}
             </p>

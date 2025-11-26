@@ -75,7 +75,7 @@ export default async function PartnerLeadDetailPage({
       />
       <PartnerSidebar />
 
-      <main className="lg:ml-64 pt-28 lg:pt-32 px-4 sm:px-6 lg:px-8 py-6 lg:py-8">
+      <main className="lg:ml-64 pt-28 lg:pt-28 px-4 sm:px-6 lg:px-8 py-6 lg:py-8">
         {/* Page Header */}
         <div className="mb-8">
           <Link
@@ -319,8 +319,8 @@ export default async function PartnerLeadDetailPage({
                   </p>
                 </div>
               </div>
-              <div className="mt-4 p-3 bg-blue-50 rounded-lg">
-                <p className="text-xs text-blue-800">
+              <div className="mt-4 p-3 bg-omniwallet-primary/10 rounded-lg">
+                <p className="text-xs text-omniwallet-secondary">
                   La configuración de comisión es establecida por el administrador
                 </p>
               </div>

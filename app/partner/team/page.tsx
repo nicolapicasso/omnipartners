@@ -61,7 +61,7 @@ export default async function PartnerTeamPage() {
       />
       <PartnerSidebar />
 
-      <main className="lg:ml-64 pt-28 lg:pt-32 px-4 sm:px-6 lg:px-8 py-6 lg:py-8">
+      <main className="lg:ml-64 pt-28 lg:pt-28 px-4 sm:px-6 lg:px-8 py-6 lg:py-8">
         {/* Page Title */}
         <div className="mb-8">
           <h1 className="text-2xl font-semibold text-gray-900">My Team</h1>
@@ -133,9 +133,9 @@ export default async function PartnerTeamPage() {
                 <InviteTeamMemberForm />
               </div>
             ) : (
-              <div className="bg-blue-50 border border-blue-200 rounded-md p-6">
-                <Shield className="w-8 h-8 text-blue-600 mb-3" />
-                <p className="text-sm text-blue-800">
+              <div className="bg-omniwallet-primary/10 border border-omniwallet-primary/30 rounded-md p-6">
+                <Shield className="w-8 h-8 text-omniwallet-primary mb-3" />
+                <p className="text-sm text-omniwallet-secondary">
                   Only the partner owner can invite new team members.
                 </p>
               </div>

@@ -93,7 +93,7 @@ export default async function PartnerDashboard() {
       />
       <PartnerSidebar />
 
-      <main className="lg:ml-64 pt-28 lg:pt-32 px-4 sm:px-6 lg:px-8 py-6 lg:py-8">
+      <main className="lg:ml-64 pt-28 lg:pt-28 px-4 sm:px-6 lg:px-8 py-6 lg:py-8">
         {/* Page Title */}
         <div className="mb-8">
           <h1 className="text-2xl font-semibold text-gray-900">Dashboard</h1>
@@ -327,9 +327,9 @@ export default async function PartnerDashboard() {
         <div className="bg-white rounded-lg shadow-sm border border-gray-200 p-6 mb-8">
           <h3 className="text-base font-semibold text-gray-900 mb-4">Your Omniwallet Account</h3>
           {partner.omniwalletAccountUrl ? (
-            <div className="flex items-start gap-4 p-4 bg-blue-50 border border-blue-200 rounded-lg">
-              <div className="bg-blue-100 p-2.5 rounded-lg">
-                <Wallet className="w-6 h-6 text-blue-700" />
+            <div className="flex items-start gap-4 p-4 bg-omniwallet-primary/10 border border-omniwallet-primary/30 rounded-lg">
+              <div className="bg-omniwallet-primary/20 p-2.5 rounded-lg">
+                <Wallet className="w-6 h-6 text-omniwallet-primary" />
               </div>
               <div className="flex-1">
                 <p className="text-sm font-medium text-gray-900 mb-1">Your account is ready</p>
@@ -340,7 +340,7 @@ export default async function PartnerDashboard() {
                   href={partner.omniwalletAccountUrl}
                   target="_blank"
                   rel="noopener noreferrer"
-                  className="inline-flex items-center gap-2 bg-blue-600 text-white px-4 py-2 rounded-md text-sm font-medium hover:bg-blue-700 transition"
+                  className="inline-flex items-center gap-2 bg-omniwallet-primary text-white px-4 py-2 rounded-md text-sm font-medium hover:bg-omniwallet-secondary transition"
                 >
                   <ExternalLink className="w-4 h-4" />
                   Access Account

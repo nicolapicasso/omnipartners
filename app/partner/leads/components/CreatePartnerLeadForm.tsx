@@ -174,8 +174,8 @@ export default function CreatePartnerLeadForm() {
         </div>
       </div>
 
-      <div className="bg-blue-50 border border-blue-200 rounded-lg p-4">
-        <p className="text-sm text-blue-800">
+      <div className="bg-omniwallet-primary/10 border border-omniwallet-primary/30 rounded-lg p-4">
+        <p className="text-sm text-omniwallet-secondary">
           <strong>Nota:</strong> El administrador asignará la configuración de comisión para este
           lead. Recibirás una notificación cuando se configure.
         </p>

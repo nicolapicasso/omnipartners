@@ -45,7 +45,7 @@ export default function RequirementsContent({
       <div className="mb-8">
         <div className="flex items-center gap-3 mb-2">
           <Calendar className="w-8 h-8 text-omniwallet-primary" />
-          <h1 className="text-3xl font-bold text-gray-900">
+          <h1 className="text-2xl font-semibold text-gray-900">
             {t('requirements.title')} {currentYear}
           </h1>
         </div>
@@ -173,7 +173,7 @@ export default function RequirementsContent({
       </div>
 
       {/* Help Section */}
-      <div className="mt-8 bg-blue-50 border border-blue-200 rounded-lg p-6">
+      <div className="mt-8 bg-omniwallet-primary/10 border border-omniwallet-primary/30 rounded-lg p-6">
         <h3 className="text-lg font-semibold text-gray-900 mb-2">
           {t('requirements.helpTitle')}
         </h3>
