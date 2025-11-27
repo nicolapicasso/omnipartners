@@ -1,0 +1,36 @@
+version: '3.8'
+
+# Production docker-compose for DigitalOcean
+# Uses external PostgreSQL (DigitalOcean Managed Database)
+#
+# Usage:
+#   docker-compose -f docker-compose.prod.yml up -d
+#
+# Required environment variables (set in .env or DigitalOcean App Platform):
+#   - DATABASE_URL: PostgreSQL connection string from DigitalOcean
+#   - NEXTAUTH_SECRET: Random secret for NextAuth
+#   - NEXTAUTH_URL: Your production URL (e.g., https://partners.yourdomain.com)
+
+services:
+  app:
+    build:
+      context: .
+      dockerfile: Dockerfile
+    ports:
+      - "3000:3000"
+    environment:
+      - DATABASE_URL=${DATABASE_URL}
+      - NEXTAUTH_URL=${NEXTAUTH_URL}
+      - NEXTAUTH_SECRET=${NEXTAUTH_SECRET}
+      - MAKE_WEBHOOK_URL=${MAKE_WEBHOOK_URL:-}
+      - HUBSPOT_API_KEY=${HUBSPOT_API_KEY:-}
+      - HUBSPOT_PORTAL_ID=${HUBSPOT_PORTAL_ID:-}
+      - OMNIWALLET_API_URL=${OMNIWALLET_API_URL:-}
+      - OMNIWALLET_API_KEY=${OMNIWALLET_API_KEY:-}
+    restart: unless-stopped
+    healthcheck:
+      test: ["CMD", "wget", "--no-verbose", "--tries=1", "--spider", "http://localhost:3000/api/health"]
+      interval: 30s
+      timeout: 10s
+      retries: 3
+      start_period: 40s

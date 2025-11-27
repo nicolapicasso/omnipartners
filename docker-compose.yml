@@ -8,7 +8,7 @@ services:
     ports:
       - "3000:3000"
     environment:
-      - DATABASE_URL=${DATABASE_URL:-file:/app/data/prod.db}
+      - DATABASE_URL=${DATABASE_URL:-postgresql://postgres:postgres@db:5432/omnipartners?schema=public}
       - NEXTAUTH_URL=${NEXTAUTH_URL:-http://localhost:3000}
       - NEXTAUTH_SECRET=${NEXTAUTH_SECRET}
       - MAKE_WEBHOOK_URL=${MAKE_WEBHOOK_URL:-}
@@ -16,9 +16,6 @@ services:
       - HUBSPOT_PORTAL_ID=${HUBSPOT_PORTAL_ID:-}
       - OMNIWALLET_API_URL=${OMNIWALLET_API_URL:-}
       - OMNIWALLET_API_KEY=${OMNIWALLET_API_KEY:-}
-    volumes:
-      # Persist SQLite database (if using SQLite in production)
-      - app_data:/app/data
     restart: unless-stopped
     healthcheck:
       test: ["CMD", "wget", "--no-verbose", "--tries=1", "--spider", "http://localhost:3000/api/health"]
@@ -26,6 +23,28 @@ services:
       timeout: 10s
       retries: 3
       start_period: 40s
+    depends_on:
+      db:
+        condition: service_healthy
+
+  # PostgreSQL for local development
+  # For production on DigitalOcean, remove this service and use Managed Database
+  db:
+    image: postgres:16-alpine
+    environment:
+      - POSTGRES_USER=postgres
+      - POSTGRES_PASSWORD=postgres
+      - POSTGRES_DB=omnipartners
+    volumes:
+      - postgres_data:/var/lib/postgresql/data
+    ports:
+      - "5432:5432"
+    restart: unless-stopped
+    healthcheck:
+      test: ["CMD-SHELL", "pg_isready -U postgres"]
+      interval: 10s
+      timeout: 5s
+      retries: 5
 
 volumes:
-  app_data:
+  postgres_data:
