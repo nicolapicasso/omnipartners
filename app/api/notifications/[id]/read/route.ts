@@ -1,6 +1,6 @@
 import { NextRequest, NextResponse } from 'next/server'
 import { getServerSession } from 'next-auth'
-import { authOptions } from '@/lib/auth'
+import { authOptions } from '@/lib/auth-options'
 import { prisma } from '@/lib/prisma'
 
 // POST /api/notifications/[id]/read - Mark a notification as read
@@ -21,13 +21,19 @@ export async function POST(
 
     if (!notification) {
       return NextResponse.json(
-        { error: 'Notificación no encontrada' },
+        { error: 'Notificacion no encontrada' },
         { status: 404 }
       )
     }
 
     // Verify user owns this notification
-    if (notification.userId !== session.user.id) {
+    // For PARTNER_OWNER, check partnerId; for others, check userId
+    const isPartnerOwner = session.user.role === 'PARTNER_OWNER'
+    const isOwner = isPartnerOwner
+      ? notification.partnerId === session.user.id
+      : notification.userId === session.user.id
+
+    if (!isOwner) {
       return NextResponse.json({ error: 'Unauthorized' }, { status: 403 })
     }
 
@@ -43,7 +49,7 @@ export async function POST(
   } catch (error) {
     console.error('Error marking notification as read:', error)
     return NextResponse.json(
-      { error: 'Error al actualizar notificación' },
+      { error: 'Error al actualizar notificacion' },
       { status: 500 }
     )
   }
