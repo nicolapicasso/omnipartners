@@ -2,8 +2,6 @@
 
 import { useState, useEffect, useRef } from 'react'
 import { Bell, Check, CheckCheck, X } from 'lucide-react'
-import { formatDistanceToNow } from 'date-fns'
-import { es } from 'date-fns/locale'
 
 interface Notification {
   id: string
@@ -14,6 +12,49 @@ interface Notification {
   readAt: string | null
   createdAt: string
   metadata: string | null
+}
+
+// Helper function to format relative time in Spanish (replaces date-fns)
+function formatTimeAgo(dateString: string): string {
+  try {
+    const date = new Date(dateString)
+    const now = new Date()
+    const diffInSeconds = Math.floor((now.getTime() - date.getTime()) / 1000)
+
+    if (diffInSeconds < 60) {
+      return 'hace unos segundos'
+    }
+
+    const diffInMinutes = Math.floor(diffInSeconds / 60)
+    if (diffInMinutes < 60) {
+      return diffInMinutes === 1 ? 'hace 1 minuto' : `hace ${diffInMinutes} minutos`
+    }
+
+    const diffInHours = Math.floor(diffInMinutes / 60)
+    if (diffInHours < 24) {
+      return diffInHours === 1 ? 'hace 1 hora' : `hace ${diffInHours} horas`
+    }
+
+    const diffInDays = Math.floor(diffInHours / 24)
+    if (diffInDays < 7) {
+      return diffInDays === 1 ? 'hace 1 dia' : `hace ${diffInDays} dias`
+    }
+
+    const diffInWeeks = Math.floor(diffInDays / 7)
+    if (diffInWeeks < 4) {
+      return diffInWeeks === 1 ? 'hace 1 semana' : `hace ${diffInWeeks} semanas`
+    }
+
+    const diffInMonths = Math.floor(diffInDays / 30)
+    if (diffInMonths < 12) {
+      return diffInMonths === 1 ? 'hace 1 mes' : `hace ${diffInMonths} meses`
+    }
+
+    const diffInYears = Math.floor(diffInDays / 365)
+    return diffInYears === 1 ? 'hace 1 año' : `hace ${diffInYears} años`
+  } catch {
+    return ''
+  }
 }
 
 export default function NotificationBell() {
@@ -96,21 +137,6 @@ export default function NotificationBell() {
       console.error('Error marking all as read:', error)
     }
     setLoading(false)
-  }
-
-  // Get icon for notification type
-  const getNotificationIcon = (type: string) => {
-    // You can customize icons based on notification type
-    return null
-  }
-
-  // Format time ago
-  const formatTimeAgo = (dateString: string) => {
-    try {
-      return formatDistanceToNow(new Date(dateString), { addSuffix: true, locale: es })
-    } catch {
-      return ''
-    }
   }
 
   return (
@@ -212,7 +238,6 @@ export default function NotificationBell() {
             <div className="px-4 py-2 border-t border-gray-200 bg-gray-50">
               <button
                 onClick={() => {
-                  // Could navigate to a full notifications page
                   setIsOpen(false)
                 }}
                 className="text-xs text-gray-500 hover:text-gray-700 w-full text-center"
