@@ -4,6 +4,8 @@ import { prisma } from '@/lib/prisma'
 import { revalidatePath } from 'next/cache'
 import { getAdminSession } from '@/lib/session'
 import { ContentType, ContentCategory, ContentStatus, NotificationType } from '@/types'
+import { sendContentWebhook } from '@/lib/webhooks'
+import { WebhookEventType } from '@/lib/webhook-types'
 
 export async function createContent(data: {
   title: string
@@ -35,7 +37,7 @@ export async function createContent(data: {
       },
     })
 
-    // If published, notify all partners
+    // If published, notify all partners and send webhook
     if (data.status === ContentStatus.PUBLISHED) {
       const partners = await prisma.partner.findMany({
         where: { status: 'ACTIVE' },
@@ -58,6 +60,19 @@ export async function createContent(data: {
           })
         )
       )
+
+      // Send webhook for content published event
+      const tags = data.tags || []
+      await sendContentWebhook(WebhookEventType.CONTENT_PUBLISHED, {
+        id: content.id,
+        title: content.title,
+        description: content.description || undefined,
+        type: content.type,
+        category: content.category,
+        fileUrl: content.fileUrl || undefined,
+        externalUrl: content.externalUrl || undefined,
+        tags,
+      })
     }
 
     revalidatePath('/admin/content')
@@ -110,7 +125,7 @@ export async function updateContent(
       },
     })
 
-    // If just published, notify partners
+    // If just published, notify partners and send webhook
     if (data.status === ContentStatus.PUBLISHED && oldContent.status === ContentStatus.DRAFT) {
       const partners = await prisma.partner.findMany({
         where: { status: 'ACTIVE' },
@@ -133,6 +148,19 @@ export async function updateContent(
           })
         )
       )
+
+      // Send webhook for content published event
+      const tags = content.tags ? JSON.parse(content.tags) : []
+      await sendContentWebhook(WebhookEventType.CONTENT_PUBLISHED, {
+        id: content.id,
+        title: content.title,
+        description: content.description || undefined,
+        type: content.type,
+        category: content.category,
+        fileUrl: content.fileUrl || undefined,
+        externalUrl: content.externalUrl || undefined,
+        tags,
+      })
     }
 
     revalidatePath('/admin/content')

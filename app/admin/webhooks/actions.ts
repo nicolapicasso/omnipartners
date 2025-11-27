@@ -332,5 +332,8 @@ export async function getAllWebhookEventTypes(): Promise<{ value: string; label:
     // Requirement Events
     { value: WebhookEventType.REQUIREMENT_COMPLETED, label: 'Requisito completado', category: 'Requisitos' },
     { value: WebhookEventType.ALL_REQUIREMENTS_MET, label: 'Todos los requisitos cumplidos', category: 'Requisitos' },
+
+    // Content Events
+    { value: WebhookEventType.CONTENT_PUBLISHED, label: 'Contenido publicado', category: 'Contenido' },
   ]
 }

@@ -28,6 +28,9 @@ export enum WebhookEventType {
   // Requirement Events
   REQUIREMENT_COMPLETED = 'requirement.completed',
   ALL_REQUIREMENTS_MET = 'requirements.all_met',
+
+  // Content Events
+  CONTENT_PUBLISHED = 'content.published',
 }
 
 // ============================================
@@ -73,6 +76,17 @@ export interface PaymentData {
   partnerId: string
   partnerName: string
   commissionAmount: number
+}
+
+export interface ContentData {
+  id: string
+  title: string
+  description?: string
+  type: string
+  category: string
+  fileUrl?: string
+  externalUrl?: string
+  tags?: string[]
 }
 
 export interface HubspotContact {

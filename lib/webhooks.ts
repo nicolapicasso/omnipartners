@@ -8,6 +8,7 @@ import {
   PartnerData,
   LeadData,
   PaymentData,
+  ContentData,
   HubspotContact
 } from './webhook-types'
 
@@ -211,6 +212,20 @@ export async function sendPaymentWebhook(
 ) {
   return dispatchWebhook(event, {
     payment,
+    ...additionalData
+  })
+}
+
+/**
+ * Send webhook for content events
+ */
+export async function sendContentWebhook(
+  event: WebhookEventType,
+  content: ContentData,
+  additionalData?: Record<string, unknown>
+) {
+  return dispatchWebhook(event, {
+    content,
     ...additionalData
   })
 }
