@@ -5,7 +5,8 @@ import { revalidatePath } from 'next/cache'
 import { getAdminSession } from '@/lib/session'
 import { LeadStatus, CommissionType, NotificationType } from '@/types'
 import { notifyPartnerUsers, NotificationType as NotifType } from '@/lib/notifications'
-import { sendLeadWebhook, WebhookEventType } from '@/lib/webhooks'
+import { sendLeadWebhook } from '@/lib/webhooks'
+import { WebhookEventType } from '@/lib/webhook-types'
 
 export async function createLead(data: {
   companyName: string

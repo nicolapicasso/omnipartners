@@ -2,83 +2,14 @@
 
 import { prisma } from '@/lib/prisma'
 import crypto from 'crypto'
-
-// ============================================
-// WEBHOOK EVENT TYPES
-// ============================================
-
-export enum WebhookEventType {
-  // Partner Events
-  PARTNER_REGISTERED = 'partner.registered',
-  PARTNER_APPROVED = 'partner.approved',
-  PARTNER_REJECTED = 'partner.rejected',
-  PARTNER_SUSPENDED = 'partner.suspended',
-  PARTNER_CERTIFIED = 'partner.certified',
-
-  // Lead Events
-  LEAD_CREATED = 'lead.created',
-  LEAD_UPDATED = 'lead.updated',
-  LEAD_TO_PROSPECT = 'lead.converted_to_prospect',
-  LEAD_TO_CLIENT = 'lead.converted_to_client',
-
-  // Payment Events
-  PAYMENT_RECEIVED = 'payment.received',
-  COMMISSION_GENERATED = 'commission.generated',
-  INVOICE_CREATED = 'invoice.created',
-
-  // User Events
-  USER_INVITED = 'user.invited',
-  USER_JOINED = 'user.joined',
-
-  // Requirement Events
-  REQUIREMENT_COMPLETED = 'requirement.completed',
-  ALL_REQUIREMENTS_MET = 'requirements.all_met',
-}
-
-// ============================================
-// WEBHOOK PAYLOAD INTERFACES
-// ============================================
-
-interface WebhookPayload {
-  event: WebhookEventType | string
-  timestamp: string
-  data: Record<string, unknown>
-}
-
-interface PartnerData {
-  id: string
-  companyName: string
-  contactName: string
-  email: string
-  phone?: string
-  country: string
-  website?: string
-  status: string
-  category: string
-}
-
-interface LeadData {
-  id: string
-  companyName: string
-  contactName: string
-  email: string
-  phone?: string
-  country: string
-  status: string
-  partnerId: string
-  partnerName: string
-}
-
-interface PaymentData {
-  id: string
-  amount: number
-  currency: string
-  leadId: string
-  clientName: string
-  partnerId: string
-  partnerName: string
-  commissionAmount: number
-}
+import {
+  WebhookEventType,
+  WebhookPayload,
+  PartnerData,
+  LeadData,
+  PaymentData,
+  HubspotContact
+} from './webhook-types'
 
 // ============================================
 // WEBHOOK SERVICE
@@ -299,18 +230,6 @@ export async function sendWebhook(
 // ============================================
 
 const HUBSPOT_API_KEY = process.env.HUBSPOT_API_KEY
-
-interface HubspotContact {
-  email: string
-  firstname?: string
-  lastname?: string
-  company?: string
-  phone?: string
-  country?: string
-  website?: string
-  partner_status?: string
-  partner_category?: string
-}
 
 /**
  * Create or update a contact in Hubspot

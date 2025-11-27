@@ -3,7 +3,8 @@ import { prisma } from '@/lib/prisma'
 import { hashPassword } from '@/lib/auth'
 import { registerPartnerSchema } from '@/lib/validations'
 import { PartnerStatus, PartnerCategory, NotificationType } from '@/types'
-import { sendPartnerWebhook, WebhookEventType } from '@/lib/webhooks'
+import { sendPartnerWebhook } from '@/lib/webhooks'
+import { WebhookEventType } from '@/lib/webhook-types'
 
 export async function POST(request: NextRequest) {
   try {

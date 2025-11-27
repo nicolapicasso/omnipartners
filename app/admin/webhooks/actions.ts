@@ -2,7 +2,7 @@
 
 import { revalidatePath } from 'next/cache'
 import { prisma } from '@/lib/prisma'
-import { WebhookEventType } from '@/lib/webhooks'
+import { WebhookEventType } from '@/lib/webhook-types'
 import crypto from 'crypto'
 
 // ============================================
