@@ -253,7 +253,7 @@ export async function clearWebhookLogs(subscriptionId: string) {
 // HELPERS
 // ============================================
 
-export function getAllWebhookEventTypes(): { value: string; label: string; category: string }[] {
+export async function getAllWebhookEventTypes(): Promise<{ value: string; label: string; category: string }[]> {
   return [
     // Partner Events
     { value: WebhookEventType.PARTNER_REGISTERED, label: 'Partner registrado', category: 'Partners' },

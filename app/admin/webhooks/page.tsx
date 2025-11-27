@@ -5,7 +5,7 @@ import { Webhook, Plus } from 'lucide-react'
 
 export default async function WebhooksPage() {
   const subscriptions = await getWebhookSubscriptions()
-  const eventTypes = getAllWebhookEventTypes()
+  const eventTypes = await getAllWebhookEventTypes()
 
   return (
     <div className="space-y-6">
