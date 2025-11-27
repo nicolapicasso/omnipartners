@@ -68,6 +68,58 @@ export async function getWebhookLogs(subscriptionId: string, limit = 50) {
   return logs
 }
 
+export interface LogFilters {
+  subscriptionId?: string
+  event?: string
+  success?: boolean
+  page?: number
+  limit?: number
+}
+
+export async function getAllWebhookLogs(filters: LogFilters = {}) {
+  const { subscriptionId, event, success, page = 1, limit = 50 } = filters
+
+  const where: Record<string, unknown> = {}
+
+  if (subscriptionId) {
+    where.subscriptionId = subscriptionId
+  }
+
+  if (event) {
+    where.event = event
+  }
+
+  if (success !== undefined) {
+    where.success = success
+  }
+
+  const [logs, total] = await Promise.all([
+    prisma.webhookLog.findMany({
+      where,
+      orderBy: { createdAt: 'desc' },
+      skip: (page - 1) * limit,
+      take: limit,
+      include: {
+        subscription: {
+          select: {
+            name: true,
+            url: true
+          }
+        }
+      }
+    }),
+    prisma.webhookLog.count({ where })
+  ])
+
+  return {
+    logs,
+    total,
+    page,
+    limit,
+    totalPages: Math.ceil(total / limit)
+  }
+}
+
 // ============================================
 // MUTATIONS
 // ============================================

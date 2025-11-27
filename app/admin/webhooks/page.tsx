@@ -4,7 +4,8 @@ import WebhookList from './components/WebhookList'
 import CreateWebhookButton from './components/CreateWebhookButton'
 import AdminDashboardHeader from '@/components/AdminDashboardHeader'
 import AdminSidebar from '@/components/AdminSidebar'
-import { Webhook } from 'lucide-react'
+import { Webhook, FileText } from 'lucide-react'
+import Link from 'next/link'
 
 export default async function WebhooksPage() {
   const session = await getAdminSession()
@@ -25,7 +26,17 @@ export default async function WebhooksPage() {
               Suscribe URLs a eventos para integrar con Make, Hubspot u otros servicios
             </p>
           </div>
-          <CreateWebhookButton eventTypes={eventTypes} />
+          <div className="flex items-center gap-2">
+            <Link
+              href="/admin/webhooks/logs"
+              className="inline-flex items-center gap-2 px-4 py-2 border border-gray-300 rounded-md text-sm font-medium text-gray-700 hover:bg-gray-50 transition"
+            >
+              <FileText className="w-4 h-4" />
+              <span className="hidden sm:inline">Ver Logs</span>
+              <span className="sm:hidden">Logs</span>
+            </Link>
+            <CreateWebhookButton eventTypes={eventTypes} />
+          </div>
         </div>
 
         {/* Stats */}

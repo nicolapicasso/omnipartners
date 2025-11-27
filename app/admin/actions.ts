@@ -4,6 +4,8 @@ import { prisma } from '@/lib/prisma'
 import { revalidatePath } from 'next/cache'
 import { PartnerStatus, NotificationType, PartnerCategory } from '@/types'
 import { getAdminSession } from '@/lib/session'
+import { sendPartnerWebhook } from '@/lib/webhooks'
+import { WebhookEventType } from '@/lib/webhook-types'
 
 export async function approvePartner(partnerId: string) {
   try {
@@ -27,7 +29,17 @@ export async function approvePartner(partnerId: string) {
       },
     })
 
-    // TODO: Send email notification (Hubspot integration)
+    // Send webhook for partner approved event
+    await sendPartnerWebhook(WebhookEventType.PARTNER_APPROVED, {
+      id: partner.id,
+      companyName: partner.companyName,
+      contactName: partner.contactName,
+      email: partner.email,
+      phone: partner.phone || undefined,
+      country: partner.country,
+      status: PartnerStatus.ACTIVE,
+      category: partner.partnerCategory || '',
+    })
 
     revalidatePath('/admin')
     revalidatePath('/admin/partners')
@@ -57,7 +69,17 @@ export async function rejectPartner(partnerId: string) {
       },
     })
 
-    // TODO: Send email notification (Hubspot integration)
+    // Send webhook for partner rejected event
+    await sendPartnerWebhook(WebhookEventType.PARTNER_REJECTED, {
+      id: partner.id,
+      companyName: partner.companyName,
+      contactName: partner.contactName,
+      email: partner.email,
+      phone: partner.phone || undefined,
+      country: partner.country,
+      status: PartnerStatus.REJECTED,
+      category: partner.partnerCategory || '',
+    })
 
     revalidatePath('/admin')
     revalidatePath('/admin/partners')
@@ -90,9 +112,21 @@ export async function suspendPartner(partnerId: string) {
   try {
     await getAdminSession() // Verify admin
 
-    await prisma.partner.update({
+    const partner = await prisma.partner.update({
       where: { id: partnerId },
       data: { status: PartnerStatus.SUSPENDED },
+    })
+
+    // Send webhook for partner suspended event
+    await sendPartnerWebhook(WebhookEventType.PARTNER_SUSPENDED, {
+      id: partner.id,
+      companyName: partner.companyName,
+      contactName: partner.contactName,
+      email: partner.email,
+      phone: partner.phone || undefined,
+      country: partner.country,
+      status: PartnerStatus.SUSPENDED,
+      category: partner.partnerCategory || '',
     })
 
     revalidatePath('/admin/partners')
@@ -108,9 +142,21 @@ export async function activatePartner(partnerId: string) {
   try {
     await getAdminSession() // Verify admin
 
-    await prisma.partner.update({
+    const partner = await prisma.partner.update({
       where: { id: partnerId },
       data: { status: PartnerStatus.ACTIVE },
+    })
+
+    // Send webhook for partner reactivated (using approved event)
+    await sendPartnerWebhook(WebhookEventType.PARTNER_APPROVED, {
+      id: partner.id,
+      companyName: partner.companyName,
+      contactName: partner.contactName,
+      email: partner.email,
+      phone: partner.phone || undefined,
+      country: partner.country,
+      status: PartnerStatus.ACTIVE,
+      category: partner.partnerCategory || '',
     })
 
     revalidatePath('/admin/partners')
