@@ -90,7 +90,7 @@ export default function WebhookList({ subscriptions, eventTypes }: WebhookListPr
             : result.errorMessage || `Error (${result.statusCode})`
         }
       }))
-    } catch (error) {
+    } catch {
       setTestResults(prev => ({
         ...prev,
         [id]: {
@@ -120,17 +120,17 @@ export default function WebhookList({ subscriptions, eventTypes }: WebhookListPr
         {subscriptions.map((subscription) => (
           <div
             key={subscription.id}
-            className={`bg-white rounded-lg border ${subscription.isActive ? 'border-gray-200' : 'border-gray-200 opacity-60'}`}
+            className={`bg-white rounded-lg shadow-sm border ${subscription.isActive ? 'border-gray-200' : 'border-gray-200 opacity-60'}`}
           >
             {/* Header */}
-            <div className="p-4">
-              <div className="flex items-start justify-between">
-                <div className="flex items-start gap-3">
-                  <div className={`p-2 rounded-lg ${subscription.isActive ? 'bg-omniwallet-primary/10' : 'bg-gray-100'}`}>
+            <div className="p-4 sm:p-6">
+              <div className="flex flex-col sm:flex-row sm:items-start sm:justify-between gap-4">
+                <div className="flex items-start gap-3 min-w-0 flex-1">
+                  <div className={`p-2 rounded-lg flex-shrink-0 ${subscription.isActive ? 'bg-omniwallet-primary/10' : 'bg-gray-100'}`}>
                     <Webhook className={`w-5 h-5 ${subscription.isActive ? 'text-omniwallet-primary' : 'text-gray-400'}`} />
                   </div>
-                  <div>
-                    <div className="flex items-center gap-2">
+                  <div className="min-w-0 flex-1">
+                    <div className="flex items-center gap-2 flex-wrap">
                       <h3 className="font-semibold text-gray-900">{subscription.name}</h3>
                       {!subscription.isActive && (
                         <span className="text-xs bg-gray-100 text-gray-500 px-2 py-0.5 rounded">
@@ -138,33 +138,18 @@ export default function WebhookList({ subscriptions, eventTypes }: WebhookListPr
                         </span>
                       )}
                     </div>
-                    <p className="text-sm text-gray-500 flex items-center gap-1 mt-0.5">
-                      <ExternalLink className="w-3 h-3" />
-                      {subscription.url}
+                    <p className="text-sm text-gray-500 flex items-center gap-1 mt-0.5 truncate">
+                      <ExternalLink className="w-3 h-3 flex-shrink-0" />
+                      <span className="truncate">{subscription.url}</span>
                     </p>
                     {subscription.description && (
-                      <p className="text-sm text-gray-400 mt-1">{subscription.description}</p>
+                      <p className="text-sm text-gray-400 mt-1 line-clamp-2">{subscription.description}</p>
                     )}
                   </div>
                 </div>
 
-                <div className="flex items-center gap-2">
-                  {/* Test Result */}
-                  {testResults[subscription.id] && (
-                    <span className={`text-xs px-2 py-1 rounded flex items-center gap-1 ${
-                      testResults[subscription.id]!.success
-                        ? 'bg-green-100 text-green-700'
-                        : 'bg-red-100 text-red-700'
-                    }`}>
-                      {testResults[subscription.id]!.success
-                        ? <CheckCircle className="w-3 h-3" />
-                        : <XCircle className="w-3 h-3" />
-                      }
-                      {testResults[subscription.id]!.message}
-                    </span>
-                  )}
-
-                  {/* Actions */}
+                {/* Actions */}
+                <div className="flex items-center gap-1 sm:gap-2 flex-shrink-0">
                   <button
                     onClick={() => handleTest(subscription.id)}
                     disabled={loading[`test-${subscription.id}`] || !subscription.isActive}
@@ -213,9 +198,24 @@ export default function WebhookList({ subscriptions, eventTypes }: WebhookListPr
                 </div>
               </div>
 
+              {/* Test Result */}
+              {testResults[subscription.id] && (
+                <div className={`mt-3 text-xs px-3 py-2 rounded flex items-center gap-1 ${
+                  testResults[subscription.id]!.success
+                    ? 'bg-green-100 text-green-700'
+                    : 'bg-red-100 text-red-700'
+                }`}>
+                  {testResults[subscription.id]!.success
+                    ? <CheckCircle className="w-3 h-3" />
+                    : <XCircle className="w-3 h-3" />
+                  }
+                  {testResults[subscription.id]!.message}
+                </div>
+              )}
+
               {/* Events Tags */}
               <div className="mt-3 flex flex-wrap gap-1.5">
-                {subscription.events.map((event) => (
+                {subscription.events.slice(0, 5).map((event) => (
                   <span
                     key={event}
                     className="text-xs bg-gray-100 text-gray-600 px-2 py-1 rounded"
@@ -223,10 +223,15 @@ export default function WebhookList({ subscriptions, eventTypes }: WebhookListPr
                     {getEventLabel(event)}
                   </span>
                 ))}
+                {subscription.events.length > 5 && (
+                  <span className="text-xs bg-gray-100 text-gray-500 px-2 py-1 rounded">
+                    +{subscription.events.length - 5} mas
+                  </span>
+                )}
               </div>
 
               {/* Stats */}
-              <div className="mt-3 flex items-center gap-4 text-xs text-gray-500">
+              <div className="mt-3 flex flex-wrap items-center gap-3 sm:gap-4 text-xs text-gray-500">
                 <span className="flex items-center gap-1">
                   <CheckCircle className="w-3 h-3 text-green-500" />
                   {subscription.successCount} exitosos
@@ -237,44 +242,44 @@ export default function WebhookList({ subscriptions, eventTypes }: WebhookListPr
                 </span>
                 <span className="flex items-center gap-1">
                   <Clock className="w-3 h-3" />
-                  Ultimo: {formatDate(subscription.lastTriggeredAt)}
+                  <span className="hidden sm:inline">Ultimo:</span> {formatDate(subscription.lastTriggeredAt)}
                 </span>
               </div>
             </div>
 
             {/* Expanded Details */}
             {expandedId === subscription.id && (
-              <div className="border-t p-4 bg-gray-50">
-                <div className="grid grid-cols-2 gap-4 text-sm">
+              <div className="border-t p-4 sm:p-6 bg-gray-50">
+                <div className="grid grid-cols-1 sm:grid-cols-2 gap-4 text-sm">
                   <div>
-                    <p className="text-gray-500">ID</p>
-                    <p className="font-mono text-xs">{subscription.id}</p>
+                    <p className="text-gray-500 text-xs uppercase tracking-wide">ID</p>
+                    <p className="font-mono text-xs mt-1 break-all">{subscription.id}</p>
                   </div>
                   <div>
-                    <p className="text-gray-500">Creado</p>
-                    <p>{formatDate(subscription.createdAt)}</p>
+                    <p className="text-gray-500 text-xs uppercase tracking-wide">Creado</p>
+                    <p className="mt-1">{formatDate(subscription.createdAt)}</p>
                   </div>
                   <div>
-                    <p className="text-gray-500">Secret</p>
-                    <p className="font-mono text-xs">
-                      {subscription.secret ? `${subscription.secret.substring(0, 16)}...` : 'No configurado'}
+                    <p className="text-gray-500 text-xs uppercase tracking-wide">Secret</p>
+                    <p className="font-mono text-xs mt-1 break-all">
+                      {subscription.secret ? `${subscription.secret.substring(0, 20)}...` : 'No configurado'}
                     </p>
                   </div>
                   <div>
-                    <p className="text-gray-500">Total de logs</p>
-                    <p>{subscription.logsCount}</p>
+                    <p className="text-gray-500 text-xs uppercase tracking-wide">Total de logs</p>
+                    <p className="mt-1">{subscription.logsCount}</p>
                   </div>
                 </div>
 
                 <div className="mt-4">
-                  <p className="text-gray-500 text-sm mb-2">Eventos suscritos:</p>
+                  <p className="text-gray-500 text-xs uppercase tracking-wide mb-2">Eventos suscritos</p>
                   <div className="space-y-1">
                     {subscription.events.map((event) => (
                       <div key={event} className="flex items-center gap-2 text-sm">
-                        <span className="w-2 h-2 bg-omniwallet-primary rounded-full" />
-                        <span className="font-mono text-xs text-gray-600">{event}</span>
-                        <span className="text-gray-400">-</span>
-                        <span>{getEventLabel(event)}</span>
+                        <span className="w-2 h-2 bg-omniwallet-primary rounded-full flex-shrink-0" />
+                        <span className="font-mono text-xs text-gray-600 hidden sm:inline">{event}</span>
+                        <span className="text-gray-400 hidden sm:inline">-</span>
+                        <span className="text-gray-700">{getEventLabel(event)}</span>
                       </div>
                     ))}
                   </div>

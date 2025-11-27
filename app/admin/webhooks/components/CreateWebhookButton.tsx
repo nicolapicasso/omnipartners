@@ -22,14 +22,15 @@ export default function CreateWebhookButton({ eventTypes, variant = 'default' }:
     <>
       <button
         onClick={() => setIsOpen(true)}
-        className={`flex items-center gap-2 px-4 py-2 rounded-lg transition ${
+        className={`inline-flex items-center gap-2 px-4 py-2 rounded-md text-sm font-medium transition ${
           variant === 'primary'
             ? 'bg-omniwallet-primary text-white hover:bg-omniwallet-secondary'
-            : 'bg-white border border-gray-300 text-gray-700 hover:bg-gray-50'
+            : 'bg-omniwallet-primary text-white hover:bg-omniwallet-secondary'
         }`}
       >
         <Plus className="w-4 h-4" />
-        Nueva Suscripcion
+        <span className="hidden sm:inline">Nueva Suscripcion</span>
+        <span className="sm:hidden">Nueva</span>
       </button>
 
       {isOpen && (

@@ -129,14 +129,14 @@ export default function EditWebhookModal({ subscription, eventTypes, onClose }: 
 
   return (
     <div className="fixed inset-0 bg-black/50 flex items-center justify-center z-50 p-4">
-      <div className="bg-white rounded-xl shadow-xl w-full max-w-2xl max-h-[90vh] overflow-hidden flex flex-col">
+      <div className="bg-white rounded-lg shadow-xl w-full max-w-2xl max-h-[90vh] overflow-hidden flex flex-col">
         {/* Header */}
-        <div className="flex items-center justify-between px-6 py-4 border-b">
+        <div className="flex items-center justify-between px-4 sm:px-6 py-4 border-b">
           <div className="flex items-center gap-3">
-            <div className="p-2 bg-omniwallet-primary/10 rounded-lg">
+            <div className="p-2 bg-omniwallet-primary/10 rounded-lg hidden sm:block">
               <Webhook className="w-5 h-5 text-omniwallet-primary" />
             </div>
-            <h2 className="text-lg font-semibold">Editar Suscripcion</h2>
+            <h2 className="text-lg font-semibold text-gray-900">Editar Suscripcion</h2>
           </div>
           <button
             onClick={onClose}
@@ -148,7 +148,7 @@ export default function EditWebhookModal({ subscription, eventTypes, onClose }: 
 
         {/* Form */}
         <form onSubmit={handleSubmit} className="flex-1 overflow-y-auto">
-          <div className="p-6 space-y-6">
+          <div className="p-4 sm:p-6 space-y-5">
             {/* Basic Info */}
             <div className="space-y-4">
               <div>
@@ -159,7 +159,7 @@ export default function EditWebhookModal({ subscription, eventTypes, onClose }: 
                   type="text"
                   value={name}
                   onChange={(e) => setName(e.target.value)}
-                  className="w-full px-3 py-2 border rounded-lg focus:ring-2 focus:ring-omniwallet-primary focus:border-omniwallet-primary"
+                  className="w-full px-3 py-2 border border-gray-300 rounded-md focus:ring-2 focus:ring-omniwallet-primary focus:border-omniwallet-primary text-sm"
                 />
               </div>
 
@@ -171,7 +171,7 @@ export default function EditWebhookModal({ subscription, eventTypes, onClose }: 
                   type="url"
                   value={url}
                   onChange={(e) => setUrl(e.target.value)}
-                  className="w-full px-3 py-2 border rounded-lg focus:ring-2 focus:ring-omniwallet-primary focus:border-omniwallet-primary font-mono text-sm"
+                  className="w-full px-3 py-2 border border-gray-300 rounded-md focus:ring-2 focus:ring-omniwallet-primary focus:border-omniwallet-primary font-mono text-sm"
                 />
               </div>
 
@@ -183,7 +183,7 @@ export default function EditWebhookModal({ subscription, eventTypes, onClose }: 
                   value={description}
                   onChange={(e) => setDescription(e.target.value)}
                   rows={2}
-                  className="w-full px-3 py-2 border rounded-lg focus:ring-2 focus:ring-omniwallet-primary focus:border-omniwallet-primary"
+                  className="w-full px-3 py-2 border border-gray-300 rounded-md focus:ring-2 focus:ring-omniwallet-primary focus:border-omniwallet-primary text-sm"
                 />
               </div>
 
@@ -192,13 +192,13 @@ export default function EditWebhookModal({ subscription, eventTypes, onClose }: 
                 <label className="block text-sm font-medium text-gray-700 mb-1">
                   Secret (para verificacion de firma)
                 </label>
-                <div className="flex gap-2">
+                <div className="flex flex-col sm:flex-row gap-2">
                   <div className="flex-1 relative">
                     <input
                       type="text"
                       value={secret}
                       readOnly
-                      className="w-full px-3 py-2 border rounded-lg bg-gray-50 font-mono text-xs pr-10"
+                      className="w-full px-3 py-2 border border-gray-300 rounded-md bg-gray-50 font-mono text-xs pr-10"
                     />
                     <button
                       type="button"
@@ -217,10 +217,10 @@ export default function EditWebhookModal({ subscription, eventTypes, onClose }: 
                     type="button"
                     onClick={handleRegenerateSecret}
                     disabled={regenerating}
-                    className="px-3 py-2 border rounded-lg text-gray-600 hover:bg-gray-50 transition flex items-center gap-1.5 text-sm disabled:opacity-50"
+                    className="px-3 py-2 border border-gray-300 rounded-md text-gray-600 hover:bg-gray-50 transition flex items-center justify-center gap-1.5 text-sm disabled:opacity-50"
                   >
                     <RefreshCw className={`w-4 h-4 ${regenerating ? 'animate-spin' : ''}`} />
-                    Regenerar
+                    <span className="sm:inline">Regenerar</span>
                   </button>
                 </div>
                 <p className="text-xs text-gray-500 mt-1">
@@ -235,7 +235,7 @@ export default function EditWebhookModal({ subscription, eventTypes, onClose }: 
                 Eventos a escuchar *
               </label>
 
-              <div className="border rounded-lg divide-y">
+              <div className="border border-gray-200 rounded-md divide-y divide-gray-200">
                 {Object.entries(eventsByCategory).map(([category, events]) => {
                   const categoryEventValues = events.map(e => e.value)
                   const allCategorySelected = categoryEventValues.every(e => selectedEvents.includes(e))
@@ -247,7 +247,7 @@ export default function EditWebhookModal({ subscription, eventTypes, onClose }: 
                         <button
                           type="button"
                           onClick={() => selectAllInCategory(category)}
-                          className={`w-4 h-4 rounded border flex items-center justify-center transition ${
+                          className={`w-4 h-4 rounded border flex items-center justify-center transition flex-shrink-0 ${
                             allCategorySelected
                               ? 'bg-omniwallet-primary border-omniwallet-primary'
                               : someCategorySelected
@@ -260,9 +260,9 @@ export default function EditWebhookModal({ subscription, eventTypes, onClose }: 
                             <div className="w-2 h-0.5 bg-white" />
                           )}
                         </button>
-                        <span className="font-medium text-gray-700">{category}</span>
+                        <span className="font-medium text-gray-700 text-sm">{category}</span>
                       </div>
-                      <div className="grid grid-cols-2 gap-2 ml-6">
+                      <div className="grid grid-cols-1 sm:grid-cols-2 gap-2 ml-6">
                         {events.map((event) => (
                           <label
                             key={event.value}
@@ -294,25 +294,25 @@ export default function EditWebhookModal({ subscription, eventTypes, onClose }: 
 
             {/* Error */}
             {error && (
-              <div className="bg-red-50 text-red-600 px-4 py-3 rounded-lg text-sm">
+              <div className="bg-red-50 text-red-600 px-4 py-3 rounded-md text-sm">
                 {error}
               </div>
             )}
           </div>
 
           {/* Footer */}
-          <div className="px-6 py-4 border-t bg-gray-50 flex items-center justify-end gap-3">
+          <div className="px-4 sm:px-6 py-4 border-t bg-gray-50 flex flex-col-reverse sm:flex-row items-center justify-end gap-3">
             <button
               type="button"
               onClick={onClose}
-              className="px-4 py-2 text-gray-700 hover:bg-gray-100 rounded-lg transition"
+              className="w-full sm:w-auto px-4 py-2 text-gray-700 hover:bg-gray-100 rounded-md transition text-sm font-medium"
             >
               Cancelar
             </button>
             <button
               type="submit"
               disabled={loading}
-              className="px-4 py-2 bg-omniwallet-primary text-white rounded-lg hover:bg-omniwallet-secondary transition disabled:opacity-50"
+              className="w-full sm:w-auto px-4 py-2 bg-omniwallet-primary text-white rounded-md hover:bg-omniwallet-secondary transition disabled:opacity-50 text-sm font-medium"
             >
               {loading ? 'Guardando...' : 'Guardar Cambios'}
             </button>
