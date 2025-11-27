@@ -1,17 +1,7 @@
 'use server'
 
-import { NotificationType } from './notifications'
-
-// ============================================
-// WEBHOOK CONFIGURATION
-// ============================================
-
-// Make webhook URL - should be set in environment variables
-const MAKE_WEBHOOK_URL = process.env.MAKE_WEBHOOK_URL
-
-// Hubspot API - optional direct integration
-const HUBSPOT_API_KEY = process.env.HUBSPOT_API_KEY
-const HUBSPOT_PORTAL_ID = process.env.HUBSPOT_PORTAL_ID
+import { prisma } from '@/lib/prisma'
+import crypto from 'crypto'
 
 // ============================================
 // WEBHOOK EVENT TYPES
@@ -50,7 +40,7 @@ export enum WebhookEventType {
 // ============================================
 
 interface WebhookPayload {
-  event: WebhookEventType
+  event: WebhookEventType | string
   timestamp: string
   data: Record<string, unknown>
 }
@@ -95,35 +85,162 @@ interface PaymentData {
 // ============================================
 
 /**
- * Send a webhook to Make (or other integrator)
+ * Get all active subscriptions for a given event type
  */
-async function sendToMake(payload: WebhookPayload): Promise<boolean> {
-  if (!MAKE_WEBHOOK_URL) {
-    console.log('[Webhook] Make webhook URL not configured, skipping...')
-    return false
-  }
+async function getSubscriptionsForEvent(event: WebhookEventType | string) {
+  const subscriptions = await prisma.webhookSubscription.findMany({
+    where: {
+      isActive: true
+    }
+  })
+
+  // Filter subscriptions that include this event
+  return subscriptions.filter(sub => {
+    const events = JSON.parse(sub.events) as string[]
+    return events.includes(event)
+  })
+}
+
+/**
+ * Create HMAC signature for webhook payload
+ */
+function createSignature(payload: string, secret: string): string {
+  return crypto
+    .createHmac('sha256', secret)
+    .update(payload)
+    .digest('hex')
+}
+
+/**
+ * Send webhook to a single subscription URL
+ */
+async function sendToSubscription(
+  subscriptionId: string,
+  url: string,
+  secret: string | null,
+  payload: WebhookPayload
+): Promise<{ success: boolean; statusCode?: number; responseTime: number; error?: string }> {
+  const startTime = Date.now()
+  const payloadString = JSON.stringify(payload)
 
   try {
-    const response = await fetch(MAKE_WEBHOOK_URL, {
-      method: 'POST',
-      headers: {
-        'Content-Type': 'application/json',
-      },
-      body: JSON.stringify(payload),
-    })
-
-    if (!response.ok) {
-      console.error('[Webhook] Failed to send to Make:', response.status, await response.text())
-      return false
+    const headers: Record<string, string> = {
+      'Content-Type': 'application/json',
+      'X-Webhook-Event': payload.event,
+      'X-Webhook-Timestamp': payload.timestamp
     }
 
-    console.log('[Webhook] Successfully sent to Make:', payload.event)
-    return true
+    // Add signature if secret exists
+    if (secret) {
+      headers['X-Webhook-Signature'] = createSignature(payloadString, secret)
+    }
+
+    const response = await fetch(url, {
+      method: 'POST',
+      headers,
+      body: payloadString
+    })
+
+    const responseTime = Date.now() - startTime
+    const responseBody = await response.text()
+
+    // Log the webhook delivery
+    await prisma.webhookLog.create({
+      data: {
+        subscriptionId,
+        event: payload.event,
+        payload: payloadString,
+        statusCode: response.status,
+        responseBody: responseBody.substring(0, 1000),
+        responseTime,
+        success: response.ok,
+        errorMessage: response.ok ? null : `HTTP ${response.status}`
+      }
+    })
+
+    // Update subscription stats
+    await prisma.webhookSubscription.update({
+      where: { id: subscriptionId },
+      data: {
+        lastTriggeredAt: new Date(),
+        successCount: response.ok ? { increment: 1 } : undefined,
+        failureCount: !response.ok ? { increment: 1 } : undefined
+      }
+    })
+
+    return {
+      success: response.ok,
+      statusCode: response.status,
+      responseTime
+    }
   } catch (error) {
-    console.error('[Webhook] Error sending to Make:', error)
-    return false
+    const responseTime = Date.now() - startTime
+    const errorMessage = error instanceof Error ? error.message : 'Unknown error'
+
+    // Log the failed delivery
+    await prisma.webhookLog.create({
+      data: {
+        subscriptionId,
+        event: payload.event,
+        payload: payloadString,
+        responseTime,
+        success: false,
+        errorMessage
+      }
+    })
+
+    // Update subscription failure count
+    await prisma.webhookSubscription.update({
+      where: { id: subscriptionId },
+      data: {
+        lastTriggeredAt: new Date(),
+        failureCount: { increment: 1 }
+      }
+    })
+
+    return {
+      success: false,
+      responseTime,
+      error: errorMessage
+    }
   }
 }
+
+/**
+ * Dispatch webhook event to all subscribed URLs
+ */
+async function dispatchWebhook(event: WebhookEventType, data: Record<string, unknown>) {
+  const subscriptions = await getSubscriptionsForEvent(event)
+
+  if (subscriptions.length === 0) {
+    console.log(`[Webhook] No subscriptions for event: ${event}`)
+    return []
+  }
+
+  const payload: WebhookPayload = {
+    event,
+    timestamp: new Date().toISOString(),
+    data
+  }
+
+  console.log(`[Webhook] Dispatching ${event} to ${subscriptions.length} subscription(s)`)
+
+  // Send to all subscriptions in parallel
+  const results = await Promise.all(
+    subscriptions.map(sub =>
+      sendToSubscription(sub.id, sub.url, sub.secret, payload)
+    )
+  )
+
+  const successCount = results.filter(r => r.success).length
+  console.log(`[Webhook] ${event}: ${successCount}/${subscriptions.length} successful`)
+
+  return results
+}
+
+// ============================================
+// PUBLIC API
+// ============================================
 
 /**
  * Send webhook for partner events
@@ -133,16 +250,10 @@ export async function sendPartnerWebhook(
   partner: PartnerData,
   additionalData?: Record<string, unknown>
 ) {
-  const payload: WebhookPayload = {
-    event,
-    timestamp: new Date().toISOString(),
-    data: {
-      partner,
-      ...additionalData,
-    },
-  }
-
-  return sendToMake(payload)
+  return dispatchWebhook(event, {
+    partner,
+    ...additionalData
+  })
 }
 
 /**
@@ -153,16 +264,10 @@ export async function sendLeadWebhook(
   lead: LeadData,
   additionalData?: Record<string, unknown>
 ) {
-  const payload: WebhookPayload = {
-    event,
-    timestamp: new Date().toISOString(),
-    data: {
-      lead,
-      ...additionalData,
-    },
-  }
-
-  return sendToMake(payload)
+  return dispatchWebhook(event, {
+    lead,
+    ...additionalData
+  })
 }
 
 /**
@@ -173,16 +278,10 @@ export async function sendPaymentWebhook(
   payment: PaymentData,
   additionalData?: Record<string, unknown>
 ) {
-  const payload: WebhookPayload = {
-    event,
-    timestamp: new Date().toISOString(),
-    data: {
-      payment,
-      ...additionalData,
-    },
-  }
-
-  return sendToMake(payload)
+  return dispatchWebhook(event, {
+    payment,
+    ...additionalData
+  })
 }
 
 /**
@@ -192,18 +291,14 @@ export async function sendWebhook(
   event: WebhookEventType,
   data: Record<string, unknown>
 ) {
-  const payload: WebhookPayload = {
-    event,
-    timestamp: new Date().toISOString(),
-    data,
-  }
-
-  return sendToMake(payload)
+  return dispatchWebhook(event, data)
 }
 
 // ============================================
 // HUBSPOT INTEGRATION (Optional - Direct)
 // ============================================
+
+const HUBSPOT_API_KEY = process.env.HUBSPOT_API_KEY
 
 interface HubspotContact {
   email: string
@@ -219,7 +314,7 @@ interface HubspotContact {
 
 /**
  * Create or update a contact in Hubspot
- * Note: This is optional - you can also do this via Make
+ * Note: This is optional - you can also do this via webhooks to Make
  */
 export async function syncToHubspot(contact: HubspotContact): Promise<boolean> {
   if (!HUBSPOT_API_KEY) {

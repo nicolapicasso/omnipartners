@@ -2,7 +2,7 @@
 
 import Link from 'next/link'
 import { usePathname } from 'next/navigation'
-import { LayoutDashboard, Users, TrendingUp, FileText, Award, X } from 'lucide-react'
+import { LayoutDashboard, Users, TrendingUp, FileText, Award, Webhook, X } from 'lucide-react'
 import { useTranslation } from '@/lib/contexts/LanguageContext'
 import { useSidebar } from '@/lib/contexts/SidebarContext'
 import Logo from './Logo'
@@ -42,6 +42,12 @@ export default function AdminSidebar() {
       label: t('admin.manageCertification'),
       icon: Award,
       active: pathname?.startsWith('/admin/certification')
+    },
+    {
+      href: '/admin/webhooks',
+      label: 'Webhooks',
+      icon: Webhook,
+      active: pathname?.startsWith('/admin/webhooks')
     }
   ]
 
