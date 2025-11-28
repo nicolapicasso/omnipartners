@@ -6,22 +6,35 @@ import { createContent, updateContent } from '../actions'
 import { ContentType, ContentCategory, ContentStatus, Content } from '@/types'
 import { FileText, Link as LinkIcon, Tag, Star } from 'lucide-react'
 
+interface FormData {
+  title: string
+  description: string
+  type: ContentType
+  category: ContentCategory
+  fileUrl: string
+  externalUrl: string
+  tags: string[]
+  isFeatured: boolean
+  order: number
+  status: ContentStatus
+}
+
 export default function ContentForm({ content }: { content?: Content }) {
   const router = useRouter()
   const [loading, setLoading] = useState(false)
   const [error, setError] = useState('')
 
-  const [formData, setFormData] = useState({
+  const [formData, setFormData] = useState<FormData>({
     title: content?.title || '',
     description: content?.description || '',
-    type: content?.type || ContentType.DOCUMENT,
-    category: content?.category || ContentCategory.GENERAL,
+    type: (content?.type as ContentType) || ContentType.DOCUMENT,
+    category: (content?.category as ContentCategory) || ContentCategory.GENERAL,
     fileUrl: content?.fileUrl || '',
     externalUrl: content?.externalUrl || '',
     tags: content?.tags ? JSON.parse(content.tags) : [],
     isFeatured: content?.isFeatured || false,
     order: content?.order || 0,
-    status: content?.status || ContentStatus.DRAFT,
+    status: (content?.status as ContentStatus) || ContentStatus.DRAFT,
   })
 
   const [tagInput, setTagInput] = useState('')
