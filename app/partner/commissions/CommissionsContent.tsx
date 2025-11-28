@@ -7,6 +7,7 @@ import { useTranslation } from '@/lib/contexts/LanguageContext'
 interface Lead {
   id: string
   companyName: string
+  commissionRate: number
 }
 
 interface Invoice {
@@ -19,7 +20,6 @@ interface Payment {
   id: string
   paymentDate: Date
   amount: number
-  commissionRate: number
   commissionAmount: number
   lead: Lead
   invoices: Array<{ invoice: Invoice }>
@@ -256,7 +256,7 @@ export default function CommissionsContent({
                       €{payment.amount.toFixed(2)}
                     </td>
                     <td className="px-6 py-4 whitespace-nowrap text-sm text-gray-600">
-                      {payment.commissionRate}%
+                      {payment.lead.commissionRate}%
                     </td>
                     <td className="px-6 py-4 whitespace-nowrap text-sm font-bold text-green-600">
                       €{payment.commissionAmount.toFixed(2)}
