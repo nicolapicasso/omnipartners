@@ -1,10 +1,16 @@
 #!/bin/sh
 set -e
 
-echo "Syncing database schema..."
-npx prisma db push --skip-generate
+echo "=== Starting OmniPartners ==="
+echo "DATABASE_URL is set: $(if [ -n "$DATABASE_URL" ]; then echo 'yes'; else echo 'NO - THIS IS A PROBLEM'; fi)"
 
-echo "Checking if admin user exists..."
+echo ""
+echo "=== Syncing database schema ==="
+node ./node_modules/prisma/build/index.js db push --skip-generate --accept-data-loss
+echo "Database schema synced successfully!"
+
+echo ""
+echo "=== Checking if admin user exists ==="
 node -e "
 const { PrismaClient } = require('@prisma/client');
 const bcrypt = require('bcryptjs');
@@ -40,5 +46,6 @@ async function seedAdmin() {
 seedAdmin();
 "
 
-echo "Starting application..."
+echo ""
+echo "=== Starting Next.js server ==="
 exec node server.js
