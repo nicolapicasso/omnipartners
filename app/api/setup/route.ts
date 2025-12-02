@@ -16,6 +16,25 @@ export async function GET(request: Request) {
   }
 
   try {
+    // First, try to fix permissions for PostgreSQL 15+
+    try {
+      await prisma.$executeRawUnsafe(`GRANT ALL ON SCHEMA public TO CURRENT_USER;`)
+    } catch {
+      // Ignore if this fails - we'll try to create tables anyway
+    }
+
+    try {
+      await prisma.$executeRawUnsafe(`GRANT CREATE ON SCHEMA public TO CURRENT_USER;`)
+    } catch {
+      // Ignore
+    }
+
+    try {
+      await prisma.$executeRawUnsafe(`ALTER DEFAULT PRIVILEGES IN SCHEMA public GRANT ALL ON TABLES TO CURRENT_USER;`)
+    } catch {
+      // Ignore
+    }
+
     // Create all tables using raw SQL
     await prisma.$executeRawUnsafe(`
       -- Partners table
