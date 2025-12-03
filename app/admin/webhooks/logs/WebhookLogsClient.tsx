@@ -13,8 +13,11 @@ import {
   ChevronRight,
   ExternalLink,
   Copy,
-  CheckCircle2
+  CheckCircle2,
+  RefreshCw,
+  Loader2
 } from 'lucide-react'
+import { retryWebhook } from '../actions'
 
 interface Log {
   id: string
@@ -78,6 +81,12 @@ export default function WebhookLogsClient({
   const [expandedId, setExpandedId] = useState<string | null>(null)
   const [showFilters, setShowFilters] = useState(false)
   const [copiedId, setCopiedId] = useState<string | null>(null)
+  const [retryingId, setRetryingId] = useState<string | null>(null)
+  const [retryResult, setRetryResult] = useState<{
+    id: string
+    success: boolean
+    message: string
+  } | null>(null)
 
   // Local filter state
   const [subscriptionId, setSubscriptionId] = useState(currentFilters.subscriptionId || '')
@@ -128,6 +137,34 @@ export default function WebhookLogsClient({
     navigator.clipboard.writeText(payload)
     setCopiedId(id)
     setTimeout(() => setCopiedId(null), 2000)
+  }
+
+  const handleRetry = async (logId: string) => {
+    setRetryingId(logId)
+    setRetryResult(null)
+
+    try {
+      const result = await retryWebhook(logId)
+      setRetryResult({
+        id: logId,
+        success: result.success,
+        message: result.success
+          ? `Webhook enviado correctamente (HTTP ${result.statusCode}, ${result.responseTime}ms)`
+          : `Error: ${result.errorMessage || `HTTP ${result.statusCode}`}`
+      })
+      // Refresh the page to show the new log
+      router.refresh()
+    } catch (error) {
+      setRetryResult({
+        id: logId,
+        success: false,
+        message: error instanceof Error ? error.message : 'Error desconocido'
+      })
+    } finally {
+      setRetryingId(null)
+      // Clear result after 5 seconds
+      setTimeout(() => setRetryResult(null), 5000)
+    }
   }
 
   const hasActiveFilters = subscriptionId || event || success
@@ -230,6 +267,32 @@ export default function WebhookLogsClient({
         )}
       </div>
 
+      {/* Retry Result Notification */}
+      {retryResult && (
+        <div
+          className={`p-4 rounded-lg flex items-center gap-3 ${
+            retryResult.success
+              ? 'bg-green-50 border border-green-200'
+              : 'bg-red-50 border border-red-200'
+          }`}
+        >
+          {retryResult.success ? (
+            <CheckCircle className="w-5 h-5 text-green-600 flex-shrink-0" />
+          ) : (
+            <XCircle className="w-5 h-5 text-red-600 flex-shrink-0" />
+          )}
+          <p className={`text-sm ${retryResult.success ? 'text-green-800' : 'text-red-800'}`}>
+            {retryResult.message}
+          </p>
+          <button
+            onClick={() => setRetryResult(null)}
+            className="ml-auto text-gray-400 hover:text-gray-600"
+          >
+            <XCircle className="w-4 h-4" />
+          </button>
+        </div>
+      )}
+
       {/* Logs List */}
       {logs.length === 0 ? (
         <div className="bg-white rounded-lg shadow-sm border border-gray-200 p-12 text-center">
@@ -306,6 +369,18 @@ export default function WebhookLogsClient({
                         {log.responseTime}ms
                       </span>
                     )}
+                    <button
+                      onClick={() => handleRetry(log.id)}
+                      disabled={retryingId === log.id}
+                      className="p-1.5 text-gray-400 hover:text-omniwallet-primary hover:bg-omniwallet-primary/10 rounded transition disabled:opacity-50 disabled:cursor-not-allowed"
+                      title="Reintentar webhook"
+                    >
+                      {retryingId === log.id ? (
+                        <Loader2 className="w-4 h-4 animate-spin" />
+                      ) : (
+                        <RefreshCw className="w-4 h-4" />
+                      )}
+                    </button>
                     <button
                       onClick={() => setExpandedId(expandedId === log.id ? null : log.id)}
                       className="p-1.5 text-gray-400 hover:text-gray-600 hover:bg-gray-100 rounded transition"
