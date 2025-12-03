@@ -301,6 +301,110 @@ export async function clearWebhookLogs(subscriptionId: string) {
   revalidatePath(`/admin/webhooks/${subscriptionId}`)
 }
 
+export async function retryWebhook(logId: string) {
+  // Get the original log entry
+  const log = await prisma.webhookLog.findUnique({
+    where: { id: logId },
+    include: {
+      subscription: true
+    }
+  })
+
+  if (!log) {
+    throw new Error('Log no encontrado')
+  }
+
+  if (!log.subscription) {
+    throw new Error('Suscripcion no encontrada')
+  }
+
+  if (!log.subscription.isActive) {
+    throw new Error('La suscripcion esta desactivada')
+  }
+
+  // Parse the original payload
+  const payload = JSON.parse(log.payload)
+
+  // Update timestamp to indicate this is a retry
+  payload.retryOf = logId
+  payload.retryTimestamp = new Date().toISOString()
+
+  const startTime = Date.now()
+  let success = false
+  let statusCode: number | null = null
+  let responseBody: string | null = null
+  let errorMessage: string | null = null
+
+  try {
+    const headers: Record<string, string> = {
+      'Content-Type': 'application/json',
+      'X-Webhook-Event': log.event,
+      'X-Webhook-Timestamp': new Date().toISOString(),
+      'X-Webhook-Retry': 'true',
+      'X-Webhook-Original-Log': logId
+    }
+
+    // Add signature if secret exists
+    if (log.subscription.secret) {
+      const signature = crypto
+        .createHmac('sha256', log.subscription.secret)
+        .update(JSON.stringify(payload))
+        .digest('hex')
+      headers['X-Webhook-Signature'] = signature
+    }
+
+    const response = await fetch(log.subscription.url, {
+      method: 'POST',
+      headers,
+      body: JSON.stringify(payload)
+    })
+
+    statusCode = response.status
+    responseBody = await response.text()
+    success = response.ok
+  } catch (error) {
+    errorMessage = error instanceof Error ? error.message : 'Error desconocido'
+    success = false
+  }
+
+  const responseTime = Date.now() - startTime
+
+  // Create a new log entry for the retry
+  const newLog = await prisma.webhookLog.create({
+    data: {
+      subscriptionId: log.subscriptionId,
+      event: log.event,
+      payload: JSON.stringify(payload),
+      statusCode,
+      responseBody: responseBody?.substring(0, 1000) || null,
+      responseTime,
+      success,
+      errorMessage
+    }
+  })
+
+  // Update subscription stats
+  await prisma.webhookSubscription.update({
+    where: { id: log.subscriptionId },
+    data: {
+      lastTriggeredAt: new Date(),
+      successCount: success ? { increment: 1 } : undefined,
+      failureCount: !success ? { increment: 1 } : undefined
+    }
+  })
+
+  revalidatePath('/admin/webhooks')
+  revalidatePath('/admin/webhooks/logs')
+
+  return {
+    success,
+    statusCode,
+    responseTime,
+    errorMessage,
+    newLogId: newLog.id
+  }
+}
+
 // ============================================
 // HELPERS
 // ============================================
