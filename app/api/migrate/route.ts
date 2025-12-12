@@ -76,6 +76,16 @@ export async function GET(request: Request) {
       results.push(`lead_notes table: ${e instanceof Error ? e.message : 'already exists or error'}`)
     }
 
+    // Migration: Add coverImageUrl to contents
+    try {
+      await prisma.$executeRawUnsafe(`
+        ALTER TABLE "contents" ADD COLUMN IF NOT EXISTS "coverImageUrl" TEXT;
+      `)
+      results.push('Added coverImageUrl to contents')
+    } catch (e) {
+      results.push(`coverImageUrl: ${e instanceof Error ? e.message : 'already exists or error'}`)
+    }
+
     return NextResponse.json({
       success: true,
       message: 'Migrations completed',

@@ -2,7 +2,7 @@ import { prisma } from '@/lib/prisma'
 import { getAdminSession } from '@/lib/session'
 import { LeadStatus } from '@/types'
 import Link from 'next/link'
-import { ArrowLeft, Mail, Phone, Globe, MapPin, Calendar, DollarSign, User } from 'lucide-react'
+import { ArrowLeft, Mail, Phone, Globe, MapPin, Calendar, DollarSign, User, MessageSquare, Clock } from 'lucide-react'
 import { UpdateStatusButton, UpdateCommissionForm } from '../components/LeadActions'
 import AdminDashboardHeader from '@/components/AdminDashboardHeader'
 import AdminSidebar from '@/components/AdminSidebar'
@@ -21,6 +21,9 @@ export default async function LeadDetailPage({
       createdBy: true,
       payments: {
         orderBy: { paymentDate: 'desc' },
+      },
+      leadNotes: {
+        orderBy: { createdAt: 'desc' },
       },
     },
   })
@@ -201,6 +204,54 @@ export default async function LeadDetailPage({
                 >
                   Ver Partner →
                 </Link>
+              </div>
+            </div>
+
+            {/* Partner Notes */}
+            <div className="bg-white rounded-lg shadow-sm border border-gray-200">
+              <div className="px-6 py-4 border-b border-gray-100">
+                <div className="flex items-center gap-2">
+                  <MessageSquare className="w-5 h-5 text-omniwallet-primary" />
+                  <h2 className="text-xl font-semibold text-gray-800">
+                    Notas del Partner ({lead.leadNotes.length})
+                  </h2>
+                </div>
+              </div>
+              <div className="divide-y divide-gray-100 max-h-96 overflow-y-auto">
+                {lead.leadNotes.length === 0 ? (
+                  <div className="text-center py-8 text-gray-500">
+                    <MessageSquare className="w-8 h-8 mx-auto mb-2 text-gray-300" />
+                    <p className="text-sm">El partner no ha añadido notas</p>
+                  </div>
+                ) : (
+                  lead.leadNotes.map((note) => (
+                    <div key={note.id} className="p-4 hover:bg-gray-50 transition">
+                      <div className="flex items-start gap-3">
+                        <div className="w-8 h-8 bg-omniwallet-primary/10 rounded-full flex items-center justify-center flex-shrink-0">
+                          <User className="w-4 h-4 text-omniwallet-primary" />
+                        </div>
+                        <div className="flex-1 min-w-0">
+                          <div className="flex items-center gap-2 mb-1">
+                            <span className="text-sm font-medium text-gray-900">
+                              {note.authorName}
+                            </span>
+                            <span className="flex items-center gap-1 text-xs text-gray-500">
+                              <Clock className="w-3 h-3" />
+                              {new Date(note.createdAt).toLocaleDateString('es-ES', {
+                                day: '2-digit',
+                                month: '2-digit',
+                                year: 'numeric',
+                                hour: '2-digit',
+                                minute: '2-digit',
+                              })}
+                            </span>
+                          </div>
+                          <p className="text-sm text-gray-700 whitespace-pre-wrap">{note.content}</p>
+                        </div>
+                      </div>
+                    </div>
+                  ))
+                )}
               </div>
             </div>
 
