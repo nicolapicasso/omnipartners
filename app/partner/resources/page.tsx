@@ -186,29 +186,58 @@ export default async function PartnerResourcesPage({
                 <Link
                   key={content.id}
                   href={`/partner/resources/${content.id}`}
-                  className="bg-white rounded-lg shadow-sm border border-gray-200 p-6 hover:shadow-md transition"
+                  className="bg-white rounded-lg shadow-sm border border-gray-200 overflow-hidden hover:shadow-md transition group"
                 >
-                  <div className="flex items-start gap-3 mb-3">
-                    <div className="w-10 h-10 bg-omniwallet-primary bg-opacity-10 rounded-lg flex items-center justify-center text-omniwallet-primary">
-                      {getTypeIcon(content.type)}
+                  {/* Cover Image */}
+                  {content.coverImageUrl ? (
+                    <div className="relative h-40 bg-gray-100">
+                      <img
+                        src={content.coverImageUrl}
+                        alt={content.title}
+                        className="w-full h-full object-cover group-hover:scale-105 transition-transform duration-300"
+                      />
+                      {favoriteIds.includes(content.id) && (
+                        <div className="absolute top-2 right-2">
+                          <Star className="w-5 h-5 text-yellow-500 fill-yellow-500 drop-shadow" />
+                        </div>
+                      )}
+                      <div className="absolute top-2 left-2">
+                        <span
+                          className={`text-xs px-2 py-1 rounded-full ${getCategoryColor(
+                            content.category
+                          )}`}
+                        >
+                          {content.category}
+                        </span>
+                      </div>
                     </div>
-                    <div className="flex-1">
-                      <h3 className="font-semibold text-gray-900 mb-1">{content.title}</h3>
-                      <span
-                        className={`text-xs px-2 py-1 rounded-full ${getCategoryColor(
-                          content.category
-                        )}`}
-                      >
-                        {content.category}
-                      </span>
+                  ) : (
+                    <div className="h-32 bg-gradient-to-br from-omniwallet-primary/10 to-omniwallet-primary/5 flex items-center justify-center relative">
+                      <div className="w-16 h-16 bg-omniwallet-primary bg-opacity-20 rounded-full flex items-center justify-center text-omniwallet-primary">
+                        {getTypeIcon(content.type)}
+                      </div>
+                      {favoriteIds.includes(content.id) && (
+                        <div className="absolute top-2 right-2">
+                          <Star className="w-5 h-5 text-yellow-500 fill-yellow-500" />
+                        </div>
+                      )}
+                      <div className="absolute top-2 left-2">
+                        <span
+                          className={`text-xs px-2 py-1 rounded-full ${getCategoryColor(
+                            content.category
+                          )}`}
+                        >
+                          {content.category}
+                        </span>
+                      </div>
                     </div>
-                    {favoriteIds.includes(content.id) && (
-                      <Star className="w-5 h-5 text-yellow-500 fill-yellow-500" />
+                  )}
+                  <div className="p-4">
+                    <h3 className="font-semibold text-gray-900 mb-2 line-clamp-1">{content.title}</h3>
+                    {content.description && (
+                      <p className="text-sm text-gray-600 line-clamp-2">{content.description}</p>
                     )}
                   </div>
-                  {content.description && (
-                    <p className="text-sm text-gray-600 line-clamp-2">{content.description}</p>
-                  )}
                 </Link>
               ))}
             </div>
@@ -239,33 +268,67 @@ export default async function PartnerResourcesPage({
                 <Link
                   key={content.id}
                   href={`/partner/resources/${content.id}`}
-                  className="bg-white rounded-lg shadow-sm border border-gray-200 p-6 hover:shadow-md transition"
+                  className="bg-white rounded-lg shadow-sm border border-gray-200 overflow-hidden hover:shadow-md transition group"
                 >
-                  <div className="flex items-start gap-3 mb-3">
-                    <div className="w-10 h-10 bg-omniwallet-primary bg-opacity-10 rounded-lg flex items-center justify-center text-omniwallet-primary">
-                      {getTypeIcon(content.type)}
+                  {/* Cover Image */}
+                  {content.coverImageUrl ? (
+                    <div className="relative h-40 bg-gray-100">
+                      <img
+                        src={content.coverImageUrl}
+                        alt={content.title}
+                        className="w-full h-full object-cover group-hover:scale-105 transition-transform duration-300"
+                      />
+                      {favoriteIds.includes(content.id) && (
+                        <div className="absolute top-2 right-2">
+                          <Star className="w-5 h-5 text-yellow-500 fill-yellow-500 drop-shadow" />
+                        </div>
+                      )}
+                      <div className="absolute top-2 left-2">
+                        <span
+                          className={`text-xs px-2 py-1 rounded-full ${getCategoryColor(
+                            content.category
+                          )}`}
+                        >
+                          {content.category}
+                        </span>
+                      </div>
+                      <div className="absolute bottom-2 right-2 bg-white/90 rounded px-2 py-1">
+                        <div className="text-omniwallet-primary">
+                          {getTypeIcon(content.type)}
+                        </div>
+                      </div>
                     </div>
-                    <div className="flex-1">
-                      <h3 className="font-semibold text-gray-900 mb-1">{content.title}</h3>
-                      <span
-                        className={`text-xs px-2 py-1 rounded-full border ${getCategoryColor(
-                          content.category
-                        )}`}
-                      >
-                        {content.category}
-                      </span>
+                  ) : (
+                    <div className="h-32 bg-gradient-to-br from-omniwallet-primary/10 to-omniwallet-primary/5 flex items-center justify-center relative">
+                      <div className="w-16 h-16 bg-omniwallet-primary bg-opacity-20 rounded-full flex items-center justify-center text-omniwallet-primary">
+                        {getTypeIcon(content.type)}
+                      </div>
+                      {favoriteIds.includes(content.id) && (
+                        <div className="absolute top-2 right-2">
+                          <Star className="w-5 h-5 text-yellow-500 fill-yellow-500" />
+                        </div>
+                      )}
+                      <div className="absolute top-2 left-2">
+                        <span
+                          className={`text-xs px-2 py-1 rounded-full ${getCategoryColor(
+                            content.category
+                          )}`}
+                        >
+                          {content.category}
+                        </span>
+                      </div>
                     </div>
-                    {favoriteIds.includes(content.id) && (
-                      <Star className="w-5 h-5 text-yellow-500 fill-yellow-500" />
-                    )}
-                  </div>
-                  {content.description && (
-                    <p className="text-sm text-gray-600 line-clamp-3 mb-3">
-                      {content.description}
-                    </p>
                   )}
-                  <div className="text-xs text-gray-500">
-                    {content.viewCount} vistas · {content.downloadCount} descargas
+                  <div className="p-4">
+                    <h3 className="font-semibold text-gray-900 mb-2 line-clamp-1">{content.title}</h3>
+                    {content.description && (
+                      <p className="text-sm text-gray-600 line-clamp-2 mb-3">
+                        {content.description}
+                      </p>
+                    )}
+                    <div className="text-xs text-gray-500">
+                      {content.viewCount} vistas · {content.downloadCount} descargas
+                    </div>
                   </div>
                 </Link>
               ))}

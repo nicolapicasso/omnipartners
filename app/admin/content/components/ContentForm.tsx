@@ -4,7 +4,7 @@ import { useState } from 'react'
 import { useRouter } from 'next/navigation'
 import { createContent, updateContent } from '../actions'
 import { ContentType, ContentCategory, ContentStatus, Content } from '@/types'
-import { FileText, Link as LinkIcon, Tag, Star } from 'lucide-react'
+import { FileText, Link as LinkIcon, Tag, Star, Image } from 'lucide-react'
 
 interface FormData {
   title: string
@@ -13,6 +13,7 @@ interface FormData {
   category: ContentCategory
   fileUrl: string
   externalUrl: string
+  coverImageUrl: string
   tags: string[]
   isFeatured: boolean
   order: number
@@ -31,6 +32,7 @@ export default function ContentForm({ content }: { content?: Content }) {
     category: (content?.category as ContentCategory) || ContentCategory.GENERAL,
     fileUrl: content?.fileUrl || '',
     externalUrl: content?.externalUrl || '',
+    coverImageUrl: (content as any)?.coverImageUrl || '',
     tags: content?.tags ? JSON.parse(content.tags) : [],
     isFeatured: content?.isFeatured || false,
     order: content?.order || 0,
@@ -206,6 +208,35 @@ export default function ContentForm({ content }: { content?: Content }) {
           <p className="text-xs text-gray-500 mt-1">
             URL externa (YouTube, Vimeo, Google Drive, etc.)
           </p>
+        </div>
+
+        <div>
+          <label className="block text-sm font-medium text-gray-700 mb-2">
+            <Image className="w-4 h-4 inline mr-1" />
+            Imagen de Portada
+          </label>
+          <input
+            type="url"
+            value={formData.coverImageUrl}
+            onChange={(e) => setFormData({ ...formData, coverImageUrl: e.target.value })}
+            className="w-full border border-gray-300 rounded-lg px-3 py-2 focus:ring-2 focus:ring-omniwallet-primary focus:border-transparent"
+            placeholder="https://ejemplo.com/imagen.jpg"
+          />
+          <p className="text-xs text-gray-500 mt-1">
+            URL de la imagen de portada (se mostrará en la biblioteca de recursos)
+          </p>
+          {formData.coverImageUrl && (
+            <div className="mt-2">
+              <img
+                src={formData.coverImageUrl}
+                alt="Preview"
+                className="w-32 h-20 object-cover rounded-lg border border-gray-200"
+                onError={(e) => {
+                  (e.target as HTMLImageElement).style.display = 'none'
+                }}
+              />
+            </div>
+          )}
         </div>
       </div>
 

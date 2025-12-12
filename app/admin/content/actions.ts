@@ -14,6 +14,7 @@ export async function createContent(data: {
   category: ContentCategory
   fileUrl?: string
   externalUrl?: string
+  coverImageUrl?: string
   tags?: string[]
   isFeatured?: boolean
   order?: number
@@ -30,6 +31,7 @@ export async function createContent(data: {
         category: data.category,
         fileUrl: data.fileUrl,
         externalUrl: data.externalUrl,
+        coverImageUrl: data.coverImageUrl,
         tags: data.tags ? JSON.stringify(data.tags) : null,
         isFeatured: data.isFeatured || false,
         order: data.order || 0,
@@ -92,6 +94,7 @@ export async function updateContent(
     category?: ContentCategory
     fileUrl?: string
     externalUrl?: string
+    coverImageUrl?: string
     tags?: string[]
     isFeatured?: boolean
     order?: number
@@ -118,6 +121,7 @@ export async function updateContent(
         ...(data.category && { category: data.category }),
         ...(data.fileUrl !== undefined && { fileUrl: data.fileUrl }),
         ...(data.externalUrl !== undefined && { externalUrl: data.externalUrl }),
+        ...(data.coverImageUrl !== undefined && { coverImageUrl: data.coverImageUrl }),
         ...(data.tags && { tags: JSON.stringify(data.tags) }),
         ...(data.isFeatured !== undefined && { isFeatured: data.isFeatured }),
         ...(data.order !== undefined && { order: data.order }),

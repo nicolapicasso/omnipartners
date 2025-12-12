@@ -295,6 +295,7 @@ model Content {
   // URLs
   fileUrl     String?  // URL del archivo subido
   externalUrl String?  // URL externa (YouTube, etc.)
+  coverImageUrl String?  // URL de la imagen de portada
 
   // Tags para búsqueda (JSON array)
   tags        String?
