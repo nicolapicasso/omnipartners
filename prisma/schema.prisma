@@ -84,6 +84,7 @@ model User {
 
   // Relaciones
   leadsCreated     Lead[]
+  leadNotes        LeadNote[]
   notifications    Notification[]
   contentViews     ContentView[]
   contentFavorites ContentFavorite[]
@@ -132,8 +133,36 @@ model Lead {
   // Relaciones
   payments        Payment[]
   contacts        Contact[]
+  leadNotes       LeadNote[]
 
   @@map("leads")
+}
+
+// ============================================
+// LEAD NOTES (Historial de notas por lead)
+// ============================================
+
+model LeadNote {
+  id        String   @id @default(cuid())
+
+  leadId    String
+  lead      Lead     @relation(fields: [leadId], references: [id], onDelete: Cascade)
+
+  // Quien creó la nota (puede ser null si fue el partner owner)
+  userId    String?
+  user      User?    @relation(fields: [userId], references: [id])
+
+  // Si no hay userId, guardamos el partnerId
+  partnerId String?
+
+  // Nombre del autor (para mostrar aunque se elimine el usuario)
+  authorName String
+
+  content   String
+
+  createdAt DateTime @default(now())
+
+  @@map("lead_notes")
 }
 
 // ============================================

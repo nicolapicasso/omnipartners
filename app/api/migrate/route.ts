@@ -58,6 +58,24 @@ export async function GET(request: Request) {
       results.push(`contacts table: ${e instanceof Error ? e.message : 'already exists or error'}`)
     }
 
+    // Migration: Create lead_notes table
+    try {
+      await prisma.$executeRawUnsafe(`
+        CREATE TABLE IF NOT EXISTS "lead_notes" (
+          "id" TEXT NOT NULL PRIMARY KEY,
+          "leadId" TEXT NOT NULL REFERENCES "leads"("id") ON DELETE CASCADE,
+          "userId" TEXT REFERENCES "users"("id"),
+          "partnerId" TEXT,
+          "authorName" TEXT NOT NULL,
+          "content" TEXT NOT NULL,
+          "createdAt" TIMESTAMP(3) NOT NULL DEFAULT CURRENT_TIMESTAMP
+        );
+      `)
+      results.push('Created lead_notes table')
+    } catch (e) {
+      results.push(`lead_notes table: ${e instanceof Error ? e.message : 'already exists or error'}`)
+    }
+
     return NextResponse.json({
       success: true,
       message: 'Migrations completed',

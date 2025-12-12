@@ -4,6 +4,7 @@ import { LeadStatus } from '@/types'
 import Link from 'next/link'
 import { ArrowLeft, Mail, Phone, Globe, MapPin, Calendar, DollarSign, User, Pencil } from 'lucide-react'
 import { DeleteLeadButton } from '../components/LeadActions'
+import LeadNotesSection from '../components/LeadNotesSection'
 import PartnerDashboardHeader from '@/components/PartnerDashboardHeader'
 import PartnerSidebar from '@/components/PartnerSidebar'
 
@@ -30,6 +31,9 @@ export default async function PartnerLeadDetailPage({
       createdBy: true,
       payments: {
         orderBy: { paymentDate: 'desc' },
+      },
+      leadNotes: {
+        orderBy: { createdAt: 'desc' },
       },
     },
   })
@@ -208,6 +212,9 @@ export default async function PartnerLeadDetailPage({
                 </div>
               )}
             </div>
+
+            {/* Notes Section */}
+            <LeadNotesSection leadId={lead.id} notes={lead.leadNotes} />
 
             {/* Payments Table */}
             <div className="bg-white rounded-lg shadow-sm border border-gray-200">

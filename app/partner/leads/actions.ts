@@ -253,3 +253,48 @@ export async function deletePartnerLead(leadId: string) {
     return { success: false, error: 'Failed to delete lead' }
   }
 }
+
+export async function addLeadNote(leadId: string, content: string) {
+  try {
+    const session = await getPartnerSession()
+    const partnerId = session.user.partnerId!
+
+    // Verify lead belongs to partner
+    const lead = await prisma.lead.findUnique({
+      where: { id: leadId },
+    })
+
+    if (!lead || lead.partnerId !== partnerId) {
+      return { success: false, error: 'Lead not found or unauthorized' }
+    }
+
+    // Try to get the user (if exists in User table)
+    const user = await prisma.user.findUnique({
+      where: { email: session.user.email || '' },
+    })
+
+    // Get partner name for author
+    const partner = await prisma.partner.findUnique({
+      where: { id: partnerId },
+    })
+
+    const authorName = user?.name || partner?.contactName || session.user.name || 'Partner'
+
+    // Create the note
+    await prisma.leadNote.create({
+      data: {
+        leadId,
+        userId: user?.id,
+        partnerId: partnerId,
+        authorName,
+        content,
+      },
+    })
+
+    revalidatePath(`/partner/leads/${leadId}`)
+    return { success: true }
+  } catch (error) {
+    console.error('Error adding lead note:', error)
+    return { success: false, error: 'Failed to add note' }
+  }
+}
