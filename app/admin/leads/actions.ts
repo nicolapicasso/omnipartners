@@ -9,17 +9,30 @@ import { NotificationType as NotifType } from '@/lib/notification-types'
 import { sendLeadWebhook } from '@/lib/webhooks'
 import { WebhookEventType } from '@/lib/webhook-types'
 
+interface ContactInput {
+  id?: string
+  name: string
+  email: string
+  phone?: string
+  phoneCountryCode?: string
+  jobTitle?: string
+  isPrimary?: boolean
+}
+
 export async function createLead(data: {
   companyName: string
   contactName: string
   email: string
   phone?: string
+  phoneCountryCode?: string
+  jobTitle?: string
   country: string
   website?: string
   notes?: string
   partnerId: string
   commissionType: CommissionType
   commissionRate: number
+  contacts?: ContactInput[]
 }) {
   try {
     const session = await getAdminSession() // Verify admin
@@ -46,6 +59,8 @@ export async function createLead(data: {
         contactName: data.contactName,
         email: data.email,
         phone: data.phone,
+        phoneCountryCode: data.phoneCountryCode,
+        jobTitle: data.jobTitle,
         country: data.country,
         website: data.website,
         notes: data.notes,
@@ -54,6 +69,20 @@ export async function createLead(data: {
         commissionType: data.commissionType,
         commissionRate: data.commissionRate,
         status: LeadStatus.LEAD,
+        // Create contacts if provided
+        ...(data.contacts &&
+          data.contacts.length > 0 && {
+            contacts: {
+              create: data.contacts.map((contact) => ({
+                name: contact.name,
+                email: contact.email,
+                phone: contact.phone,
+                phoneCountryCode: contact.phoneCountryCode,
+                jobTitle: contact.jobTitle,
+                isPrimary: contact.isPrimary || false,
+              })),
+            },
+          }),
       },
     })
 
@@ -131,6 +160,8 @@ export async function updateLeadStatus(leadId: string, status: LeadStatus) {
         contactName: lead.contactName,
         email: lead.email,
         phone: lead.phone || undefined,
+        phoneCountryCode: lead.phoneCountryCode || undefined,
+        jobTitle: lead.jobTitle || undefined,
         country: lead.country,
         status: LeadStatus.CLIENT,
         partnerId: lead.partnerId,
@@ -151,6 +182,8 @@ export async function updateLeadStatus(leadId: string, status: LeadStatus) {
         contactName: lead.contactName,
         email: lead.email,
         phone: lead.phone || undefined,
+        phoneCountryCode: lead.phoneCountryCode || undefined,
+        jobTitle: lead.jobTitle || undefined,
         country: lead.country,
         status: LeadStatus.PROSPECT,
         partnerId: lead.partnerId,

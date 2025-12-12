@@ -4,7 +4,10 @@ import { useState } from 'react'
 import { useRouter } from 'next/navigation'
 import { CommissionType } from '@/types'
 import { createLead } from '../actions'
-import { Loader2, Save } from 'lucide-react'
+import { Loader2, Save, Building2, User, Mail, Globe, MapPin, FileText, Briefcase } from 'lucide-react'
+import CountrySelect from '@/components/CountrySelect'
+import PhoneInput from '@/components/PhoneInput'
+import ContactForm, { ContactData } from '@/components/ContactForm'
 
 interface Partner {
   id: string
@@ -22,13 +25,17 @@ export default function CreateLeadForm({ partners }: { partners: Partner[] }) {
     contactName: '',
     email: '',
     phone: '',
-    country: '',
+    phoneCountryCode: '+34',
+    jobTitle: '',
+    country: 'Spain', // Por defecto España
     website: '',
     notes: '',
     partnerId: partners[0]?.id || '',
     commissionType: CommissionType.REFERRAL,
     commissionRate: '10',
   })
+
+  const [contacts, setContacts] = useState<ContactData[]>([])
 
   const handleChange = (
     e: React.ChangeEvent<HTMLInputElement | HTMLTextAreaElement | HTMLSelectElement>
@@ -39,10 +46,31 @@ export default function CreateLeadForm({ partners }: { partners: Partner[] }) {
     })
   }
 
+  const handlePhoneChange = (fullPhone: string) => {
+    const parts = fullPhone.split(' ')
+    const phoneCountryCode = parts[0] || '+34'
+    const phone = parts.slice(1).join(' ')
+    setFormData({ ...formData, phone, phoneCountryCode })
+  }
+
+  const getFullPhone = () => {
+    if (!formData.phone) return ''
+    return `${formData.phoneCountryCode || '+34'} ${formData.phone}`.trim()
+  }
+
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault()
     setError('')
     setLoading(true)
+
+    // Validar contactos adicionales
+    for (let i = 0; i < contacts.length; i++) {
+      if (!contacts[i].name || !contacts[i].email) {
+        setError(`Por favor completa el nombre y email del contacto ${i + 1}`)
+        setLoading(false)
+        return
+      }
+    }
 
     try {
       const result = await createLead({
@@ -50,12 +78,15 @@ export default function CreateLeadForm({ partners }: { partners: Partner[] }) {
         contactName: formData.contactName,
         email: formData.email,
         phone: formData.phone || undefined,
+        phoneCountryCode: formData.phoneCountryCode || undefined,
+        jobTitle: formData.jobTitle || undefined,
         country: formData.country,
         website: formData.website || undefined,
         notes: formData.notes || undefined,
         partnerId: formData.partnerId,
         commissionType: formData.commissionType as CommissionType,
         commissionRate: parseFloat(formData.commissionRate),
+        contacts: contacts.length > 0 ? contacts : undefined,
       })
 
       if (result.success) {
@@ -72,186 +103,227 @@ export default function CreateLeadForm({ partners }: { partners: Partner[] }) {
 
   return (
     <form onSubmit={handleSubmit} className="space-y-6">
-      <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
-        {/* Company Name */}
-        <div className="md:col-span-2">
-          <label htmlFor="companyName" className="block text-sm font-medium text-gray-700 mb-2">
-            Nombre de la Empresa *
-          </label>
-          <input
-            id="companyName"
-            name="companyName"
-            type="text"
-            value={formData.companyName}
-            onChange={handleChange}
-            required
-            className="w-full px-4 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-omniwallet-primary focus:border-transparent"
-            placeholder="Acme Corp"
-          />
-        </div>
+      {/* Información de la Empresa */}
+      <div className="space-y-4">
+        <h3 className="text-lg font-semibold text-gray-800 border-b pb-2">
+          Información de la Empresa
+        </h3>
 
-        {/* Contact Name */}
-        <div>
-          <label htmlFor="contactName" className="block text-sm font-medium text-gray-700 mb-2">
-            Nombre del Contacto *
-          </label>
-          <input
-            id="contactName"
-            name="contactName"
-            type="text"
-            value={formData.contactName}
-            onChange={handleChange}
-            required
-            className="w-full px-4 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-omniwallet-primary focus:border-transparent"
-            placeholder="Juan Pérez"
-          />
-        </div>
+        <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+          <div className="md:col-span-2">
+            <label htmlFor="companyName" className="block text-sm font-medium text-gray-700 mb-2">
+              Nombre de la Empresa *
+            </label>
+            <div className="flex items-center gap-2">
+              <Building2 className="w-5 h-5 text-gray-400" />
+              <input
+                id="companyName"
+                name="companyName"
+                type="text"
+                value={formData.companyName}
+                onChange={handleChange}
+                required
+                className="flex-1 px-4 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-omniwallet-primary focus:border-transparent"
+                placeholder="Acme Corp"
+              />
+            </div>
+          </div>
 
-        {/* Email */}
-        <div>
-          <label htmlFor="email" className="block text-sm font-medium text-gray-700 mb-2">
-            Email *
-          </label>
-          <input
-            id="email"
-            name="email"
-            type="email"
-            value={formData.email}
-            onChange={handleChange}
-            required
-            className="w-full px-4 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-omniwallet-primary focus:border-transparent"
-            placeholder="contacto@empresa.com"
-          />
-        </div>
+          <div>
+            <label htmlFor="country" className="block text-sm font-medium text-gray-700 mb-2">
+              País *
+            </label>
+            <div className="flex items-center gap-2">
+              <MapPin className="w-5 h-5 text-gray-400 flex-shrink-0" />
+              <CountrySelect
+                value={formData.country}
+                onChange={(value) => setFormData({ ...formData, country: value })}
+                required
+                className="flex-1"
+              />
+            </div>
+          </div>
 
-        {/* Phone */}
-        <div>
-          <label htmlFor="phone" className="block text-sm font-medium text-gray-700 mb-2">
-            Teléfono
-          </label>
-          <input
-            id="phone"
-            name="phone"
-            type="tel"
-            value={formData.phone}
-            onChange={handleChange}
-            className="w-full px-4 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-omniwallet-primary focus:border-transparent"
-            placeholder="+34 600 000 000"
-          />
+          <div>
+            <label htmlFor="website" className="block text-sm font-medium text-gray-700 mb-2">
+              Sitio Web
+            </label>
+            <div className="flex items-center gap-2">
+              <Globe className="w-5 h-5 text-gray-400" />
+              <input
+                id="website"
+                name="website"
+                type="url"
+                value={formData.website}
+                onChange={handleChange}
+                className="flex-1 px-4 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-omniwallet-primary focus:border-transparent"
+                placeholder="https://www.empresa.com"
+              />
+            </div>
+          </div>
         </div>
+      </div>
 
-        {/* Country */}
-        <div>
-          <label htmlFor="country" className="block text-sm font-medium text-gray-700 mb-2">
-            País *
-          </label>
-          <input
-            id="country"
-            name="country"
-            type="text"
-            value={formData.country}
-            onChange={handleChange}
-            required
-            className="w-full px-4 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-omniwallet-primary focus:border-transparent"
-            placeholder="España"
-          />
+      {/* Contacto Principal */}
+      <div className="space-y-4">
+        <h3 className="text-lg font-semibold text-gray-800 border-b pb-2">Contacto Principal</h3>
+
+        <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+          <div>
+            <label htmlFor="contactName" className="block text-sm font-medium text-gray-700 mb-2">
+              Nombre del Contacto *
+            </label>
+            <div className="flex items-center gap-2">
+              <User className="w-5 h-5 text-gray-400" />
+              <input
+                id="contactName"
+                name="contactName"
+                type="text"
+                value={formData.contactName}
+                onChange={handleChange}
+                required
+                className="flex-1 px-4 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-omniwallet-primary focus:border-transparent"
+                placeholder="Juan Pérez"
+              />
+            </div>
+          </div>
+
+          <div>
+            <label htmlFor="jobTitle" className="block text-sm font-medium text-gray-700 mb-2">
+              Cargo
+            </label>
+            <div className="flex items-center gap-2">
+              <Briefcase className="w-5 h-5 text-gray-400" />
+              <input
+                id="jobTitle"
+                name="jobTitle"
+                type="text"
+                value={formData.jobTitle}
+                onChange={handleChange}
+                className="flex-1 px-4 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-omniwallet-primary focus:border-transparent"
+                placeholder="Director Comercial"
+              />
+            </div>
+          </div>
+
+          <div>
+            <label htmlFor="email" className="block text-sm font-medium text-gray-700 mb-2">
+              Email *
+            </label>
+            <div className="flex items-center gap-2">
+              <Mail className="w-5 h-5 text-gray-400" />
+              <input
+                id="email"
+                name="email"
+                type="email"
+                value={formData.email}
+                onChange={handleChange}
+                required
+                className="flex-1 px-4 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-omniwallet-primary focus:border-transparent"
+                placeholder="contacto@empresa.com"
+              />
+            </div>
+          </div>
+
+          <div>
+            <label htmlFor="phone" className="block text-sm font-medium text-gray-700 mb-2">
+              Teléfono
+            </label>
+            <PhoneInput value={getFullPhone()} onChange={handlePhoneChange} className="w-full" />
+          </div>
         </div>
+      </div>
 
-        {/* Website */}
-        <div className="md:col-span-2">
-          <label htmlFor="website" className="block text-sm font-medium text-gray-700 mb-2">
-            Sitio Web
-          </label>
-          <input
-            id="website"
-            name="website"
-            type="url"
-            value={formData.website}
-            onChange={handleChange}
-            className="w-full px-4 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-omniwallet-primary focus:border-transparent"
-            placeholder="https://www.empresa.com"
-          />
+      {/* Contactos Adicionales */}
+      <div className="border-t border-gray-200 pt-6">
+        <ContactForm contacts={contacts} onChange={setContacts} />
+      </div>
+
+      {/* Configuración del Partner */}
+      <div className="space-y-4 border-t border-gray-200 pt-6">
+        <h3 className="text-lg font-semibold text-gray-800 border-b pb-2">Asignación y Comisión</h3>
+
+        <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+          <div className="md:col-span-2">
+            <label htmlFor="partnerId" className="block text-sm font-medium text-gray-700 mb-2">
+              Asignar a Partner *
+            </label>
+            <select
+              id="partnerId"
+              name="partnerId"
+              value={formData.partnerId}
+              onChange={handleChange}
+              required
+              className="w-full px-4 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-omniwallet-primary focus:border-transparent"
+            >
+              {partners.map((partner) => (
+                <option key={partner.id} value={partner.id}>
+                  {partner.companyName} ({partner.email})
+                </option>
+              ))}
+            </select>
+          </div>
+
+          <div>
+            <label
+              htmlFor="commissionType"
+              className="block text-sm font-medium text-gray-700 mb-2"
+            >
+              Tipo de Comisión *
+            </label>
+            <select
+              id="commissionType"
+              name="commissionType"
+              value={formData.commissionType}
+              onChange={handleChange}
+              required
+              className="w-full px-4 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-omniwallet-primary focus:border-transparent"
+            >
+              <option value={CommissionType.AGENCY_PARTNER}>Agency Partner</option>
+              <option value={CommissionType.TECH_PARTNER}>Tech Partner</option>
+              <option value={CommissionType.REFERRAL}>Referral</option>
+              <option value={CommissionType.CUSTOM}>Custom</option>
+            </select>
+          </div>
+
+          <div>
+            <label
+              htmlFor="commissionRate"
+              className="block text-sm font-medium text-gray-700 mb-2"
+            >
+              Tasa de Comisión (%) *
+            </label>
+            <input
+              id="commissionRate"
+              name="commissionRate"
+              type="number"
+              min="0"
+              max="100"
+              step="0.1"
+              value={formData.commissionRate}
+              onChange={handleChange}
+              required
+              className="w-full px-4 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-omniwallet-primary focus:border-transparent"
+              placeholder="10.0"
+            />
+          </div>
         </div>
+      </div>
 
-        {/* Partner */}
-        <div className="md:col-span-2">
-          <label htmlFor="partnerId" className="block text-sm font-medium text-gray-700 mb-2">
-            Asignar a Partner *
-          </label>
-          <select
-            id="partnerId"
-            name="partnerId"
-            value={formData.partnerId}
-            onChange={handleChange}
-            required
-            className="w-full px-4 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-omniwallet-primary focus:border-transparent"
-          >
-            {partners.map((partner) => (
-              <option key={partner.id} value={partner.id}>
-                {partner.companyName} ({partner.email})
-              </option>
-            ))}
-          </select>
-        </div>
-
-        {/* Commission Type */}
-        <div>
-          <label
-            htmlFor="commissionType"
-            className="block text-sm font-medium text-gray-700 mb-2"
-          >
-            Tipo de Comisión *
-          </label>
-          <select
-            id="commissionType"
-            name="commissionType"
-            value={formData.commissionType}
-            onChange={handleChange}
-            required
-            className="w-full px-4 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-omniwallet-primary focus:border-transparent"
-          >
-            <option value={CommissionType.AGENCY_PARTNER}>Agency Partner</option>
-            <option value={CommissionType.TECH_PARTNER}>Tech Partner</option>
-            <option value={CommissionType.REFERRAL}>Referral</option>
-            <option value={CommissionType.CUSTOM}>Custom</option>
-          </select>
-        </div>
-
-        {/* Commission Rate */}
-        <div>
-          <label
-            htmlFor="commissionRate"
-            className="block text-sm font-medium text-gray-700 mb-2"
-          >
-            Tasa de Comisión (%) *
-          </label>
-          <input
-            id="commissionRate"
-            name="commissionRate"
-            type="number"
-            min="0"
-            max="100"
-            step="0.1"
-            value={formData.commissionRate}
-            onChange={handleChange}
-            required
-            className="w-full px-4 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-omniwallet-primary focus:border-transparent"
-            placeholder="10.0"
-          />
-        </div>
-
-        {/* Notes */}
-        <div className="md:col-span-2">
-          <label htmlFor="notes" className="block text-sm font-medium text-gray-700 mb-2">
-            Notas
-          </label>
+      {/* Notas */}
+      <div className="border-t border-gray-200 pt-6">
+        <label htmlFor="notes" className="block text-sm font-medium text-gray-700 mb-2">
+          Notas
+        </label>
+        <div className="flex gap-2">
+          <FileText className="w-5 h-5 text-gray-400 mt-2" />
           <textarea
             id="notes"
             name="notes"
             value={formData.notes}
             onChange={handleChange}
             rows={4}
-            className="w-full px-4 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-omniwallet-primary focus:border-transparent"
+            className="flex-1 px-4 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-omniwallet-primary focus:border-transparent"
             placeholder="Notas adicionales sobre el lead..."
           />
         </div>
