@@ -61,6 +61,8 @@ export interface LeadData {
   contactName: string
   email: string
   phone?: string
+  phoneCountryCode?: string
+  jobTitle?: string
   country: string
   status: string
   partnerId: string
