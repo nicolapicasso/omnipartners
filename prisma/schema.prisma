@@ -101,6 +101,8 @@ model Lead {
   contactName     String
   email           String
   phone           String?
+  phoneCountryCode String?  // Código de país del teléfono (ej: "+34")
+  jobTitle        String?  // Cargo del contacto principal
   country         String
   website         String?
 
@@ -129,8 +131,32 @@ model Lead {
 
   // Relaciones
   payments        Payment[]
+  contacts        Contact[]
 
   @@map("leads")
+}
+
+// ============================================
+// CONTACTS (Personas de contacto por lead)
+// ============================================
+
+model Contact {
+  id              String   @id @default(cuid())
+
+  leadId          String
+  lead            Lead     @relation(fields: [leadId], references: [id], onDelete: Cascade)
+
+  name            String
+  email           String
+  phone           String?
+  phoneCountryCode String?  // Código de país del teléfono (ej: "+34")
+  jobTitle        String?  // Cargo de la persona
+  isPrimary       Boolean  @default(false)  // Contacto principal
+
+  createdAt       DateTime @default(now())
+  updatedAt       DateTime @updatedAt
+
+  @@map("contacts")
 }
 
 // ============================================

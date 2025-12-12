@@ -32,15 +32,28 @@ export const createUserSchema = z.object({
 // LEAD VALIDATIONS
 // ============================================
 
+export const contactSchema = z.object({
+  id: z.string().optional(), // Para edición de contactos existentes
+  name: z.string().min(2, 'El nombre es requerido'),
+  email: z.string().email('Email inválido'),
+  phone: z.string().optional(),
+  phoneCountryCode: z.string().optional(), // Código de país (+34, etc.)
+  jobTitle: z.string().optional(), // Cargo
+  isPrimary: z.boolean().default(false),
+})
+
 export const createLeadSchema = z.object({
   companyName: z.string().min(2, 'El nombre de la empresa es requerido'),
   contactName: z.string().min(2, 'El nombre de contacto es requerido'),
   email: z.string().email('Email inválido'),
   phone: z.string().optional(),
+  phoneCountryCode: z.string().optional(), // Código de país del teléfono
+  jobTitle: z.string().optional(), // Cargo del contacto principal
   country: z.string().min(2, 'El país es requerido'),
   website: z.string().url('URL inválida').optional().or(z.literal('')),
   notes: z.string().optional(),
   partnerId: z.string().optional(), // Admin can assign to specific partner
+  contacts: z.array(contactSchema).optional(), // Contactos adicionales
 })
 
 export const updateLeadSchema = createLeadSchema.partial().extend({
@@ -71,6 +84,7 @@ export const createContentSchema = z.object({
 export type LoginInput = z.infer<typeof loginSchema>
 export type RegisterPartnerInput = z.infer<typeof registerPartnerSchema>
 export type CreateUserInput = z.infer<typeof createUserSchema>
+export type ContactInput = z.infer<typeof contactSchema>
 export type CreateLeadInput = z.infer<typeof createLeadSchema>
 export type UpdateLeadInput = z.infer<typeof updateLeadSchema>
 export type CreateContentInput = z.infer<typeof createContentSchema>

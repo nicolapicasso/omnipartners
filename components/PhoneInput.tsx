@@ -14,8 +14,9 @@ interface PhoneInputProps {
 
 export default function PhoneInput({ value, onChange, error, required = false, className = '' }: PhoneInputProps) {
   const parsePhoneNumber = (phoneValue: string) => {
-    if (!phoneValue) return { dialCode: '+1', number: '' }
-    
+    // Por defecto España (+34)
+    if (!phoneValue) return { dialCode: '+34', number: '' }
+
     const matchingCountry = countries.find(c => phoneValue.startsWith(c.dialCode))
     if (matchingCountry) {
       return {
@@ -23,8 +24,8 @@ export default function PhoneInput({ value, onChange, error, required = false, c
         number: phoneValue.substring(matchingCountry.dialCode.length).trim()
       }
     }
-    
-    return { dialCode: '+1', number: phoneValue }
+
+    return { dialCode: '+34', number: phoneValue }
   }
 
   const { dialCode: initialDialCode, number: initialNumber } = parsePhoneNumber(value)
@@ -40,7 +41,7 @@ export default function PhoneInput({ value, onChange, error, required = false, c
   const selectedDialCode = dialCodeOptions.find(opt => opt.value === dialCode) || dialCodeOptions[0]
 
   const handleDialCodeChange = (option: any) => {
-    const newDialCode = option?.value || '+1'
+    const newDialCode = option?.value || '+34'
     setDialCode(newDialCode)
     onChange(`${newDialCode} ${number}`.trim())
   }

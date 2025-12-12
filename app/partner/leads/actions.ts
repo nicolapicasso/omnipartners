@@ -9,14 +9,27 @@ import { NotificationType } from '@/lib/notification-types'
 import { sendLeadWebhook } from '@/lib/webhooks'
 import { WebhookEventType } from '@/lib/webhook-types'
 
+interface ContactInput {
+  id?: string
+  name: string
+  email: string
+  phone?: string
+  phoneCountryCode?: string
+  jobTitle?: string
+  isPrimary?: boolean
+}
+
 export async function createPartnerLead(data: {
   companyName: string
   contactName: string
   email: string
   phone?: string
+  phoneCountryCode?: string
+  jobTitle?: string
   country: string
   website?: string
   notes?: string
+  contacts?: ContactInput[]
 }) {
   try {
     const session = await getPartnerSession()
@@ -45,21 +58,37 @@ export async function createPartnerLead(data: {
         contactName: data.contactName,
         email: data.email,
         phone: data.phone,
+        phoneCountryCode: data.phoneCountryCode,
+        jobTitle: data.jobTitle,
         country: data.country,
         website: data.website,
         notes: data.notes,
         partner: {
-          connect: { id: partnerId }
+          connect: { id: partnerId },
         },
         // Only include createdBy if user exists (omit field entirely if null)
         ...(user && {
           createdBy: {
-            connect: { id: user.id }
-          }
+            connect: { id: user.id },
+          },
         }),
         status: LeadStatus.LEAD,
         commissionType: partner.partnerCategory, // Use partner's category
         commissionRate: 10, // Default rate, admin can adjust
+        // Create contacts if provided
+        ...(data.contacts &&
+          data.contacts.length > 0 && {
+            contacts: {
+              create: data.contacts.map((contact) => ({
+                name: contact.name,
+                email: contact.email,
+                phone: contact.phone,
+                phoneCountryCode: contact.phoneCountryCode,
+                jobTitle: contact.jobTitle,
+                isPrimary: contact.isPrimary || false,
+              })),
+            },
+          }),
       },
     })
 
@@ -76,6 +105,8 @@ export async function createPartnerLead(data: {
       contactName: lead.contactName,
       email: lead.email,
       phone: lead.phone || undefined,
+      phoneCountryCode: lead.phoneCountryCode || undefined,
+      jobTitle: lead.jobTitle || undefined,
       country: lead.country,
       status: lead.status,
       partnerId: partner.id,
@@ -99,9 +130,12 @@ export async function updatePartnerLead(
     contactName: string
     email: string
     phone?: string
+    phoneCountryCode?: string
+    jobTitle?: string
     country: string
     website?: string
     notes?: string
+    contacts?: ContactInput[]
   }
 ) {
   try {
@@ -111,12 +145,14 @@ export async function updatePartnerLead(
     // Verify lead belongs to partner
     const lead = await prisma.lead.findUnique({
       where: { id: leadId },
+      include: { contacts: true },
     })
 
     if (!lead || lead.partnerId !== partnerId) {
       return { success: false, error: 'Lead not found or unauthorized' }
     }
 
+    // Update lead
     await prisma.lead.update({
       where: { id: leadId },
       data: {
@@ -124,11 +160,58 @@ export async function updatePartnerLead(
         contactName: data.contactName,
         email: data.email,
         phone: data.phone,
+        phoneCountryCode: data.phoneCountryCode,
+        jobTitle: data.jobTitle,
         country: data.country,
         website: data.website,
         notes: data.notes,
       },
     })
+
+    // Handle contacts update
+    if (data.contacts !== undefined) {
+      const existingContactIds = lead.contacts.map((c) => c.id)
+      const newContactIds = data.contacts.filter((c) => c.id).map((c) => c.id!)
+
+      // Delete removed contacts
+      const contactsToDelete = existingContactIds.filter((id) => !newContactIds.includes(id))
+      if (contactsToDelete.length > 0) {
+        await prisma.contact.deleteMany({
+          where: { id: { in: contactsToDelete } },
+        })
+      }
+
+      // Update existing and create new contacts
+      for (const contact of data.contacts) {
+        if (contact.id) {
+          // Update existing contact
+          await prisma.contact.update({
+            where: { id: contact.id },
+            data: {
+              name: contact.name,
+              email: contact.email,
+              phone: contact.phone,
+              phoneCountryCode: contact.phoneCountryCode,
+              jobTitle: contact.jobTitle,
+              isPrimary: contact.isPrimary || false,
+            },
+          })
+        } else {
+          // Create new contact
+          await prisma.contact.create({
+            data: {
+              leadId: leadId,
+              name: contact.name,
+              email: contact.email,
+              phone: contact.phone,
+              phoneCountryCode: contact.phoneCountryCode,
+              jobTitle: contact.jobTitle,
+              isPrimary: contact.isPrimary || false,
+            },
+          })
+        }
+      }
+    }
 
     revalidatePath('/partner/leads')
     revalidatePath(`/partner/leads/${leadId}`)
