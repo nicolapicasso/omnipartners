@@ -50,6 +50,8 @@ model Partner {
   // Certification
   isCertified      Boolean  @default(false)
   certifiedAt      DateTime?
+  certificationExpiresAt DateTime?  // Fecha de expiración de la certificación
+  partnerLandingUrl String?  // URL de la landing del partner en Omniwallet
 
   // Relaciones
   users                 User[]
@@ -475,6 +477,27 @@ model CertificationAttempt {
   completedAt     DateTime @default(now())
 
   @@map("certification_attempts")
+}
+
+// Configuración global del sello de certificación
+model CertificationSettings {
+  id                    String   @id @default(cuid())
+
+  // URLs de las imágenes del sello
+  badgeLightUrl         String?  // Versión clara del sello
+  badgeDarkUrl          String?  // Versión oscura del sello
+
+  // Textos configurables (pueden usar variables como {partnerName}, {expirationDate}, {score})
+  badgeHoverText        String?  // Texto al hacer hover sobre el sello
+  badgeAltText          String?  // Texto alternativo para accesibilidad
+
+  // Configuración de validez
+  validityMonths        Int      @default(12)  // Meses de validez de la certificación
+
+  createdAt             DateTime @default(now())
+  updatedAt             DateTime @updatedAt
+
+  @@map("certification_settings")
 }
 
 // ============================================

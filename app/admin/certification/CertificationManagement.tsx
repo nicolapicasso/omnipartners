@@ -1,7 +1,7 @@
 'use client'
 
 import { useState } from 'react'
-import { Plus, Edit2, Trash2, Save, X } from 'lucide-react'
+import { Plus, Edit2, Trash2, Save, X, Award, Users, Settings, CheckCircle, XCircle, ExternalLink, Image, Clock } from 'lucide-react'
 import {
   createCertificationContent,
   updateCertificationContent,
@@ -9,6 +9,10 @@ import {
   createCertificationQuestion,
   updateCertificationQuestion,
   deleteCertificationQuestion,
+  updateCertificationSettings,
+  grantCertification,
+  revokeCertification,
+  updatePartnerLandingUrl,
 } from './actions'
 import { useTranslation } from '@/lib/contexts/LanguageContext'
 
@@ -37,25 +41,52 @@ type QuestionItem = {
   updatedAt: Date
 }
 
+type SettingsItem = {
+  id: string
+  badgeLightUrl: string | null
+  badgeDarkUrl: string | null
+  badgeHoverText: string | null
+  badgeAltText: string | null
+  validityMonths: number
+} | null
+
+type PartnerItem = {
+  id: string
+  companyName: string
+  contactName: string
+  email: string
+  website: string | null
+  isCertified: boolean
+  certifiedAt: Date | null
+  certificationExpiresAt: Date | null
+  partnerLandingUrl: string | null
+  bestScore: number | null
+  attemptCount: number
+}
+
 export default function CertificationManagement({
   contents,
   questions,
+  settings,
+  partners,
 }: {
   contents: ContentItem[]
   questions: QuestionItem[]
+  settings: SettingsItem
+  partners: PartnerItem[]
 }) {
   const { t } = useTranslation()
-  const [activeTab, setActiveTab] = useState<'content' | 'questions'>('content')
+  const [activeTab, setActiveTab] = useState<'content' | 'questions' | 'settings' | 'partners'>('content')
 
   return (
     <div>
       <h1 className="text-3xl font-bold text-gray-900 mb-6">{t('admin.manageCertification')}</h1>
 
       {/* Tabs */}
-      <div className="flex border-b border-gray-200 mb-6">
+      <div className="flex border-b border-gray-200 mb-6 overflow-x-auto">
         <button
           onClick={() => setActiveTab('content')}
-          className={`px-6 py-3 font-medium text-sm transition ${
+          className={`px-6 py-3 font-medium text-sm transition whitespace-nowrap ${
             activeTab === 'content'
               ? 'border-b-2 border-omniwallet-primary text-omniwallet-primary'
               : 'text-gray-600 hover:text-gray-900'
@@ -65,13 +96,35 @@ export default function CertificationManagement({
         </button>
         <button
           onClick={() => setActiveTab('questions')}
-          className={`px-6 py-3 font-medium text-sm transition ${
+          className={`px-6 py-3 font-medium text-sm transition whitespace-nowrap ${
             activeTab === 'questions'
               ? 'border-b-2 border-omniwallet-primary text-omniwallet-primary'
               : 'text-gray-600 hover:text-gray-900'
           }`}
         >
           {t('certification.adminQuestions.title')}
+        </button>
+        <button
+          onClick={() => setActiveTab('settings')}
+          className={`px-6 py-3 font-medium text-sm transition whitespace-nowrap flex items-center gap-2 ${
+            activeTab === 'settings'
+              ? 'border-b-2 border-omniwallet-primary text-omniwallet-primary'
+              : 'text-gray-600 hover:text-gray-900'
+          }`}
+        >
+          <Settings className="w-4 h-4" />
+          Gestionar Sello
+        </button>
+        <button
+          onClick={() => setActiveTab('partners')}
+          className={`px-6 py-3 font-medium text-sm transition whitespace-nowrap flex items-center gap-2 ${
+            activeTab === 'partners'
+              ? 'border-b-2 border-omniwallet-primary text-omniwallet-primary'
+              : 'text-gray-600 hover:text-gray-900'
+          }`}
+        >
+          <Users className="w-4 h-4" />
+          Partners Certificados
         </button>
       </div>
 
@@ -80,6 +133,403 @@ export default function CertificationManagement({
 
       {/* Questions Tab */}
       {activeTab === 'questions' && <QuestionManagement questions={questions} />}
+
+      {/* Settings Tab */}
+      {activeTab === 'settings' && <BadgeSettingsManagement settings={settings} />}
+
+      {/* Partners Tab */}
+      {activeTab === 'partners' && <PartnersManagement partners={partners} />}
+    </div>
+  )
+}
+
+// Badge Settings Management Component
+function BadgeSettingsManagement({ settings }: { settings: SettingsItem }) {
+  const [loading, setLoading] = useState(false)
+  const [formData, setFormData] = useState({
+    badgeLightUrl: settings?.badgeLightUrl || '',
+    badgeDarkUrl: settings?.badgeDarkUrl || '',
+    badgeHoverText: settings?.badgeHoverText || '{partnerName} está certificado por Omniwallet como expertos en Loyalty Marketing',
+    badgeAltText: settings?.badgeAltText || 'Partner Certificado Omniwallet',
+    validityMonths: settings?.validityMonths || 12,
+  })
+
+  const handleSubmit = async (e: React.FormEvent) => {
+    e.preventDefault()
+    setLoading(true)
+
+    const result = await updateCertificationSettings(formData)
+
+    if (result.success) {
+      alert('Configuración guardada correctamente')
+      window.location.reload()
+    } else {
+      alert(result.error)
+    }
+
+    setLoading(false)
+  }
+
+  return (
+    <div>
+      <div className="mb-6">
+        <h2 className="text-xl font-semibold text-gray-900 mb-2">Configuración del Sello de Certificación</h2>
+        <p className="text-sm text-gray-600">
+          Configura las imágenes del sello y los textos que se mostrarán cuando un partner lo añada a su web.
+        </p>
+      </div>
+
+      <form onSubmit={handleSubmit} className="bg-white rounded-lg shadow-sm border border-gray-200 p-6">
+        <div className="space-y-6">
+          {/* Badge Images */}
+          <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
+            <div>
+              <label className="block text-sm font-medium text-gray-700 mb-2">
+                <Image className="w-4 h-4 inline mr-1" />
+                URL Sello Versión Clara
+              </label>
+              <input
+                type="url"
+                value={formData.badgeLightUrl}
+                onChange={(e) => setFormData({ ...formData, badgeLightUrl: e.target.value })}
+                className="w-full border border-gray-300 rounded-md px-3 py-2 text-sm focus:ring-2 focus:ring-omniwallet-primary focus:border-transparent"
+                placeholder="https://..."
+              />
+              {formData.badgeLightUrl && (
+                <div className="mt-2 p-2 bg-gray-100 rounded">
+                  <img
+                    src={formData.badgeLightUrl}
+                    alt="Preview Light"
+                    className="h-16 object-contain"
+                  />
+                </div>
+              )}
+            </div>
+
+            <div>
+              <label className="block text-sm font-medium text-gray-700 mb-2">
+                <Image className="w-4 h-4 inline mr-1" />
+                URL Sello Versión Oscura
+              </label>
+              <input
+                type="url"
+                value={formData.badgeDarkUrl}
+                onChange={(e) => setFormData({ ...formData, badgeDarkUrl: e.target.value })}
+                className="w-full border border-gray-300 rounded-md px-3 py-2 text-sm focus:ring-2 focus:ring-omniwallet-primary focus:border-transparent"
+                placeholder="https://..."
+              />
+              {formData.badgeDarkUrl && (
+                <div className="mt-2 p-2 bg-gray-800 rounded">
+                  <img
+                    src={formData.badgeDarkUrl}
+                    alt="Preview Dark"
+                    className="h-16 object-contain"
+                  />
+                </div>
+              )}
+            </div>
+          </div>
+
+          {/* Hover Text */}
+          <div>
+            <label className="block text-sm font-medium text-gray-700 mb-2">
+              Texto al hacer Hover
+            </label>
+            <textarea
+              value={formData.badgeHoverText}
+              onChange={(e) => setFormData({ ...formData, badgeHoverText: e.target.value })}
+              rows={3}
+              className="w-full border border-gray-300 rounded-md px-3 py-2 text-sm focus:ring-2 focus:ring-omniwallet-primary focus:border-transparent"
+            />
+            <p className="text-xs text-gray-500 mt-1">
+              Variables disponibles: {'{partnerName}'}, {'{expirationDate}'}, {'{score}'}
+            </p>
+          </div>
+
+          {/* Alt Text */}
+          <div>
+            <label className="block text-sm font-medium text-gray-700 mb-2">
+              Texto Alternativo (Accesibilidad)
+            </label>
+            <input
+              type="text"
+              value={formData.badgeAltText}
+              onChange={(e) => setFormData({ ...formData, badgeAltText: e.target.value })}
+              className="w-full border border-gray-300 rounded-md px-3 py-2 text-sm focus:ring-2 focus:ring-omniwallet-primary focus:border-transparent"
+            />
+          </div>
+
+          {/* Validity */}
+          <div>
+            <label className="block text-sm font-medium text-gray-700 mb-2">
+              <Clock className="w-4 h-4 inline mr-1" />
+              Meses de Validez de la Certificación
+            </label>
+            <input
+              type="number"
+              value={formData.validityMonths}
+              onChange={(e) => setFormData({ ...formData, validityMonths: parseInt(e.target.value) || 12 })}
+              min="1"
+              max="60"
+              className="w-32 border border-gray-300 rounded-md px-3 py-2 text-sm focus:ring-2 focus:ring-omniwallet-primary focus:border-transparent"
+            />
+            <p className="text-xs text-gray-500 mt-1">
+              Las certificaciones expirarán después de este período.
+            </p>
+          </div>
+        </div>
+
+        <div className="flex gap-2 mt-6">
+          <button
+            type="submit"
+            disabled={loading}
+            className="inline-flex items-center gap-2 bg-omniwallet-primary text-white px-4 py-2 rounded-md text-sm font-medium hover:bg-omniwallet-secondary transition disabled:opacity-50"
+          >
+            <Save className="w-4 h-4" />
+            {loading ? 'Guardando...' : 'Guardar Configuración'}
+          </button>
+        </div>
+      </form>
+    </div>
+  )
+}
+
+// Partners Management Component
+function PartnersManagement({ partners }: { partners: PartnerItem[] }) {
+  const [loading, setLoading] = useState<string | null>(null)
+  const [editingLanding, setEditingLanding] = useState<string | null>(null)
+  const [landingUrl, setLandingUrl] = useState('')
+
+  const certifiedPartners = partners.filter(p => p.isCertified)
+  const nonCertifiedPartners = partners.filter(p => !p.isCertified)
+
+  const handleGrant = async (partnerId: string) => {
+    if (!confirm('¿Conceder certificación a este partner?')) return
+    setLoading(partnerId)
+    const result = await grantCertification(partnerId)
+    if (result.success) {
+      window.location.reload()
+    } else {
+      alert(result.error)
+    }
+    setLoading(null)
+  }
+
+  const handleRevoke = async (partnerId: string) => {
+    if (!confirm('¿Revocar certificación de este partner?')) return
+    setLoading(partnerId)
+    const result = await revokeCertification(partnerId)
+    if (result.success) {
+      window.location.reload()
+    } else {
+      alert(result.error)
+    }
+    setLoading(null)
+  }
+
+  const handleSaveLanding = async (partnerId: string) => {
+    setLoading(partnerId)
+    const result = await updatePartnerLandingUrl(partnerId, landingUrl)
+    if (result.success) {
+      setEditingLanding(null)
+      window.location.reload()
+    } else {
+      alert(result.error)
+    }
+    setLoading(null)
+  }
+
+  const startEditLanding = (partner: PartnerItem) => {
+    setEditingLanding(partner.id)
+    setLandingUrl(partner.partnerLandingUrl || '')
+  }
+
+  return (
+    <div>
+      {/* Certified Partners */}
+      <div className="mb-8">
+        <div className="flex items-center gap-2 mb-4">
+          <Award className="w-5 h-5 text-green-600" />
+          <h2 className="text-xl font-semibold text-gray-900">
+            Partners Certificados ({certifiedPartners.length})
+          </h2>
+        </div>
+
+        {certifiedPartners.length === 0 ? (
+          <div className="bg-white rounded-lg shadow-sm border border-gray-200 p-8 text-center">
+            <p className="text-gray-500">No hay partners certificados todavía.</p>
+          </div>
+        ) : (
+          <div className="bg-white rounded-lg shadow-sm border border-gray-200 overflow-hidden">
+            <table className="min-w-full divide-y divide-gray-200">
+              <thead className="bg-gray-50">
+                <tr>
+                  <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase">Partner</th>
+                  <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase">Mejor Puntuación</th>
+                  <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase">Certificado</th>
+                  <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase">Expira</th>
+                  <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase">Landing URL</th>
+                  <th className="px-6 py-3 text-right text-xs font-medium text-gray-500 uppercase">Acciones</th>
+                </tr>
+              </thead>
+              <tbody className="bg-white divide-y divide-gray-200">
+                {certifiedPartners.map((partner) => (
+                  <tr key={partner.id}>
+                    <td className="px-6 py-4">
+                      <div>
+                        <p className="font-medium text-gray-900">{partner.companyName}</p>
+                        <p className="text-sm text-gray-500">{partner.email}</p>
+                      </div>
+                    </td>
+                    <td className="px-6 py-4">
+                      {partner.bestScore !== null ? (
+                        <span className="text-green-600 font-medium">{partner.bestScore.toFixed(1)}%</span>
+                      ) : (
+                        <span className="text-gray-400">-</span>
+                      )}
+                    </td>
+                    <td className="px-6 py-4">
+                      <span className="text-sm text-gray-600">
+                        {partner.certifiedAt ? new Date(partner.certifiedAt).toLocaleDateString() : '-'}
+                      </span>
+                    </td>
+                    <td className="px-6 py-4">
+                      {partner.certificationExpiresAt ? (
+                        <span className={`text-sm ${
+                          new Date(partner.certificationExpiresAt) < new Date() ? 'text-red-600' : 'text-gray-600'
+                        }`}>
+                          {new Date(partner.certificationExpiresAt).toLocaleDateString()}
+                        </span>
+                      ) : (
+                        <span className="text-gray-400">-</span>
+                      )}
+                    </td>
+                    <td className="px-6 py-4">
+                      {editingLanding === partner.id ? (
+                        <div className="flex items-center gap-2">
+                          <input
+                            type="url"
+                            value={landingUrl}
+                            onChange={(e) => setLandingUrl(e.target.value)}
+                            className="w-48 border border-gray-300 rounded px-2 py-1 text-sm"
+                            placeholder="https://..."
+                          />
+                          <button
+                            onClick={() => handleSaveLanding(partner.id)}
+                            disabled={loading === partner.id}
+                            className="text-green-600 hover:text-green-700"
+                          >
+                            <Save className="w-4 h-4" />
+                          </button>
+                          <button
+                            onClick={() => setEditingLanding(null)}
+                            className="text-gray-600 hover:text-gray-700"
+                          >
+                            <X className="w-4 h-4" />
+                          </button>
+                        </div>
+                      ) : (
+                        <div className="flex items-center gap-2">
+                          {partner.partnerLandingUrl ? (
+                            <a
+                              href={partner.partnerLandingUrl}
+                              target="_blank"
+                              rel="noopener noreferrer"
+                              className="text-omniwallet-primary hover:text-omniwallet-secondary text-sm flex items-center gap-1"
+                            >
+                              Ver <ExternalLink className="w-3 h-3" />
+                            </a>
+                          ) : (
+                            <span className="text-gray-400 text-sm">No configurada</span>
+                          )}
+                          <button
+                            onClick={() => startEditLanding(partner)}
+                            className="text-gray-500 hover:text-gray-700"
+                          >
+                            <Edit2 className="w-3 h-3" />
+                          </button>
+                        </div>
+                      )}
+                    </td>
+                    <td className="px-6 py-4 text-right">
+                      <button
+                        onClick={() => handleRevoke(partner.id)}
+                        disabled={loading === partner.id}
+                        className="text-red-600 hover:text-red-700 text-sm font-medium disabled:opacity-50"
+                      >
+                        Revocar
+                      </button>
+                    </td>
+                  </tr>
+                ))}
+              </tbody>
+            </table>
+          </div>
+        )}
+      </div>
+
+      {/* Non-Certified Partners */}
+      <div>
+        <div className="flex items-center gap-2 mb-4">
+          <Users className="w-5 h-5 text-gray-600" />
+          <h2 className="text-xl font-semibold text-gray-900">
+            Partners sin Certificar ({nonCertifiedPartners.length})
+          </h2>
+        </div>
+
+        {nonCertifiedPartners.length === 0 ? (
+          <div className="bg-white rounded-lg shadow-sm border border-gray-200 p-8 text-center">
+            <p className="text-gray-500">Todos los partners activos están certificados.</p>
+          </div>
+        ) : (
+          <div className="bg-white rounded-lg shadow-sm border border-gray-200 overflow-hidden">
+            <table className="min-w-full divide-y divide-gray-200">
+              <thead className="bg-gray-50">
+                <tr>
+                  <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase">Partner</th>
+                  <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase">Intentos</th>
+                  <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase">Mejor Puntuación</th>
+                  <th className="px-6 py-3 text-right text-xs font-medium text-gray-500 uppercase">Acciones</th>
+                </tr>
+              </thead>
+              <tbody className="bg-white divide-y divide-gray-200">
+                {nonCertifiedPartners.map((partner) => (
+                  <tr key={partner.id}>
+                    <td className="px-6 py-4">
+                      <div>
+                        <p className="font-medium text-gray-900">{partner.companyName}</p>
+                        <p className="text-sm text-gray-500">{partner.email}</p>
+                      </div>
+                    </td>
+                    <td className="px-6 py-4">
+                      <span className="text-sm text-gray-600">{partner.attemptCount}</span>
+                    </td>
+                    <td className="px-6 py-4">
+                      {partner.bestScore !== null ? (
+                        <span className={`font-medium ${partner.bestScore >= 70 ? 'text-green-600' : 'text-red-600'}`}>
+                          {partner.bestScore.toFixed(1)}%
+                        </span>
+                      ) : (
+                        <span className="text-gray-400">Sin intentos</span>
+                      )}
+                    </td>
+                    <td className="px-6 py-4 text-right">
+                      <button
+                        onClick={() => handleGrant(partner.id)}
+                        disabled={loading === partner.id}
+                        className="inline-flex items-center gap-1 text-green-600 hover:text-green-700 text-sm font-medium disabled:opacity-50"
+                      >
+                        <Award className="w-4 h-4" />
+                        Conceder
+                      </button>
+                    </td>
+                  </tr>
+                ))}
+              </tbody>
+            </table>
+          </div>
+        )}
+      </div>
     </div>
   )
 }
