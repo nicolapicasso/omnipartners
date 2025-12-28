@@ -86,6 +86,45 @@ export async function GET(request: Request) {
       results.push(`coverImageUrl: ${e instanceof Error ? e.message : 'already exists or error'}`)
     }
 
+    // Migration: Add certificationExpiresAt to partners
+    try {
+      await prisma.$executeRawUnsafe(`
+        ALTER TABLE "partners" ADD COLUMN IF NOT EXISTS "certificationExpiresAt" TIMESTAMP(3);
+      `)
+      results.push('Added certificationExpiresAt to partners')
+    } catch (e) {
+      results.push(`certificationExpiresAt: ${e instanceof Error ? e.message : 'already exists or error'}`)
+    }
+
+    // Migration: Add partnerLandingUrl to partners
+    try {
+      await prisma.$executeRawUnsafe(`
+        ALTER TABLE "partners" ADD COLUMN IF NOT EXISTS "partnerLandingUrl" TEXT;
+      `)
+      results.push('Added partnerLandingUrl to partners')
+    } catch (e) {
+      results.push(`partnerLandingUrl: ${e instanceof Error ? e.message : 'already exists or error'}`)
+    }
+
+    // Migration: Create certification_settings table
+    try {
+      await prisma.$executeRawUnsafe(`
+        CREATE TABLE IF NOT EXISTS "certification_settings" (
+          "id" TEXT NOT NULL PRIMARY KEY,
+          "badgeLightUrl" TEXT,
+          "badgeDarkUrl" TEXT,
+          "badgeHoverText" TEXT,
+          "badgeAltText" TEXT,
+          "validityMonths" INTEGER NOT NULL DEFAULT 12,
+          "createdAt" TIMESTAMP(3) NOT NULL DEFAULT CURRENT_TIMESTAMP,
+          "updatedAt" TIMESTAMP(3) NOT NULL DEFAULT CURRENT_TIMESTAMP
+        );
+      `)
+      results.push('Created certification_settings table')
+    } catch (e) {
+      results.push(`certification_settings table: ${e instanceof Error ? e.message : 'already exists or error'}`)
+    }
+
     return NextResponse.json({
       success: true,
       message: 'Migrations completed',

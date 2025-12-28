@@ -11,9 +11,11 @@ export default async function PartnerCertificationPage() {
   const partner = await prisma.partner.findUnique({
     where: { id: partnerId },
     select: {
+      id: true,
       companyName: true,
       isCertified: true,
       certifiedAt: true,
+      certificationExpiresAt: true,
     },
   })
 
@@ -47,6 +49,12 @@ export default async function PartnerCertificationPage() {
     take: 10,
   })
 
+  // Fetch certification settings for badge URLs
+  const settings = await prisma.certificationSettings.findFirst()
+
+  // Get base URL from environment or default
+  const baseUrl = process.env.NEXTAUTH_URL || process.env.NEXT_PUBLIC_APP_URL || 'https://partners.omniwallet.com'
+
   return (
     <div className="min-h-screen bg-gray-50">
       <PartnerDashboardHeader
@@ -57,11 +65,16 @@ export default async function PartnerCertificationPage() {
 
       <main className="lg:ml-64 pt-28 lg:pt-28 px-4 sm:px-6 lg:px-8 py-6 lg:py-8">
         <CertificationPortal
+          partnerId={partner.id}
           isCertified={partner.isCertified}
           certifiedAt={partner.certifiedAt}
+          expiresAt={partner.certificationExpiresAt}
           contents={contents}
           questions={questions}
           attempts={attempts}
+          badgeLightUrl={settings?.badgeLightUrl || null}
+          badgeDarkUrl={settings?.badgeDarkUrl || null}
+          baseUrl={baseUrl}
         />
       </main>
     </div>

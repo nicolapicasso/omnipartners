@@ -1,8 +1,8 @@
 'use client'
 
 import { useState } from 'react'
-import { Award, BookOpen, CheckCircle, XCircle, ExternalLink, FileText, Video, Link as LinkIcon } from 'lucide-react'
-import { submitCertificationExam } from './actions'
+import { Award, BookOpen, CheckCircle, XCircle, ExternalLink, FileText, Video, Link as LinkIcon, AlertTriangle, Lightbulb, Code, Copy, Check, Sun, Moon } from 'lucide-react'
+import { submitCertificationExam, verifyAnswer } from './actions'
 import { useTranslation } from '@/lib/contexts/LanguageContext'
 
 type ContentItem = {
@@ -31,38 +31,78 @@ type AttemptItem = {
   completedAt: Date
 }
 
+type AnswerResult = {
+  answer: number
+  correct: boolean
+  explanation: string | null
+  correctAnswer: number
+}
+
 export default function CertificationPortal({
+  partnerId,
   isCertified,
   certifiedAt,
+  expiresAt,
   contents,
   questions,
   attempts,
+  badgeLightUrl,
+  badgeDarkUrl,
+  baseUrl,
 }: {
+  partnerId: string
   isCertified: boolean
   certifiedAt: Date | null
+  expiresAt: Date | null
   contents: ContentItem[]
   questions: QuestionItem[]
   attempts: AttemptItem[]
+  badgeLightUrl: string | null
+  badgeDarkUrl: string | null
+  baseUrl: string
 }) {
   const { t } = useTranslation()
   const [view, setView] = useState<'overview' | 'content' | 'exam' | 'results'>('overview')
   const [currentQuestion, setCurrentQuestion] = useState(0)
-  const [answers, setAnswers] = useState<{ [key: number]: number }>({})
+  const [answerResults, setAnswerResults] = useState<{ [key: number]: AnswerResult }>({})
   const [examResults, setExamResults] = useState<any>(null)
   const [submitting, setSubmitting] = useState(false)
+  const [verifying, setVerifying] = useState(false)
+  const [showConfirmModal, setShowConfirmModal] = useState(false)
+  const [selectedTheme, setSelectedTheme] = useState<'light' | 'dark'>('light')
+  const [copiedCode, setCopiedCode] = useState<string | null>(null)
 
   const handleStartExam = () => {
     setCurrentQuestion(0)
-    setAnswers({})
+    setAnswerResults({})
     setExamResults(null)
     setView('exam')
   }
 
-  const handleAnswerSelect = (answerIndex: number) => {
-    setAnswers({
-      ...answers,
-      [currentQuestion]: answerIndex,
-    })
+  const handleAnswerSelect = async (answerIndex: number) => {
+    // Si ya hay una respuesta para esta pregunta, no hacer nada (bloqueado)
+    if (answerResults[currentQuestion] !== undefined) {
+      return
+    }
+
+    setVerifying(true)
+
+    const question = questions[currentQuestion]
+    const result = await verifyAnswer(question.id, answerIndex)
+
+    if (result.success) {
+      setAnswerResults({
+        ...answerResults,
+        [currentQuestion]: {
+          answer: answerIndex,
+          correct: result.correct!,
+          explanation: result.explanation || null,
+          correctAnswer: result.correctAnswer!
+        }
+      })
+    }
+
+    setVerifying(false)
   }
 
   const handleNext = () => {
@@ -77,24 +117,37 @@ export default function CertificationPortal({
     }
   }
 
-  const handleSubmitExam = async () => {
-    // Check all questions answered
-    if (Object.keys(answers).length < questions.length) {
-      alert(t('certification.answerAllQuestions'))
-      return
+  const getUnansweredQuestions = () => {
+    const unanswered: number[] = []
+    for (let i = 0; i < questions.length; i++) {
+      if (answerResults[i] === undefined) {
+        unanswered.push(i + 1) // +1 para mostrar números humanos (1-based)
+      }
     }
+    return unanswered
+  }
 
+  const handleFinishExam = () => {
+    const unanswered = getUnansweredQuestions()
+    if (unanswered.length > 0) {
+      setShowConfirmModal(true)
+    } else {
+      submitExam()
+    }
+  }
+
+  const submitExam = async () => {
+    setShowConfirmModal(false)
     setSubmitting(true)
 
-    // Prepare answers with question IDs
+    // Preparar respuestas con IDs de pregunta
     const formattedAnswers = questions.map((q, index) => {
-      const selectedAnswer = answers[index]
-
+      const result = answerResults[index]
       return {
         questionId: q.id,
-        answer: selectedAnswer,
+        answer: result?.answer ?? -1, // -1 para preguntas sin responder
       }
-    })
+    }).filter(a => a.answer !== -1) // Solo enviar las respondidas
 
     const result = await submitCertificationExam(formattedAnswers)
 
@@ -108,8 +161,47 @@ export default function CertificationPortal({
     setSubmitting(false)
   }
 
+  const answeredCount = Object.keys(answerResults).length
+  const currentResult = answerResults[currentQuestion]
+  const isCurrentAnswered = currentResult !== undefined
+
   return (
     <div>
+      {/* Modal de confirmación para finalizar con preguntas pendientes */}
+      {showConfirmModal && (
+        <div className="fixed inset-0 bg-black/50 flex items-center justify-center z-50 p-4">
+          <div className="bg-white rounded-lg shadow-xl max-w-md w-full p-6">
+            <div className="flex items-center gap-3 mb-4">
+              <div className="p-2 bg-amber-100 rounded-full">
+                <AlertTriangle className="w-6 h-6 text-amber-600" />
+              </div>
+              <h3 className="text-lg font-semibold text-gray-900">Preguntas sin responder</h3>
+            </div>
+            <p className="text-gray-600 mb-4">
+              Tienes {getUnansweredQuestions().length} pregunta(s) sin responder:
+              <span className="font-semibold"> {getUnansweredQuestions().join(', ')}</span>
+            </p>
+            <p className="text-gray-600 mb-6">
+              Las preguntas sin responder contarán como incorrectas. ¿Estás seguro de que deseas finalizar el examen?
+            </p>
+            <div className="flex gap-3">
+              <button
+                onClick={() => setShowConfirmModal(false)}
+                className="flex-1 px-4 py-2 bg-gray-200 text-gray-700 rounded-md font-medium hover:bg-gray-300 transition"
+              >
+                Volver al examen
+              </button>
+              <button
+                onClick={submitExam}
+                className="flex-1 px-4 py-2 bg-red-600 text-white rounded-md font-medium hover:bg-red-700 transition"
+              >
+                Finalizar sin responder
+              </button>
+            </div>
+          </div>
+        </div>
+      )}
+
       {/* Overview */}
       {view === 'overview' && (
         <div>
@@ -151,6 +243,122 @@ export default function CertificationPortal({
               </div>
             )}
           </div>
+
+          {/* Embed Code Section - Only show if certified */}
+          {isCertified && (
+            <div className="bg-white rounded-lg shadow-sm border border-gray-200 p-6 mb-8">
+              <div className="flex items-center gap-3 mb-4">
+                <Code className="w-6 h-6 text-omniwallet-primary" />
+                <h2 className="text-xl font-semibold text-gray-900">Sello de Certificación para tu Web</h2>
+              </div>
+              <p className="text-sm text-gray-600 mb-6">
+                Añade el sello de Partner Certificado a tu página web para que tus clientes sepan que estás certificado por Omniwallet.
+              </p>
+
+              {/* Theme Selector */}
+              <div className="flex items-center gap-4 mb-4">
+                <span className="text-sm font-medium text-gray-700">Tema del sello:</span>
+                <div className="flex gap-2">
+                  <button
+                    onClick={() => setSelectedTheme('light')}
+                    className={`flex items-center gap-2 px-3 py-2 rounded-md text-sm font-medium transition ${
+                      selectedTheme === 'light'
+                        ? 'bg-omniwallet-primary text-white'
+                        : 'bg-gray-100 text-gray-700 hover:bg-gray-200'
+                    }`}
+                  >
+                    <Sun className="w-4 h-4" />
+                    Claro
+                  </button>
+                  <button
+                    onClick={() => setSelectedTheme('dark')}
+                    className={`flex items-center gap-2 px-3 py-2 rounded-md text-sm font-medium transition ${
+                      selectedTheme === 'dark'
+                        ? 'bg-omniwallet-primary text-white'
+                        : 'bg-gray-100 text-gray-700 hover:bg-gray-200'
+                    }`}
+                  >
+                    <Moon className="w-4 h-4" />
+                    Oscuro
+                  </button>
+                </div>
+              </div>
+
+              {/* Preview */}
+              {(selectedTheme === 'light' ? badgeLightUrl : badgeDarkUrl) && (
+                <div className={`p-4 rounded-lg mb-6 ${selectedTheme === 'dark' ? 'bg-gray-800' : 'bg-gray-100'}`}>
+                  <p className="text-sm text-gray-500 mb-2">Vista previa:</p>
+                  <img
+                    src={selectedTheme === 'light' ? badgeLightUrl! : badgeDarkUrl!}
+                    alt="Sello de certificación"
+                    className="h-16 object-contain"
+                  />
+                </div>
+              )}
+
+              {/* Code Options */}
+              <div className="space-y-4">
+                {/* JavaScript Option */}
+                <div>
+                  <div className="flex items-center justify-between mb-2">
+                    <label className="text-sm font-medium text-gray-700">Opción 1: Script JavaScript (Recomendado)</label>
+                    <button
+                      onClick={() => {
+                        const code = `<script src="${baseUrl}/api/badge/${partnerId}?format=js&theme=${selectedTheme}"></script>`
+                        navigator.clipboard.writeText(code)
+                        setCopiedCode('js')
+                        setTimeout(() => setCopiedCode(null), 2000)
+                      }}
+                      className="flex items-center gap-1 text-sm text-omniwallet-primary hover:text-omniwallet-secondary"
+                    >
+                      {copiedCode === 'js' ? <Check className="w-4 h-4" /> : <Copy className="w-4 h-4" />}
+                      {copiedCode === 'js' ? 'Copiado' : 'Copiar'}
+                    </button>
+                  </div>
+                  <pre className="bg-gray-900 text-gray-100 p-4 rounded-lg text-sm overflow-x-auto">
+                    <code>{`<script src="${baseUrl}/api/badge/${partnerId}?format=js&theme=${selectedTheme}"></script>`}</code>
+                  </pre>
+                  <p className="text-xs text-gray-500 mt-1">
+                    Coloca este código donde quieras que aparezca el sello (generalmente en el footer).
+                  </p>
+                </div>
+
+                {/* Iframe Option */}
+                <div>
+                  <div className="flex items-center justify-between mb-2">
+                    <label className="text-sm font-medium text-gray-700">Opción 2: Iframe</label>
+                    <button
+                      onClick={() => {
+                        const code = `<iframe src="${baseUrl}/badge/${partnerId}?theme=${selectedTheme}" width="200" height="80" frameborder="0" scrolling="no"></iframe>`
+                        navigator.clipboard.writeText(code)
+                        setCopiedCode('iframe')
+                        setTimeout(() => setCopiedCode(null), 2000)
+                      }}
+                      className="flex items-center gap-1 text-sm text-omniwallet-primary hover:text-omniwallet-secondary"
+                    >
+                      {copiedCode === 'iframe' ? <Check className="w-4 h-4" /> : <Copy className="w-4 h-4" />}
+                      {copiedCode === 'iframe' ? 'Copiado' : 'Copiar'}
+                    </button>
+                  </div>
+                  <pre className="bg-gray-900 text-gray-100 p-4 rounded-lg text-sm overflow-x-auto">
+                    <code>{`<iframe src="${baseUrl}/badge/${partnerId}?theme=${selectedTheme}" width="200" height="80" frameborder="0" scrolling="no"></iframe>`}</code>
+                  </pre>
+                  <p className="text-xs text-gray-500 mt-1">
+                    Usa esta opción si prefieres un iframe aislado.
+                  </p>
+                </div>
+              </div>
+
+              {expiresAt && (
+                <div className="mt-4 p-3 bg-amber-50 border border-amber-200 rounded-lg">
+                  <p className="text-sm text-amber-700">
+                    Tu certificación expira el <strong>{new Date(expiresAt).toLocaleDateString()}</strong>.
+                    Después de esta fecha, el sello aparecerá como caducado.
+                  </p>
+                </div>
+              )}
+            </div>
+          )}
 
           {/* Quick Actions */}
           <div className="grid grid-cols-1 md:grid-cols-2 gap-6 mb-8">
@@ -330,11 +538,34 @@ export default function CertificationPortal({
             </div>
 
             {/* Progress Bar */}
-            <div className="w-full bg-gray-200 rounded-full h-2 mb-6">
+            <div className="w-full bg-gray-200 rounded-full h-2 mb-2">
               <div
                 className="bg-omniwallet-primary h-2 rounded-full transition-all duration-300"
                 style={{ width: `${((currentQuestion + 1) / questions.length) * 100}%` }}
               />
+            </div>
+
+            {/* Progress indicators */}
+            <div className="flex gap-1 mb-6 flex-wrap">
+              {questions.map((_, index) => {
+                const result = answerResults[index]
+                let bgColor = 'bg-gray-300'
+                if (result) {
+                  bgColor = result.correct ? 'bg-green-500' : 'bg-red-500'
+                }
+                const isActive = index === currentQuestion
+                return (
+                  <button
+                    key={index}
+                    onClick={() => setCurrentQuestion(index)}
+                    className={`w-8 h-8 rounded-full text-xs font-medium transition ${bgColor} ${
+                      isActive ? 'ring-2 ring-omniwallet-primary ring-offset-2' : ''
+                    } ${result ? 'text-white' : 'text-gray-600'}`}
+                  >
+                    {index + 1}
+                  </button>
+                )
+              })}
             </div>
           </div>
 
@@ -346,37 +577,93 @@ export default function CertificationPortal({
 
             {/* Options */}
             <div className="space-y-3">
-              {JSON.parse(questions[currentQuestion].options).map((option: string, index: number) => (
-                <button
-                  key={index}
-                  onClick={() => handleAnswerSelect(index)}
-                  className={`w-full text-left p-4 rounded-lg border-2 transition ${
-                    answers[currentQuestion] === index
-                      ? 'border-omniwallet-primary bg-omniwallet-primary/5'
-                      : 'border-gray-200 hover:border-gray-300'
-                  }`}
-                >
-                  <div className="flex items-center gap-3">
-                    <div
-                      className={`w-6 h-6 rounded-full border-2 flex items-center justify-center ${
-                        answers[currentQuestion] === index
-                          ? 'border-omniwallet-primary bg-omniwallet-primary'
-                          : 'border-gray-300'
-                      }`}
-                    >
-                      {answers[currentQuestion] === index && (
-                        <div className="w-2 h-2 bg-white rounded-full" />
-                      )}
+              {JSON.parse(questions[currentQuestion].options).map((option: string, index: number) => {
+                const isSelected = currentResult?.answer === index
+                const isCorrectAnswer = currentResult?.correctAnswer === index
+                const showAsCorrect = isCurrentAnswered && isCorrectAnswer
+                const showAsIncorrect = isCurrentAnswered && isSelected && !currentResult?.correct
+
+                let buttonClass = 'border-gray-200 hover:border-gray-300'
+                if (showAsCorrect) {
+                  buttonClass = 'border-green-500 bg-green-50'
+                } else if (showAsIncorrect) {
+                  buttonClass = 'border-red-500 bg-red-50'
+                } else if (isSelected && !isCurrentAnswered) {
+                  buttonClass = 'border-omniwallet-primary bg-omniwallet-primary/5'
+                }
+
+                return (
+                  <button
+                    key={index}
+                    onClick={() => handleAnswerSelect(index)}
+                    disabled={isCurrentAnswered || verifying}
+                    className={`w-full text-left p-4 rounded-lg border-2 transition ${buttonClass} ${
+                      isCurrentAnswered ? 'cursor-default' : ''
+                    } ${verifying ? 'opacity-50' : ''}`}
+                  >
+                    <div className="flex items-center gap-3">
+                      <div
+                        className={`w-6 h-6 rounded-full border-2 flex items-center justify-center ${
+                          showAsCorrect
+                            ? 'border-green-500 bg-green-500'
+                            : showAsIncorrect
+                            ? 'border-red-500 bg-red-500'
+                            : isSelected
+                            ? 'border-omniwallet-primary bg-omniwallet-primary'
+                            : 'border-gray-300'
+                        }`}
+                      >
+                        {showAsCorrect && <CheckCircle className="w-4 h-4 text-white" />}
+                        {showAsIncorrect && <XCircle className="w-4 h-4 text-white" />}
+                        {isSelected && !isCurrentAnswered && (
+                          <div className="w-2 h-2 bg-white rounded-full" />
+                        )}
+                      </div>
+                      <span className={`text-sm font-medium ${
+                        showAsCorrect
+                          ? 'text-green-700'
+                          : showAsIncorrect
+                          ? 'text-red-700'
+                          : isSelected
+                          ? 'text-omniwallet-primary'
+                          : 'text-gray-700'
+                      }`}>
+                        {String.fromCharCode(65 + index)}. {option}
+                      </span>
                     </div>
-                    <span className={`text-sm font-medium ${
-                      answers[currentQuestion] === index ? 'text-omniwallet-primary' : 'text-gray-700'
-                    }`}>
-                      {String.fromCharCode(65 + index)}. {option}
-                    </span>
-                  </div>
-                </button>
-              ))}
+                  </button>
+                )
+              })}
             </div>
+
+            {/* Feedback después de responder */}
+            {isCurrentAnswered && (
+              <div className={`mt-6 p-4 rounded-lg ${
+                currentResult.correct ? 'bg-green-50 border border-green-200' : 'bg-red-50 border border-red-200'
+              }`}>
+                <div className="flex items-center gap-2 mb-2">
+                  {currentResult.correct ? (
+                    <>
+                      <CheckCircle className="w-5 h-5 text-green-600" />
+                      <span className="font-semibold text-green-700">¡Correcto!</span>
+                    </>
+                  ) : (
+                    <>
+                      <XCircle className="w-5 h-5 text-red-600" />
+                      <span className="font-semibold text-red-700">Incorrecto</span>
+                    </>
+                  )}
+                </div>
+                {currentResult.explanation && (
+                  <div className="flex items-start gap-2 mt-3">
+                    <Lightbulb className="w-5 h-5 text-amber-500 flex-shrink-0 mt-0.5" />
+                    <p className={`text-sm ${currentResult.correct ? 'text-green-700' : 'text-red-700'}`}>
+                      {currentResult.explanation}
+                    </p>
+                  </div>
+                )}
+              </div>
+            )}
           </div>
 
           {/* Navigation */}
@@ -390,13 +677,13 @@ export default function CertificationPortal({
             </button>
 
             <div className="text-sm text-gray-600">
-              {Object.keys(answers).length} / {questions.length} {t('certification.answered')}
+              {answeredCount} / {questions.length} {t('certification.answered')}
             </div>
 
             {currentQuestion === questions.length - 1 ? (
               <button
-                onClick={handleSubmitExam}
-                disabled={submitting || Object.keys(answers).length < questions.length}
+                onClick={handleFinishExam}
+                disabled={submitting || verifying}
                 className="px-6 py-3 bg-omniwallet-primary text-white rounded-md font-medium hover:bg-omniwallet-secondary transition disabled:opacity-50 disabled:cursor-not-allowed"
               >
                 {submitting ? t('common.submitting') : t('certification.finishExam')}
@@ -404,7 +691,7 @@ export default function CertificationPortal({
             ) : (
               <button
                 onClick={handleNext}
-                disabled={currentQuestion === questions.length - 1}
+                disabled={verifying}
                 className="px-6 py-3 bg-omniwallet-primary text-white rounded-md font-medium hover:bg-omniwallet-secondary transition disabled:opacity-50 disabled:cursor-not-allowed"
               >
                 {t('certification.nextQuestion')}
