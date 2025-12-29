@@ -18,8 +18,8 @@ export default function Logo({ variant = 'light', size = 'md', href }: LogoProps
   // Logo blanco para fondos oscuros, logo normal para fondos claros
   const logoUrl =
     variant === 'light'
-      ? 'https://www.omniwallet.net/wp-content/uploads/2023/09/omniwallet-logo-blanco.png'
-      : 'https://www.omniwallet.net/wp-content/uploads/2023/09/omniwallet-logo.png'
+      ? 'https://www.omniwallet.net/assets/images/logo-white.svg'
+      : 'https://www.omniwallet.net/assets/images/logo.svg'
 
   const content = (
     <div className="relative">
