@@ -149,7 +149,7 @@ export async function GET(
       return new NextResponse(jsCode, {
         headers: {
           'Content-Type': 'application/javascript',
-          'Cache-Control': 'public, max-age=3600',
+          'Cache-Control': 'no-cache, must-revalidate',
           'Access-Control-Allow-Origin': '*',
         },
       })
@@ -158,7 +158,7 @@ export async function GET(
     // Default: return JSON
     return NextResponse.json(badgeData, {
       headers: {
-        'Cache-Control': 'public, max-age=3600',
+        'Cache-Control': 'no-cache, must-revalidate',
         'Access-Control-Allow-Origin': '*',
       },
     })
