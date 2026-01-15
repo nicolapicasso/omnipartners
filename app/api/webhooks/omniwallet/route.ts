@@ -159,7 +159,16 @@ export async function POST(req: NextRequest) {
           partner: {
             select: {
               id: true,
-              companyName: true
+              companyName: true,
+              parentPartnerId: true,
+              affiliateCommission: true,
+              parentPartner: {
+                select: {
+                  id: true,
+                  companyName: true,
+                  commissionRate: true,
+                }
+              }
             }
           }
         }
@@ -181,10 +190,26 @@ export async function POST(req: NextRequest) {
     }
 
     // ============================================
-    // CALCULATE COMMISSION
+    // CALCULATE COMMISSION (with affiliate split support)
     // ============================================
 
     const commissionAmount = payload.amount * (lead.commissionRate / 100)
+
+    // Calculate affiliate split if applicable
+    const isAffiliateLead = !!lead.partner.parentPartnerId && !!lead.partner.parentPartner
+    let affiliateCommission = 0
+    let parentCommission = 0
+
+    if (isAffiliateLead) {
+      // This lead belongs to an affiliate - split the commission
+      const affiliateRate = lead.partner.affiliateCommission || 0
+      const parentRate = (lead.partner.parentPartner?.commissionRate || lead.commissionRate) - affiliateRate
+
+      affiliateCommission = payload.amount * (affiliateRate / 100)
+      parentCommission = payload.amount * (parentRate / 100)
+
+      console.log(`[Omniwallet Webhook] Affiliate split: Affiliate ${affiliateRate}% (€${affiliateCommission.toFixed(2)}) | Parent ${parentRate}% (€${parentCommission.toFixed(2)})`)
+    }
 
     // ============================================
     // CREATE PAYMENT RECORD
@@ -197,7 +222,7 @@ export async function POST(req: NextRequest) {
         currency: payload.currency || 'EUR',
         paymentDate: payload.paymentDate ? new Date(payload.paymentDate) : new Date(),
         status: payload.status || 'COMPLETED',
-        commissionAmount,
+        commissionAmount, // Total commission amount
         externalReference: payload.externalReference,
         description: payload.description
       }
@@ -206,28 +231,66 @@ export async function POST(req: NextRequest) {
     console.log(`[Omniwallet Webhook] Payment created: ${payment.id} - Amount: €${payload.amount} - Commission: €${commissionAmount}`)
 
     // ============================================
-    // SEND NOTIFICATIONS TO PARTNER
+    // SEND NOTIFICATIONS
     // ============================================
 
-    // Notify partner about payment received
-    await notifyPartnerUsers(
-      lead.partnerId,
-      NotificationType.PAYMENT_RECEIVED,
-      {
-        amount: `€${payload.amount.toFixed(2)}`,
-        clientName: lead.companyName
-      }
-    )
+    if (isAffiliateLead && lead.partner.parentPartner) {
+      // Send notifications to BOTH affiliate and parent partner
 
-    // Notify partner about commission generated
-    await notifyPartnerUsers(
-      lead.partnerId,
-      NotificationType.COMMISSION_GENERATED,
-      {
-        amount: `€${commissionAmount.toFixed(2)}`,
-        clientName: lead.companyName
-      }
-    )
+      // Notify affiliate about their commission
+      await notifyPartnerUsers(
+        lead.partnerId, // The affiliate
+        NotificationType.PAYMENT_RECEIVED,
+        {
+          amount: `€${payload.amount.toFixed(2)}`,
+          clientName: lead.companyName
+        }
+      )
+      await notifyPartnerUsers(
+        lead.partnerId,
+        NotificationType.COMMISSION_GENERATED,
+        {
+          amount: `€${affiliateCommission.toFixed(2)}`,
+          clientName: lead.companyName
+        }
+      )
+
+      // Notify parent partner about their commission
+      await notifyPartnerUsers(
+        lead.partner.parentPartner.id, // The parent partner
+        NotificationType.PAYMENT_RECEIVED,
+        {
+          amount: `€${payload.amount.toFixed(2)}`,
+          clientName: `${lead.companyName} (via ${lead.partner.companyName})`
+        }
+      )
+      await notifyPartnerUsers(
+        lead.partner.parentPartner.id,
+        NotificationType.COMMISSION_GENERATED,
+        {
+          amount: `€${parentCommission.toFixed(2)}`,
+          clientName: `${lead.companyName} (via ${lead.partner.companyName})`
+        }
+      )
+    } else {
+      // Regular partner (no affiliate) - single notification
+      await notifyPartnerUsers(
+        lead.partnerId,
+        NotificationType.PAYMENT_RECEIVED,
+        {
+          amount: `€${payload.amount.toFixed(2)}`,
+          clientName: lead.companyName
+        }
+      )
+      await notifyPartnerUsers(
+        lead.partnerId,
+        NotificationType.COMMISSION_GENERATED,
+        {
+          amount: `€${commissionAmount.toFixed(2)}`,
+          clientName: lead.companyName
+        }
+      )
+    }
 
     // ============================================
     // DISPATCH OUTBOUND WEBHOOKS
@@ -242,7 +305,15 @@ export async function POST(req: NextRequest) {
       partnerId: lead.partnerId,
       partnerName: lead.partner.companyName,
       commissionAmount,
-      externalReference: payload.externalReference
+      externalReference: payload.externalReference,
+      // Include affiliate info if applicable
+      ...(isAffiliateLead && lead.partner.parentPartner && {
+        isAffiliateLead: true,
+        affiliateCommission,
+        parentCommission,
+        parentPartnerId: lead.partner.parentPartner.id,
+        parentPartnerName: lead.partner.parentPartner.companyName,
+      })
     }
 
     // Send payment.received webhook
@@ -273,7 +344,15 @@ export async function POST(req: NextRequest) {
         leadId: lead.id,
         clientName: lead.companyName,
         partnerId: lead.partnerId,
-        partnerName: lead.partner.companyName
+        partnerName: lead.partner.companyName,
+        // Include affiliate split info if applicable
+        ...(isAffiliateLead && lead.partner.parentPartner && {
+          isAffiliateLead: true,
+          affiliateCommission,
+          parentCommission,
+          parentPartnerId: lead.partner.parentPartner.id,
+          parentPartnerName: lead.partner.parentPartner.companyName,
+        })
       }
     })
 

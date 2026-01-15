@@ -1,7 +1,7 @@
 'use client'
 
 import Link from 'next/link'
-import { DollarSign, FileText, Calendar } from 'lucide-react'
+import { DollarSign, FileText, Calendar, Users, UserPlus } from 'lucide-react'
 import { useTranslation } from '@/lib/contexts/LanguageContext'
 
 interface Lead {
@@ -23,6 +23,9 @@ interface Payment {
   commissionAmount: number
   lead: Lead
   invoices: Array<{ invoice: Invoice }>
+  source?: 'own' | 'affiliate'
+  affiliateName?: string
+  effectiveCommission?: number
 }
 
 interface InvoiceWithPayments {
@@ -40,6 +43,9 @@ interface CommissionsContentProps {
   totalCommissions: number
   paidCommissions: number
   pendingCommissions: number
+  ownCommissions?: number
+  affiliateCommissions?: number
+  hasAffiliates?: boolean
 }
 
 export default function CommissionsContent({
@@ -48,6 +54,9 @@ export default function CommissionsContent({
   totalCommissions,
   paidCommissions,
   pendingCommissions,
+  ownCommissions = 0,
+  affiliateCommissions = 0,
+  hasAffiliates = false,
 }: CommissionsContentProps) {
   const { t } = useTranslation()
 
@@ -86,6 +95,17 @@ export default function CommissionsContent({
               <p className="text-2xl font-semibold text-gray-900 mt-2">
                 €{totalCommissions.toFixed(2)}
               </p>
+              {hasAffiliates && (
+                <div className="mt-2 text-xs space-y-1">
+                  <p className="text-gray-500">
+                    Propios: <span className="font-medium text-gray-700">€{ownCommissions.toFixed(2)}</span>
+                  </p>
+                  <p className="text-purple-600">
+                    <UserPlus className="w-3 h-3 inline mr-1" />
+                    Afiliados: <span className="font-medium">€{affiliateCommissions.toFixed(2)}</span>
+                  </p>
+                </div>
+              )}
             </div>
             <div className="bg-blue-100 p-3 rounded-lg">
               <DollarSign className="w-6 h-6 text-blue-600" />
@@ -240,17 +260,25 @@ export default function CommissionsContent({
               </thead>
               <tbody className="bg-white divide-y divide-gray-200">
                 {payments.map((payment) => (
-                  <tr key={payment.id} className="hover:bg-gray-50">
+                  <tr key={payment.id} className={`hover:bg-gray-50 ${payment.source === 'affiliate' ? 'bg-purple-50/50' : ''}`}>
                     <td className="px-6 py-4 whitespace-nowrap text-sm text-gray-900">
                       {new Date(payment.paymentDate).toLocaleDateString()}
                     </td>
                     <td className="px-6 py-4 whitespace-nowrap">
-                      <Link
-                        href={`/partner/leads/${payment.lead.id}`}
-                        className="text-sm font-medium text-omniwallet-primary hover:text-omniwallet-secondary"
-                      >
-                        {payment.lead.companyName}
-                      </Link>
+                      <div>
+                        <Link
+                          href={`/partner/leads/${payment.lead.id}`}
+                          className="text-sm font-medium text-omniwallet-primary hover:text-omniwallet-secondary"
+                        >
+                          {payment.lead.companyName}
+                        </Link>
+                        {payment.source === 'affiliate' && (
+                          <span className="block text-xs text-purple-600 mt-0.5">
+                            <UserPlus className="w-3 h-3 inline mr-1" />
+                            via {payment.affiliateName}
+                          </span>
+                        )}
+                      </div>
                     </td>
                     <td className="px-6 py-4 whitespace-nowrap text-sm text-gray-900">
                       €{payment.amount.toFixed(2)}
@@ -259,7 +287,7 @@ export default function CommissionsContent({
                       {payment.lead.commissionRate}%
                     </td>
                     <td className="px-6 py-4 whitespace-nowrap text-sm font-bold text-green-600">
-                      €{payment.commissionAmount.toFixed(2)}
+                      €{(payment.effectiveCommission ?? payment.commissionAmount).toFixed(2)}
                     </td>
                     <td className="px-6 py-4 whitespace-nowrap text-sm text-gray-500">
                       {payment.invoices.length > 0
