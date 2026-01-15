@@ -3,15 +3,32 @@
 import { useState } from 'react'
 import { useRouter } from 'next/navigation'
 import { createPartnerLead } from '../actions'
-import { Building2, User, Mail, Phone, Globe, MapPin, FileText, Briefcase } from 'lucide-react'
+import { Building2, User, Mail, Phone, Globe, MapPin, FileText, Briefcase, UserPlus } from 'lucide-react'
 import CountrySelect from '@/components/CountrySelect'
 import PhoneInput from '@/components/PhoneInput'
 import ContactForm, { ContactData } from '@/components/ContactForm'
 
-export default function CreatePartnerLeadForm() {
+interface Affiliate {
+  id: string
+  companyName: string
+  affiliateCommission: number | null
+}
+
+interface CreatePartnerLeadFormProps {
+  affiliates?: Affiliate[]
+  parentPartnerId: string
+  parentCommission?: number
+}
+
+export default function CreatePartnerLeadForm({
+  affiliates = [],
+  parentPartnerId,
+  parentCommission = 0,
+}: CreatePartnerLeadFormProps) {
   const router = useRouter()
   const [loading, setLoading] = useState(false)
   const [error, setError] = useState('')
+  const [assignToPartnerId, setAssignToPartnerId] = useState(parentPartnerId)
 
   const [formData, setFormData] = useState({
     companyName: '',
@@ -72,6 +89,7 @@ export default function CreatePartnerLeadForm() {
       website: formData.website || undefined,
       notes: formData.notes || undefined,
       contacts: contacts.length > 0 ? contacts : undefined,
+      assignToPartnerId: assignToPartnerId !== parentPartnerId ? assignToPartnerId : undefined,
     })
 
     if (result.success) {
@@ -139,6 +157,53 @@ export default function CreatePartnerLeadForm() {
           </div>
         </div>
       </div>
+
+      {/* Affiliate Assignment Section - Only show if partner has affiliates */}
+      {affiliates.length > 0 && (
+        <div className="border-t border-gray-200 pt-6 space-y-4">
+          <h3 className="text-lg font-semibold text-gray-800">Asignar Lead</h3>
+          <div className="bg-purple-50 border border-purple-200 rounded-lg p-4">
+            <div className="flex items-start gap-3">
+              <UserPlus className="w-5 h-5 text-purple-600 mt-0.5" />
+              <div className="flex-1">
+                <p className="text-sm text-purple-900 mb-3">
+                  Puedes asignar este lead a ti mismo o a uno de tus afiliados.
+                </p>
+                <select
+                  value={assignToPartnerId}
+                  onChange={(e) => setAssignToPartnerId(e.target.value)}
+                  className="w-full border border-purple-300 rounded-lg px-3 py-2 focus:ring-2 focus:ring-purple-500 focus:border-transparent bg-white"
+                >
+                  <option value={parentPartnerId}>Mi empresa (comisión: {parentCommission}%)</option>
+                  {affiliates.map((affiliate) => (
+                    <option key={affiliate.id} value={affiliate.id}>
+                      {affiliate.companyName} (comisión afiliado: {affiliate.affiliateCommission || 0}%)
+                    </option>
+                  ))}
+                </select>
+                {assignToPartnerId !== parentPartnerId && (
+                  <div className="mt-2 text-xs text-purple-700">
+                    {(() => {
+                      const selectedAffiliate = affiliates.find(a => a.id === assignToPartnerId)
+                      if (selectedAffiliate) {
+                        const affiliateComm = selectedAffiliate.affiliateCommission || 0
+                        const yourComm = parentCommission - affiliateComm
+                        return (
+                          <>
+                            <p>Tu comisión: {yourComm}%</p>
+                            <p>Comisión de {selectedAffiliate.companyName}: {affiliateComm}%</p>
+                          </>
+                        )
+                      }
+                      return null
+                    })()}
+                  </div>
+                )}
+              </div>
+            </div>
+          </div>
+        </div>
+      )}
 
       <div className="border-t border-gray-200 pt-6 space-y-4">
         <h3 className="text-lg font-semibold text-gray-800">Contacto Principal</h3>

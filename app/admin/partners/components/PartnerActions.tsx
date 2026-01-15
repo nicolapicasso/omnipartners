@@ -2,8 +2,8 @@
 
 import { useState } from 'react'
 import { PartnerStatus, PartnerCategory } from '@/types'
-import { updatePartnerCategory, suspendPartner, activatePartner, updatePartnerContract, updatePartnerOmniwalletAccount, updatePartnerYearlyEvent } from '../actions'
-import { Shield, ShieldOff, Tag, FileText, Save, X, Wallet, Presentation, CheckCircle, Circle } from 'lucide-react'
+import { updatePartnerCategory, suspendPartner, activatePartner, updatePartnerContract, updatePartnerOmniwalletAccount, updatePartnerYearlyEvent, updatePartnerCanHaveAffiliates, updatePartnerCommissionRate } from '../actions'
+import { Shield, ShieldOff, Tag, FileText, Save, X, Wallet, Presentation, CheckCircle, Circle, Users, UserPlus, Percent } from 'lucide-react'
 
 export function UpdateCategoryButton({
   partnerId,
@@ -402,5 +402,196 @@ export function ToggleYearlyEventButton({
         </div>
       </div>
     </div>
+  )
+}
+
+export function ToggleAffiliatesButton({
+  partnerId,
+  canHaveAffiliates,
+  affiliatesCount,
+}: {
+  partnerId: string
+  canHaveAffiliates: boolean
+  affiliatesCount: number
+}) {
+  const [loading, setLoading] = useState(false)
+  const [enabled, setEnabled] = useState(canHaveAffiliates)
+
+  const handleToggle = async () => {
+    setLoading(true)
+    const newValue = !enabled
+    const result = await updatePartnerCanHaveAffiliates(partnerId, newValue)
+    if (result.success) {
+      setEnabled(newValue)
+    }
+    setLoading(false)
+  }
+
+  return (
+    <div className="space-y-3">
+      <div className="flex items-start gap-3">
+        <div className={`p-2 rounded-lg ${enabled ? 'bg-purple-100' : 'bg-gray-100'}`}>
+          <Users className={`w-5 h-5 ${enabled ? 'text-purple-600' : 'text-gray-500'}`} />
+        </div>
+        <div className="flex-1">
+          <p className="text-sm font-medium text-gray-900 mb-1">
+            Programa de Afiliados
+          </p>
+          <p className="text-xs text-gray-500 mb-3">
+            Permite que este partner pueda reclutar y gestionar sus propios afiliados
+          </p>
+          {affiliatesCount > 0 && (
+            <p className="text-xs text-purple-600 mb-3">
+              <UserPlus className="w-3 h-3 inline mr-1" />
+              Actualmente tiene {affiliatesCount} afiliado{affiliatesCount !== 1 ? 's' : ''}
+            </p>
+          )}
+          <div className="flex items-center gap-3">
+            <button
+              onClick={handleToggle}
+              disabled={loading}
+              className={`inline-flex items-center gap-2 px-4 py-2 rounded-md text-sm font-medium transition disabled:opacity-50 ${
+                enabled
+                  ? 'bg-purple-100 text-purple-700 hover:bg-purple-200'
+                  : 'bg-gray-100 text-gray-700 hover:bg-gray-200'
+              }`}
+            >
+              {enabled ? (
+                <>
+                  <CheckCircle className="w-4 h-4" />
+                  {loading ? 'Actualizando...' : 'Habilitado'}
+                </>
+              ) : (
+                <>
+                  <Circle className="w-4 h-4" />
+                  {loading ? 'Actualizando...' : 'Deshabilitado'}
+                </>
+              )}
+            </button>
+            <span className="text-xs text-gray-500">
+              Click para {enabled ? 'deshabilitar' : 'habilitar'}
+            </span>
+          </div>
+        </div>
+      </div>
+    </div>
+  )
+}
+
+export function UpdateCommissionRateForm({
+  partnerId,
+  currentRate,
+}: {
+  partnerId: string
+  currentRate: number
+}) {
+  const [loading, setLoading] = useState(false)
+  const [editing, setEditing] = useState(false)
+  const [rate, setRate] = useState(currentRate)
+  const [message, setMessage] = useState('')
+
+  const handleSubmit = async (e: React.FormEvent) => {
+    e.preventDefault()
+    setLoading(true)
+    setMessage('')
+
+    const result = await updatePartnerCommissionRate(partnerId, rate)
+
+    if (result.success) {
+      setMessage('Comisión actualizada correctamente')
+      setEditing(false)
+      setTimeout(() => setMessage(''), 3000)
+    } else {
+      setMessage(result.error || 'Error al actualizar la comisión')
+    }
+
+    setLoading(false)
+  }
+
+  if (!editing) {
+    return (
+      <div className="space-y-3">
+        <div className="flex items-start gap-3">
+          <div className="p-2 rounded-lg bg-green-100">
+            <Percent className="w-5 h-5 text-green-600" />
+          </div>
+          <div className="flex-1">
+            <p className="text-sm font-medium text-gray-900 mb-1">Comisión Base</p>
+            <p className="text-2xl font-bold text-green-600">{currentRate}%</p>
+            <p className="text-xs text-gray-500 mt-1">
+              Esta es la comisión por defecto para los leads de este partner
+            </p>
+            <button
+              onClick={() => setEditing(true)}
+              className="mt-3 text-sm text-omniwallet-primary hover:text-omniwallet-secondary font-medium"
+            >
+              Modificar comisión
+            </button>
+          </div>
+        </div>
+      </div>
+    )
+  }
+
+  return (
+    <form onSubmit={handleSubmit} className="space-y-3">
+      <div className="flex items-start gap-3">
+        <div className="p-2 rounded-lg bg-green-100">
+          <Percent className="w-5 h-5 text-green-600" />
+        </div>
+        <div className="flex-1">
+          <label htmlFor="commissionRate" className="block text-sm font-medium text-gray-700 mb-1">
+            Comisión Base (%)
+          </label>
+          <div className="flex items-center gap-2">
+            <input
+              type="number"
+              id="commissionRate"
+              value={rate}
+              onChange={(e) => setRate(parseFloat(e.target.value) || 0)}
+              min="0"
+              max="100"
+              step="0.5"
+              className="w-24 border border-gray-300 rounded-md px-3 py-2 text-sm focus:ring-2 focus:ring-omniwallet-primary focus:border-transparent"
+              required
+            />
+            <span className="text-gray-500">%</span>
+          </div>
+          <p className="text-xs text-gray-500 mt-1">
+            Valor entre 0 y 100
+          </p>
+        </div>
+      </div>
+
+      {message && (
+        <p className={`text-sm ${message.includes('correctamente') ? 'text-green-600' : 'text-red-600'}`}>
+          {message}
+        </p>
+      )}
+
+      <div className="flex gap-2 ml-11">
+        <button
+          type="submit"
+          disabled={loading}
+          className="inline-flex items-center gap-2 bg-omniwallet-primary text-white px-4 py-2 rounded-md text-sm font-medium hover:bg-omniwallet-secondary transition disabled:opacity-50"
+        >
+          <Save className="w-4 h-4" />
+          {loading ? 'Guardando...' : 'Guardar'}
+        </button>
+        <button
+          type="button"
+          onClick={() => {
+            setEditing(false)
+            setRate(currentRate)
+            setMessage('')
+          }}
+          disabled={loading}
+          className="inline-flex items-center gap-2 bg-gray-200 text-gray-700 px-4 py-2 rounded-md text-sm font-medium hover:bg-gray-300 transition disabled:opacity-50"
+        >
+          <X className="w-4 h-4" />
+          Cancelar
+        </button>
+      </div>
+    </form>
   )
 }

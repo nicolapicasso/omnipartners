@@ -31,6 +31,9 @@ model Partner {
   // Partner Category: AGENCY_PARTNER, TECH_PARTNER, REFERRAL, CUSTOM
   partnerCategory  String   @default("REFERRAL")
 
+  // Default commission rate for this partner (0.0 - 100.0)
+  commissionRate   Float    @default(0.0)
+
   // Role: always PARTNER_OWNER for Partner model
   role             String   @default("PARTNER_OWNER")
 
@@ -52,6 +55,13 @@ model Partner {
   certifiedAt      DateTime?
   certificationExpiresAt DateTime?  // Fecha de expiración de la certificación
   partnerLandingUrl String?  // URL de la landing del partner en Omniwallet
+
+  // Sistema de Afiliados
+  canHaveAffiliates    Boolean  @default(false)  // El admin puede habilitar esto
+  parentPartnerId      String?                    // Si es afiliado, referencia al partner padre
+  parentPartner        Partner? @relation("PartnerAffiliates", fields: [parentPartnerId], references: [id])
+  affiliates           Partner[] @relation("PartnerAffiliates")
+  affiliateCommission  Float?                     // Comisión del afiliado (asignada por el padre)
 
   // Relaciones
   users                 User[]

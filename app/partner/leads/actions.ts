@@ -30,6 +30,7 @@ export async function createPartnerLead(data: {
   website?: string
   notes?: string
   contacts?: ContactInput[]
+  assignToPartnerId?: string  // Optional: assign to an affiliate instead of self
 }) {
   try {
     const session = await getPartnerSession()
@@ -44,14 +45,45 @@ export async function createPartnerLead(data: {
     // Get partner to use default commission settings
     const partner = await prisma.partner.findUnique({
       where: { id: partnerId },
+      include: {
+        affiliates: {
+          select: { id: true },
+        },
+      },
     })
 
     if (!partner) {
       return { success: false, error: 'Partner not found' }
     }
 
+    // Determine which partner the lead should be assigned to
+    let targetPartnerId = partnerId
+    let commissionRate = partner.commissionRate
+
+    // If assignToPartnerId is provided, verify it's a valid affiliate
+    if (data.assignToPartnerId && data.assignToPartnerId !== partnerId) {
+      const isValidAffiliate = partner.affiliates.some(a => a.id === data.assignToPartnerId)
+      if (!isValidAffiliate) {
+        return { success: false, error: 'Invalid affiliate' }
+      }
+
+      // Get the affiliate's info for commission rate
+      const affiliate = await prisma.partner.findUnique({
+        where: { id: data.assignToPartnerId },
+      })
+
+      if (!affiliate) {
+        return { success: false, error: 'Affiliate not found' }
+      }
+
+      targetPartnerId = data.assignToPartnerId
+      // When assigning to affiliate, use the full partner commission rate
+      // (the split will be calculated when processing payments)
+      commissionRate = partner.commissionRate
+    }
+
     // Create lead with default commission type matching partner category
-    // and a default rate (can be adjusted by admin later)
+    // and the appropriate commission rate
     const lead = await prisma.lead.create({
       data: {
         companyName: data.companyName,
@@ -64,7 +96,7 @@ export async function createPartnerLead(data: {
         website: data.website,
         notes: data.notes,
         partner: {
-          connect: { id: partnerId },
+          connect: { id: targetPartnerId },
         },
         // Only include createdBy if user exists (omit field entirely if null)
         ...(user && {
@@ -74,7 +106,7 @@ export async function createPartnerLead(data: {
         }),
         status: LeadStatus.LEAD,
         commissionType: partner.partnerCategory, // Use partner's category
-        commissionRate: 10, // Default rate, admin can adjust
+        commissionRate: commissionRate, // Use partner's commission rate
         // Create contacts if provided
         ...(data.contacts &&
           data.contacts.length > 0 && {

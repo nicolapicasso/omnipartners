@@ -2,12 +2,16 @@
 
 import Link from 'next/link'
 import { usePathname } from 'next/navigation'
-import { LayoutDashboard, TrendingUp, DollarSign, FileText, Users, CheckCircle, Award, X } from 'lucide-react'
+import { LayoutDashboard, TrendingUp, DollarSign, FileText, Users, CheckCircle, Award, X, UserPlus } from 'lucide-react'
 import { useTranslation } from '@/lib/contexts/LanguageContext'
 import { useSidebar } from '@/lib/contexts/SidebarContext'
 import Logo from './Logo'
 
-export default function PartnerSidebar() {
+interface PartnerSidebarProps {
+  canHaveAffiliates?: boolean
+}
+
+export default function PartnerSidebar({ canHaveAffiliates = false }: PartnerSidebarProps) {
   const pathname = usePathname()
   const { t } = useTranslation()
   const { isOpen, close } = useSidebar()
@@ -54,7 +58,14 @@ export default function PartnerSidebar() {
       label: t('nav.team'),
       icon: Users,
       active: pathname?.startsWith('/partner/team')
-    }
+    },
+    // Conditionally add affiliates nav item
+    ...(canHaveAffiliates ? [{
+      href: '/partner/affiliates',
+      label: t('nav.affiliates') || 'Mis Afiliados',
+      icon: UserPlus,
+      active: pathname?.startsWith('/partner/affiliates')
+    }] : [])
   ]
 
   return (

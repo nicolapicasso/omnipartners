@@ -125,6 +125,46 @@ export async function GET(request: Request) {
       results.push(`certification_settings table: ${e instanceof Error ? e.message : 'already exists or error'}`)
     }
 
+    // Migration: Add canHaveAffiliates to partners
+    try {
+      await prisma.$executeRawUnsafe(`
+        ALTER TABLE "partners" ADD COLUMN IF NOT EXISTS "canHaveAffiliates" BOOLEAN NOT NULL DEFAULT false;
+      `)
+      results.push('Added canHaveAffiliates to partners')
+    } catch (e) {
+      results.push(`canHaveAffiliates: ${e instanceof Error ? e.message : 'already exists or error'}`)
+    }
+
+    // Migration: Add parentPartnerId to partners (for affiliate relationship)
+    try {
+      await prisma.$executeRawUnsafe(`
+        ALTER TABLE "partners" ADD COLUMN IF NOT EXISTS "parentPartnerId" TEXT REFERENCES "partners"("id");
+      `)
+      results.push('Added parentPartnerId to partners')
+    } catch (e) {
+      results.push(`parentPartnerId: ${e instanceof Error ? e.message : 'already exists or error'}`)
+    }
+
+    // Migration: Add affiliateCommission to partners
+    try {
+      await prisma.$executeRawUnsafe(`
+        ALTER TABLE "partners" ADD COLUMN IF NOT EXISTS "affiliateCommission" DOUBLE PRECISION;
+      `)
+      results.push('Added affiliateCommission to partners')
+    } catch (e) {
+      results.push(`affiliateCommission: ${e instanceof Error ? e.message : 'already exists or error'}`)
+    }
+
+    // Migration: Add commissionRate to partners
+    try {
+      await prisma.$executeRawUnsafe(`
+        ALTER TABLE "partners" ADD COLUMN IF NOT EXISTS "commissionRate" DOUBLE PRECISION NOT NULL DEFAULT 0.0;
+      `)
+      results.push('Added commissionRate to partners')
+    } catch (e) {
+      results.push(`commissionRate: ${e instanceof Error ? e.message : 'already exists or error'}`)
+    }
+
     return NextResponse.json({
       success: true,
       message: 'Migrations completed',
