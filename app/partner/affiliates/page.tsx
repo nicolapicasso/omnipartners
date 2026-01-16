@@ -29,9 +29,24 @@ export default async function AffiliatesPage() {
           },
         },
         orderBy: { createdAt: 'desc' },
+        // Include temporaryPassword for the parent partner to see
       },
     },
   })
+
+  // Separately fetch temporaryPassword for each affiliate (only for PENDING affiliates)
+  const affiliatesWithPasswords = await prisma.partner.findMany({
+    where: {
+      parentPartnerId: partnerId,
+      temporaryPassword: { not: null },
+    },
+    select: {
+      id: true,
+      temporaryPassword: true,
+    },
+  })
+
+  const passwordMap = new Map(affiliatesWithPasswords.map(a => [a.id, a.temporaryPassword]))
 
   if (!partner) {
     return <div>Partner no encontrado</div>
@@ -155,6 +170,7 @@ export default async function AffiliatesPage() {
                   leadsCount: a._count.leads,
                   clientsCount: a.leads.filter(l => l.status === 'CLIENT').length,
                   createdAt: a.createdAt.toISOString(),
+                  temporaryPassword: passwordMap.get(a.id) || null,
                 }))}
                 parentCommission={partner.commissionRate || 0}
               />

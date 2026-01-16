@@ -2,7 +2,7 @@ import { prisma } from '@/lib/prisma'
 import { getAdminSession } from '@/lib/session'
 import { PartnerStatus } from '@/types'
 import Link from 'next/link'
-import { ArrowLeft, Mail, Phone, Globe, MapPin, Calendar, Users, TrendingUp } from 'lucide-react'
+import { ArrowLeft, Mail, Phone, Globe, MapPin, Calendar, Users, TrendingUp, Key, AlertCircle } from 'lucide-react'
 import { UpdateCategoryButton, ToggleStatusButton, UpdateContractForm, UpdateOmniwalletAccountForm, ToggleYearlyEventButton, ToggleAffiliatesButton, UpdateCommissionRateForm } from '../components/PartnerActions'
 import AdminDashboardHeader from '@/components/AdminDashboardHeader'
 import AdminSidebar from '@/components/AdminSidebar'
@@ -48,6 +48,16 @@ export default async function PartnerDetailPage({
       },
     },
   })
+
+  // Fetch temporaryPassword separately for security (only if this is an affiliate)
+  let temporaryPassword: string | null = null
+  if (partner?.parentPartnerId) {
+    const affiliateWithPassword = await prisma.partner.findUnique({
+      where: { id: params.id },
+      select: { temporaryPassword: true },
+    })
+    temporaryPassword = affiliateWithPassword?.temporaryPassword || null
+  }
 
   if (!partner) {
     return (
@@ -374,6 +384,39 @@ export default async function PartnerDetailPage({
                       </p>
                     )}
                   </div>
+                </div>
+              </div>
+            )}
+
+            {/* Affiliate Credentials Card - Only show for affiliates with temporary password */}
+            {partner.parentPartner && temporaryPassword && (
+              <div className="bg-amber-50 rounded-lg shadow-sm border border-amber-200 p-6">
+                <h3 className="text-lg font-semibold text-amber-800 mb-4 flex items-center gap-2">
+                  <Key className="w-5 h-5" />
+                  Credenciales de Acceso
+                </h3>
+                <div className="bg-white rounded-lg p-4 border border-amber-200">
+                  <div className="space-y-3">
+                    <div>
+                      <p className="text-xs text-gray-500 uppercase tracking-wider">Email</p>
+                      <p className="text-sm font-mono text-gray-900 bg-gray-50 px-2 py-1 rounded mt-1">
+                        {partner.email}
+                      </p>
+                    </div>
+                    <div>
+                      <p className="text-xs text-gray-500 uppercase tracking-wider">Contraseña temporal</p>
+                      <p className="text-sm font-mono text-gray-900 bg-gray-50 px-2 py-1 rounded mt-1">
+                        {temporaryPassword}
+                      </p>
+                    </div>
+                  </div>
+                </div>
+                <div className="mt-3 flex items-start gap-2">
+                  <AlertCircle className="w-4 h-4 text-amber-600 flex-shrink-0 mt-0.5" />
+                  <p className="text-xs text-amber-700">
+                    Esta contraseña se eliminará automáticamente cuando el afiliado inicie sesión por primera vez.
+                    Se enviará por email al aprobar la cuenta.
+                  </p>
                 </div>
               </div>
             )}

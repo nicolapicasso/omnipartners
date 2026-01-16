@@ -6,6 +6,7 @@ import { PartnerStatus, NotificationType, PartnerCategory } from '@/types'
 import { getAdminSession } from '@/lib/session'
 import { sendPartnerWebhook } from '@/lib/webhooks'
 import { WebhookEventType } from '@/lib/webhook-types'
+import { sendAffiliateApprovalEmail } from '@/lib/email'
 
 export async function updatePartnerCategory(partnerId: string, category: PartnerCategory) {
   try {
@@ -59,9 +60,28 @@ export async function activatePartner(partnerId: string) {
   try {
     await getAdminSession() // Verify admin
 
+    // First, get the partner to check if it's an affiliate
+    const existingPartner = await prisma.partner.findUnique({
+      where: { id: partnerId },
+      include: {
+        parentPartner: {
+          select: {
+            companyName: true,
+          },
+        },
+      },
+    })
+
+    if (!existingPartner) {
+      return { success: false, error: 'Partner not found' }
+    }
+
     const partner = await prisma.partner.update({
       where: { id: partnerId },
-      data: { status: PartnerStatus.ACTIVE },
+      data: {
+        status: PartnerStatus.ACTIVE,
+        approvedAt: new Date(),
+      },
     })
 
     // Send webhook for partner reactivated (using approved event)
@@ -75,6 +95,22 @@ export async function activatePartner(partnerId: string) {
       status: PartnerStatus.ACTIVE,
       category: partner.partnerCategory || '',
     })
+
+    // If this is an affiliate with a temporary password, send approval email
+    if (existingPartner.parentPartnerId && existingPartner.temporaryPassword) {
+      const loginUrl = process.env.NEXTAUTH_URL || 'https://partners.omniwallet.com'
+
+      await sendAffiliateApprovalEmail({
+        recipientEmail: partner.email,
+        recipientName: partner.contactName,
+        companyName: partner.companyName,
+        temporaryPassword: existingPartner.temporaryPassword,
+        parentPartnerName: existingPartner.parentPartner?.companyName || 'Omniwallet Partners',
+        loginUrl: `${loginUrl}/login`,
+      })
+
+      console.log(`[Admin] Affiliate approval email sent to ${partner.email}`)
+    }
 
     revalidatePath('/admin/partners')
     revalidatePath(`/admin/partners/${partnerId}`)
