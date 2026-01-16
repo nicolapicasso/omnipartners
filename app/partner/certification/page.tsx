@@ -1,3 +1,4 @@
+import { cookies } from 'next/headers'
 import { prisma } from '@/lib/prisma'
 import { getPartnerSession } from '@/lib/session'
 import PartnerDashboardHeader from '@/components/PartnerDashboardHeader'
@@ -7,6 +8,8 @@ import CertificationPortal from './CertificationPortal'
 export default async function PartnerCertificationPage() {
   const session = await getPartnerSession()
   const partnerId = session.user.partnerId!
+  const cookieStore = await cookies()
+  const locale = cookieStore.get('language')?.value || 'es'
 
   const partner = await prisma.partner.findUnique({
     where: { id: partnerId },
@@ -24,23 +27,43 @@ export default async function PartnerCertificationPage() {
     return <div>Partner not found</div>
   }
 
-  // Fetch published content
-  const contents = await prisma.certificationContent.findMany({
+  // Fetch published content with all translations
+  const rawContents = await prisma.certificationContent.findMany({
     where: { isPublished: true },
     orderBy: { order: 'asc' },
   })
 
-  // Fetch active questions
-  const questions = await prisma.certificationQuestion.findMany({
+  // Transform contents based on locale
+  const contents = rawContents.map((content) => {
+    const titleField = `title_${locale}` as keyof typeof content
+    const contentField = `content_${locale}` as keyof typeof content
+    const descriptionField = `description_${locale}` as keyof typeof content
+
+    return {
+      ...content,
+      title: (content[titleField] as string) || content.title,
+      content: (content[contentField] as string) || content.content,
+      description: (content[descriptionField] as string) || content.description,
+    }
+  })
+
+  // Fetch active questions with all translations
+  const rawQuestions = await prisma.certificationQuestion.findMany({
     where: { isActive: true },
     orderBy: { order: 'asc' },
-    select: {
-      id: true,
-      question: true,
-      options: true,
-      order: true,
-      // Don't send correctAnswer or explanation to client
-    },
+  })
+
+  // Transform questions based on locale (don't send correctAnswer to client)
+  const questions = rawQuestions.map((q) => {
+    const questionField = `question_${locale}` as keyof typeof q
+    const optionsField = `options_${locale}` as keyof typeof q
+
+    return {
+      id: q.id,
+      question: (q[questionField] as string) || q.question,
+      options: (q[optionsField] as string) || q.options,
+      order: q.order,
+    }
   })
 
   // Fetch previous attempts

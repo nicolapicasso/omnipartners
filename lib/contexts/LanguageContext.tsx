@@ -96,11 +96,14 @@ export function LanguageProvider({ children }: { children: ReactNode }) {
     if (savedLanguage && LANGUAGES.includes(savedLanguage)) {
       setLanguageState(savedLanguage)
       setHasSelectedLanguage(true)
+      // Sync cookie with localStorage
+      document.cookie = `language=${savedLanguage};path=/;max-age=31536000;SameSite=Lax`
     } else if (!hasSelected) {
       // First time visitor - detect browser language
       const browserLang = navigator.language.split('-')[0] as Language
       if (LANGUAGES.includes(browserLang)) {
         setLanguageState(browserLang)
+        document.cookie = `language=${browserLang};path=/;max-age=31536000;SameSite=Lax`
       }
       // Show language selection modal on first visit
       setHasSelectedLanguage(false)
@@ -109,11 +112,13 @@ export function LanguageProvider({ children }: { children: ReactNode }) {
     setIsInitialized(true)
   }, [])
 
-  // Save language to localStorage when it changes
+  // Save language to localStorage and cookie when it changes
   const setLanguage = (lang: Language) => {
     setLanguageState(lang)
     localStorage.setItem('language', lang)
     localStorage.setItem('hasSelectedLanguage', 'true')
+    // Also set cookie for server-side access
+    document.cookie = `language=${lang};path=/;max-age=31536000;SameSite=Lax`
     setHasSelectedLanguage(true)
     setShowLanguageModal(false)
   }
