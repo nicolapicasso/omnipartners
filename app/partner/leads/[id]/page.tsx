@@ -3,7 +3,7 @@ import { getPartnerSession } from '@/lib/session'
 import { LeadStatus } from '@/types'
 import Link from 'next/link'
 import { ArrowLeft, Mail, Phone, Globe, MapPin, Calendar, DollarSign, User, Pencil } from 'lucide-react'
-import { DeleteLeadButton } from '../components/LeadActions'
+import { DeleteLeadButton, ArchiveLeadButton } from '../components/LeadActions'
 import LeadNotesSection from '../components/LeadNotesSection'
 import PartnerDashboardHeader from '@/components/PartnerDashboardHeader'
 import PartnerSidebar from '@/components/PartnerSidebar'
@@ -63,6 +63,8 @@ export default async function PartnerLeadDetailPage({
         return 'bg-blue-100 text-blue-800'
       case LeadStatus.LEAD:
         return 'bg-gray-100 text-gray-800'
+      case LeadStatus.ARCHIVED:
+        return 'bg-amber-100 text-amber-800'
       default:
         return 'bg-gray-100 text-gray-800'
     }
@@ -334,12 +336,18 @@ export default async function PartnerLeadDetailPage({
             </div>
 
             {/* Actions */}
-            {lead.status !== LeadStatus.CLIENT && (
-              <div className="bg-white rounded-lg shadow-sm border border-gray-200 p-6">
-                <h3 className="text-base font-semibold text-gray-900 mb-4">Acciones</h3>
-                <DeleteLeadButton leadId={lead.id} />
+            <div className="bg-white rounded-lg shadow-sm border border-gray-200 p-6">
+              <h3 className="text-base font-semibold text-gray-900 mb-4">Acciones</h3>
+              <div className="space-y-3">
+                <ArchiveLeadButton
+                  leadId={lead.id}
+                  isArchived={lead.status === LeadStatus.ARCHIVED}
+                />
+                {lead.status !== LeadStatus.CLIENT && (
+                  <DeleteLeadButton leadId={lead.id} />
+                )}
               </div>
-            )}
+            </div>
           </div>
         </div>
       </main>

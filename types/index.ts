@@ -53,6 +53,7 @@ export enum LeadStatus {
   LEAD = 'LEAD',
   PROSPECT = 'PROSPECT',
   CLIENT = 'CLIENT',
+  ARCHIVED = 'ARCHIVED',
 }
 
 export enum CommissionType {

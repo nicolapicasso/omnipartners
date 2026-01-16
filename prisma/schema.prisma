@@ -120,7 +120,7 @@ model Lead {
   country         String
   website         String?
 
-  // Status: LEAD, PROSPECT, CLIENT
+  // Status: LEAD, PROSPECT, CLIENT, ARCHIVED
   status          String   @default("LEAD")
 
   // Commission Type: AGENCY_PARTNER, TECH_PARTNER, REFERRAL, CUSTOM

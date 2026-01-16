@@ -3,7 +3,7 @@ import { getAdminSession } from '@/lib/session'
 import { LeadStatus } from '@/types'
 import Link from 'next/link'
 import { ArrowLeft, Mail, Phone, Globe, MapPin, Calendar, DollarSign, User, MessageSquare, Clock } from 'lucide-react'
-import { UpdateStatusButton, UpdateCommissionForm } from '../components/LeadActions'
+import { UpdateStatusButton, UpdateCommissionForm, ArchiveLeadButton, DeleteLeadButton } from '../components/LeadActions'
 import AdminDashboardHeader from '@/components/AdminDashboardHeader'
 import AdminSidebar from '@/components/AdminSidebar'
 
@@ -52,6 +52,8 @@ export default async function LeadDetailPage({
         return 'bg-blue-100 text-blue-800'
       case LeadStatus.LEAD:
         return 'bg-gray-100 text-gray-800'
+      case LeadStatus.ARCHIVED:
+        return 'bg-amber-100 text-amber-800'
       default:
         return 'bg-gray-100 text-gray-800'
     }
@@ -366,6 +368,23 @@ export default async function LeadDetailPage({
                 currentType={lead.commissionType}
                 currentRate={lead.commissionRate}
               />
+            </div>
+
+            {/* Danger Zone */}
+            <div className="bg-white rounded-lg shadow-sm border border-gray-200 p-6">
+              <h3 className="text-lg font-semibold text-gray-800 mb-4">
+                Zona de Peligro
+              </h3>
+              <div className="space-y-3">
+                <ArchiveLeadButton
+                  leadId={lead.id}
+                  isArchived={lead.status === LeadStatus.ARCHIVED}
+                />
+                <DeleteLeadButton
+                  leadId={lead.id}
+                  leadName={lead.companyName}
+                />
+              </div>
             </div>
           </div>
         </div>
