@@ -1,3 +1,4 @@
+import { cookies } from 'next/headers'
 import { prisma } from '@/lib/prisma'
 import { getPartnerSession } from '@/lib/session'
 import { LeadStatus } from '@/types'
@@ -94,15 +95,11 @@ async function getPartnerRequirements(partnerId: string, locale: string) {
   return { requirements, completedCount, totalCount: requirements.length, completionPercentage }
 }
 
-export default async function RequirementsPage({
-  params,
-}: {
-  params: Promise<{ locale?: string }>
-}) {
+export default async function RequirementsPage() {
   const session = await getPartnerSession()
   const partnerId = session.user.partnerId!
-  const resolvedParams = await params
-  const locale = resolvedParams?.locale || 'es'
+  const cookieStore = await cookies()
+  const locale = cookieStore.get('language')?.value || 'es'
 
   const partner = await prisma.partner.findUnique({
     where: { id: partnerId },
