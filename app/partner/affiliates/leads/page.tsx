@@ -1,15 +1,20 @@
+import { cookies } from 'next/headers'
 import { prisma } from '@/lib/prisma'
 import { getPartnerSession } from '@/lib/session'
 import { redirect } from 'next/navigation'
 import Link from 'next/link'
-import { ArrowLeft, Eye, TrendingUp, Users, Building2 } from 'lucide-react'
+import { ArrowLeft, TrendingUp, Users, Building2 } from 'lucide-react'
 import { LeadStatus } from '@/types'
 import PartnerDashboardHeader from '@/components/PartnerDashboardHeader'
 import PartnerSidebar from '@/components/PartnerSidebar'
+import { getTranslations } from '@/lib/translations'
 
 export default async function AffiliateLeadsPage() {
   const session = await getPartnerSession()
   const partnerId = session.user.partnerId!
+  const cookieStore = await cookies()
+  const locale = cookieStore.get('language')?.value || 'es'
+  const t = getTranslations(locale) as { affiliateLeads: Record<string, string>; statusLabels: Record<string, string> }
 
   const partner = await prisma.partner.findUnique({
     where: { id: partnerId },
@@ -87,34 +92,34 @@ export default async function AffiliateLeadsPage() {
             className="inline-flex items-center gap-2 text-sm text-gray-600 hover:text-omniwallet-primary mb-4 transition"
           >
             <ArrowLeft className="w-4 h-4" />
-            Volver a Mis Afiliados
+            {t.affiliateLeads?.backToAffiliates || 'Volver a Mis Afiliados'}
           </Link>
-          <h1 className="text-2xl font-semibold text-gray-900">Leads de Afiliados</h1>
+          <h1 className="text-2xl font-semibold text-gray-900">{t.affiliateLeads?.title || 'Leads de Afiliados'}</h1>
           <p className="text-sm text-gray-500 mt-1">
-            Visualiza todos los leads generados por tus afiliados
+            {t.affiliateLeads?.subtitle || 'Visualiza todos los leads generados por tus afiliados'}
           </p>
         </div>
 
         {/* Stats Cards */}
         <div className="grid grid-cols-2 md:grid-cols-5 gap-4 mb-8">
           <div className="bg-white rounded-lg shadow-sm border border-gray-200 p-4">
-            <p className="text-xs font-medium text-gray-500">Total</p>
+            <p className="text-xs font-medium text-gray-500">{t.affiliateLeads?.total || 'Total'}</p>
             <p className="text-xl font-semibold text-gray-900 mt-1">{totalLeads}</p>
           </div>
           <div className="bg-white rounded-lg shadow-sm border border-gray-200 p-4">
-            <p className="text-xs font-medium text-gray-500">Leads</p>
+            <p className="text-xs font-medium text-gray-500">{t.affiliateLeads?.leads || 'Leads'}</p>
             <p className="text-xl font-semibold text-gray-900 mt-1">{leadCount}</p>
           </div>
           <div className="bg-white rounded-lg shadow-sm border border-gray-200 p-4">
-            <p className="text-xs font-medium text-blue-600">Prospects</p>
+            <p className="text-xs font-medium text-blue-600">{t.affiliateLeads?.prospects || 'Prospects'}</p>
             <p className="text-xl font-semibold text-gray-900 mt-1">{prospectCount}</p>
           </div>
           <div className="bg-white rounded-lg shadow-sm border border-gray-200 p-4">
-            <p className="text-xs font-medium text-green-600">Clientes</p>
+            <p className="text-xs font-medium text-green-600">{t.affiliateLeads?.clients || 'Clientes'}</p>
             <p className="text-xl font-semibold text-gray-900 mt-1">{clientCount}</p>
           </div>
           <div className="bg-white rounded-lg shadow-sm border border-gray-200 p-4">
-            <p className="text-xs font-medium text-amber-600">Archivados</p>
+            <p className="text-xs font-medium text-amber-600">{t.affiliateLeads?.archived || 'Archivados'}</p>
             <p className="text-xl font-semibold text-gray-900 mt-1">{archivedCount}</p>
           </div>
         </div>
@@ -125,12 +130,12 @@ export default async function AffiliateLeadsPage() {
             <div className="flex items-center gap-2">
               <TrendingUp className="w-5 h-5 text-omniwallet-primary" />
               <h2 className="text-base font-semibold text-gray-900">
-                Todos los Leads de Afiliados ({totalLeads})
+                {t.affiliateLeads?.allLeads || 'Todos los Leads de Afiliados'} ({totalLeads})
               </h2>
             </div>
             <div className="flex items-center gap-2 text-sm text-gray-500">
               <Users className="w-4 h-4" />
-              {partner.affiliates.length} afiliados activos
+              {partner.affiliates.length} {t.affiliateLeads?.activeAffiliates || 'afiliados activos'}
             </div>
           </div>
 
@@ -138,9 +143,9 @@ export default async function AffiliateLeadsPage() {
             {allAffiliateLeads.length === 0 ? (
               <div className="text-center py-16">
                 <Building2 className="w-12 h-12 text-gray-300 mx-auto mb-4" />
-                <p className="text-gray-500 mb-2">No hay leads de afiliados</p>
+                <p className="text-gray-500 mb-2">{t.affiliateLeads?.noLeads || 'No hay leads de afiliados'}</p>
                 <p className="text-sm text-gray-400">
-                  Tus afiliados aún no han generado leads
+                  {t.affiliateLeads?.noLeadsDescription || 'Tus afiliados aún no han generado leads'}
                 </p>
               </div>
             ) : (
@@ -148,25 +153,25 @@ export default async function AffiliateLeadsPage() {
                 <thead className="bg-gray-50">
                   <tr>
                     <th className="px-4 py-3 text-left text-xs font-medium text-gray-500 uppercase">
-                      Afiliado
+                      {t.affiliateLeads?.affiliate || 'Afiliado'}
                     </th>
                     <th className="px-4 py-3 text-left text-xs font-medium text-gray-500 uppercase">
-                      Empresa
+                      {t.affiliateLeads?.company || 'Empresa'}
                     </th>
                     <th className="px-4 py-3 text-left text-xs font-medium text-gray-500 uppercase">
-                      Contacto
+                      {t.affiliateLeads?.contact || 'Contacto'}
                     </th>
                     <th className="px-4 py-3 text-left text-xs font-medium text-gray-500 uppercase">
-                      Estado
+                      {t.affiliateLeads?.status || 'Estado'}
                     </th>
                     <th className="px-4 py-3 text-left text-xs font-medium text-gray-500 uppercase">
-                      Comisión
+                      {t.affiliateLeads?.commission || 'Comisión'}
                     </th>
                     <th className="px-4 py-3 text-left text-xs font-medium text-gray-500 uppercase">
-                      Pagos
+                      {t.affiliateLeads?.payments || 'Pagos'}
                     </th>
                     <th className="px-4 py-3 text-left text-xs font-medium text-gray-500 uppercase">
-                      Fecha
+                      {t.affiliateLeads?.date || 'Fecha'}
                     </th>
                   </tr>
                 </thead>
@@ -196,7 +201,7 @@ export default async function AffiliateLeadsPage() {
                             lead.status
                           )}`}
                         >
-                          {lead.status}
+                          {t.statusLabels?.[lead.status.toLowerCase()] || lead.status}
                         </span>
                       </td>
                       <td className="px-4 py-3 whitespace-nowrap text-sm font-medium text-gray-900">
@@ -206,7 +211,7 @@ export default async function AffiliateLeadsPage() {
                         {lead.payments.length}
                       </td>
                       <td className="px-4 py-3 whitespace-nowrap text-sm text-gray-500">
-                        {new Date(lead.createdAt).toLocaleDateString('es-ES')}
+                        {new Date(lead.createdAt).toLocaleDateString(locale === 'en' ? 'en-US' : locale === 'it' ? 'it-IT' : locale === 'fr' ? 'fr-FR' : locale === 'de' ? 'de-DE' : locale === 'pt' ? 'pt-PT' : 'es-ES')}
                       </td>
                     </tr>
                   ))}
@@ -219,8 +224,7 @@ export default async function AffiliateLeadsPage() {
         {/* Info box */}
         <div className="mt-6 bg-blue-50 border border-blue-200 rounded-lg p-4">
           <p className="text-sm text-blue-800">
-            <strong>Nota:</strong> Los leads mostrados aquí son generados por tus afiliados activos.
-            Las comisiones de estos leads se dividen entre tú y el afiliado según la configuración establecida.
+            <strong>{t.affiliateLeads?.note || 'Nota'}:</strong> {t.affiliateLeads?.noteText || 'Los leads mostrados aquí son generados por tus afiliados activos. Las comisiones de estos leads se dividen entre tú y el afiliado según la configuración establecida.'}
           </p>
         </div>
       </main>

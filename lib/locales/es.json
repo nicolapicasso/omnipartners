@@ -378,5 +378,34 @@
     "helpTitle": "¿Necesitas Ayuda?",
     "helpDescription": "Si tienes preguntas sobre algún requisito o necesitas asistencia, contacta a tu gerente de partnership de Omniwallet o comunícate con nuestro equipo de soporte.",
     "contactSupport": "Contactar Soporte"
+  },
+  "affiliateLeads": {
+    "title": "Leads de Afiliados",
+    "subtitle": "Visualiza todos los leads generados por tus afiliados",
+    "backToAffiliates": "Volver a Mis Afiliados",
+    "total": "Total",
+    "leads": "Leads",
+    "prospects": "Prospects",
+    "clients": "Clientes",
+    "archived": "Archivados",
+    "allLeads": "Todos los Leads de Afiliados",
+    "activeAffiliates": "afiliados activos",
+    "noLeads": "No hay leads de afiliados",
+    "noLeadsDescription": "Tus afiliados aún no han generado leads",
+    "affiliate": "Afiliado",
+    "company": "Empresa",
+    "contact": "Contacto",
+    "status": "Estado",
+    "commission": "Comisión",
+    "payments": "Pagos",
+    "date": "Fecha",
+    "note": "Nota",
+    "noteText": "Los leads mostrados aquí son generados por tus afiliados activos. Las comisiones de estos leads se dividen entre tú y el afiliado según la configuración establecida."
+  },
+  "statusLabels": {
+    "lead": "Lead",
+    "prospect": "Prospect",
+    "client": "Cliente",
+    "archived": "Archivado"
   }
 }
