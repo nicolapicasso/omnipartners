@@ -377,3 +377,17 @@ export async function translateCertificationContent(targetLocale: SupportedLangu
     return { success: false, error: error instanceof Error ? error.message : 'Unknown error' }
   }
 }
+
+// Export translations as JSON string
+export async function exportTranslations(locale: SupportedLanguage) {
+  await getAdminSession()
+
+  try {
+    const file = await getTranslationFile(locale)
+    const content = JSON.stringify(file, null, 2)
+    return { success: true, content }
+  } catch (error) {
+    console.error('Export translations error:', error)
+    return { success: false, error: error instanceof Error ? error.message : 'Unknown error' }
+  }
+}
