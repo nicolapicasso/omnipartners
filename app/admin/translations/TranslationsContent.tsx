@@ -12,6 +12,7 @@ import {
   Save,
   BookOpen,
   HelpCircle,
+  Download,
 } from 'lucide-react'
 import {
   saveOpenAIApiKey,
@@ -20,6 +21,7 @@ import {
   updateTranslation,
   translateCertificationQuestions,
   translateCertificationContent,
+  exportTranslations,
 } from './actions'
 
 const LANGUAGES = [
@@ -156,6 +158,24 @@ export default function TranslationsContent({
     setTranslatingCert(null)
   }
 
+  const handleExportTranslations = async (locale: string) => {
+    const result = await exportTranslations(locale as 'es' | 'en' | 'it' | 'fr' | 'de' | 'pt')
+    if (result.success && result.content) {
+      // Create and download the file
+      const blob = new Blob([result.content], { type: 'application/json' })
+      const url = URL.createObjectURL(blob)
+      const a = document.createElement('a')
+      a.href = url
+      a.download = `${locale}.json`
+      document.body.appendChild(a)
+      a.click()
+      document.body.removeChild(a)
+      URL.revokeObjectURL(url)
+    } else {
+      alert(`Error: ${result.error}`)
+    }
+  }
+
   const filteredTranslations = translations.filter(
     (t) =>
       t.key.toLowerCase().includes(searchQuery.toLowerCase()) ||
@@ -286,6 +306,13 @@ export default function TranslationsContent({
                   >
                     <Search className="w-3 h-3" />
                     Ver
+                  </button>
+                  <button
+                    onClick={() => handleExportTranslations(lang.code)}
+                    className="bg-green-100 text-green-700 px-3 py-1.5 rounded-lg text-xs font-medium hover:bg-green-200 transition flex items-center justify-center gap-1"
+                    title="Exportar JSON"
+                  >
+                    <Download className="w-3 h-3" />
                   </button>
                 </div>
               </div>
