@@ -3,8 +3,32 @@
 import { createContext, useContext, useState, useEffect, ReactNode } from 'react'
 import esTranslations from '@/lib/locales/es.json'
 import enTranslations from '@/lib/locales/en.json'
+import itTranslations from '@/lib/locales/it.json'
+import frTranslations from '@/lib/locales/fr.json'
+import deTranslations from '@/lib/locales/de.json'
+import ptTranslations from '@/lib/locales/pt.json'
 
-export type Language = 'es' | 'en'
+export type Language = 'es' | 'en' | 'it' | 'fr' | 'de' | 'pt'
+
+export const LANGUAGES: Language[] = ['es', 'en', 'it', 'fr', 'de', 'pt']
+
+export const LANGUAGE_NAMES: Record<Language, string> = {
+  es: 'Español',
+  en: 'English',
+  it: 'Italiano',
+  fr: 'Français',
+  de: 'Deutsch',
+  pt: 'Português',
+}
+
+export const LANGUAGE_FLAGS: Record<Language, string> = {
+  es: '🇪🇸',
+  en: '🇬🇧',
+  it: '🇮🇹',
+  fr: '🇫🇷',
+  de: '🇩🇪',
+  pt: '🇵🇹',
+}
 
 type Translations = typeof esTranslations
 
@@ -13,46 +37,121 @@ interface LanguageContextType {
   setLanguage: (lang: Language) => void
   t: (key: string) => string
   translations: Translations
+  showLanguageModal: boolean
+  setShowLanguageModal: (show: boolean) => void
+  hasSelectedLanguage: boolean
 }
 
 const LanguageContext = createContext<LanguageContextType | undefined>(undefined)
 
-const translations: Record<Language, Translations> = {
+// All translations with fallback logic
+const allTranslations: Record<Language, Record<string, unknown>> = {
   es: esTranslations,
   en: enTranslations,
+  it: itTranslations,
+  fr: frTranslations,
+  de: deTranslations,
+  pt: ptTranslations,
+}
+
+// Get translation with fallback
+function getTranslationValue(
+  translations: Record<string, unknown>,
+  keys: string[],
+  fallback: Record<string, unknown>
+): unknown {
+  let value: unknown = translations
+
+  for (const k of keys) {
+    if (value && typeof value === 'object' && k in (value as Record<string, unknown>)) {
+      value = (value as Record<string, unknown>)[k]
+    } else {
+      // Try fallback (English)
+      let fallbackValue: unknown = fallback
+      for (const fk of keys) {
+        if (fallbackValue && typeof fallbackValue === 'object' && fk in (fallbackValue as Record<string, unknown>)) {
+          fallbackValue = (fallbackValue as Record<string, unknown>)[fk]
+        } else {
+          return undefined
+        }
+      }
+      return fallbackValue
+    }
+  }
+
+  return value
 }
 
 export function LanguageProvider({ children }: { children: ReactNode }) {
-  const [language, setLanguageState] = useState<Language>('es')
+  const [language, setLanguageState] = useState<Language>('en')
+  const [showLanguageModal, setShowLanguageModal] = useState(false)
+  const [hasSelectedLanguage, setHasSelectedLanguage] = useState(true)
+  const [isInitialized, setIsInitialized] = useState(false)
 
   // Load language from localStorage on mount
   useEffect(() => {
     const savedLanguage = localStorage.getItem('language') as Language
-    if (savedLanguage && (savedLanguage === 'es' || savedLanguage === 'en')) {
+    const hasSelected = localStorage.getItem('hasSelectedLanguage')
+
+    if (savedLanguage && LANGUAGES.includes(savedLanguage)) {
       setLanguageState(savedLanguage)
+      setHasSelectedLanguage(true)
+    } else if (!hasSelected) {
+      // First time visitor - detect browser language
+      const browserLang = navigator.language.split('-')[0] as Language
+      if (LANGUAGES.includes(browserLang)) {
+        setLanguageState(browserLang)
+      }
+      // Show language selection modal on first visit
+      setHasSelectedLanguage(false)
+      setShowLanguageModal(true)
     }
+    setIsInitialized(true)
   }, [])
 
   // Save language to localStorage when it changes
   const setLanguage = (lang: Language) => {
     setLanguageState(lang)
     localStorage.setItem('language', lang)
+    localStorage.setItem('hasSelectedLanguage', 'true')
+    setHasSelectedLanguage(true)
+    setShowLanguageModal(false)
   }
 
-  // Translation function with dot notation support (e.g., "dashboard.title")
+  // Translation function with dot notation support and fallback
   const t = (key: string): string => {
     const keys = key.split('.')
-    let value: any = translations[language]
+    const currentTranslations = allTranslations[language]
+    const fallbackTranslations = allTranslations['en']
 
-    for (const k of keys) {
-      if (value && typeof value === 'object' && k in value) {
-        value = value[k]
-      } else {
-        return key // Return key if translation not found
-      }
+    // Try current language
+    let value = getTranslationValue(currentTranslations, keys, fallbackTranslations)
+
+    // If not found or empty, try English fallback
+    if (value === undefined || value === '') {
+      value = getTranslationValue(fallbackTranslations, keys, esTranslations)
+    }
+
+    // If still not found, try Spanish
+    if (value === undefined || value === '') {
+      value = getTranslationValue(esTranslations as Record<string, unknown>, keys, esTranslations)
     }
 
     return typeof value === 'string' ? value : key
+  }
+
+  // Get current translations (with fallback for empty languages)
+  const getCurrentTranslations = (): Translations => {
+    const current = allTranslations[language]
+    if (Object.keys(current).length === 0) {
+      return enTranslations as Translations
+    }
+    return current as Translations
+  }
+
+  // Prevent hydration mismatch by waiting for client-side initialization
+  if (!isInitialized) {
+    return null
   }
 
   return (
@@ -61,7 +160,10 @@ export function LanguageProvider({ children }: { children: ReactNode }) {
         language,
         setLanguage,
         t,
-        translations: translations[language],
+        translations: getCurrentTranslations(),
+        showLanguageModal,
+        setShowLanguageModal,
+        hasSelectedLanguage,
       }}
     >
       {children}

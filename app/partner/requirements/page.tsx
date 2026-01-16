@@ -38,51 +38,51 @@ async function getPartnerRequirements(partnerId: string, locale: string) {
   const prospectsThisYear = leadsThisYear.filter((lead) => lead.status === LeadStatus.PROSPECT || lead.status === LeadStatus.CLIENT)
   const clientsThisYear = leadsThisYear.filter((lead) => lead.status === LeadStatus.CLIENT)
 
-  const t = getTranslations(locale)
+  const t = getTranslations(locale) as { requirements: Record<string, { title: string; description: string }> }
 
   const requirements = [
     {
       id: 'contract',
-      title: t.requirements.contract.title,
-      description: t.requirements.contract.description,
+      title: t.requirements?.contract?.title || 'Contract',
+      description: t.requirements?.contract?.description || 'Sign the partner contract',
       completed: !!partner.contractUrl,
       icon: 'FileText',
     },
     {
       id: 'account',
-      title: t.requirements.account.title,
-      description: t.requirements.account.description,
+      title: t.requirements?.account?.title || 'Omniwallet Account',
+      description: t.requirements?.account?.description || 'Create your Omniwallet account',
       completed: !!partner.omniwalletAccountUrl,
       icon: 'Wallet',
     },
     {
       id: 'leads',
-      title: t.requirements.leads.title,
-      description: t.requirements.leads.description,
+      title: t.requirements?.leads?.title || 'Register Leads',
+      description: t.requirements?.leads?.description || 'Register at least 10 leads this year',
       completed: leadsThisYear.length >= 10,
       progress: { current: leadsThisYear.length, target: 10 },
       icon: 'TrendingUp',
     },
     {
       id: 'prospects',
-      title: t.requirements.prospects.title,
-      description: t.requirements.prospects.description,
+      title: t.requirements?.prospects?.title || 'Convert Prospects',
+      description: t.requirements?.prospects?.description || 'Convert at least 5 leads to prospects',
       completed: prospectsThisYear.length >= 5,
       progress: { current: prospectsThisYear.length, target: 5 },
       icon: 'Users',
     },
     {
       id: 'clients',
-      title: t.requirements.clients.title,
-      description: t.requirements.clients.description,
+      title: t.requirements?.clients?.title || 'Acquire Clients',
+      description: t.requirements?.clients?.description || 'Convert at least 2 prospects to clients',
       completed: clientsThisYear.length >= 2,
       progress: { current: clientsThisYear.length, target: 2 },
       icon: 'CheckCircle2',
     },
     {
       id: 'event',
-      title: t.requirements.event.title,
-      description: t.requirements.event.description,
+      title: t.requirements?.event?.title || 'Yearly Event',
+      description: t.requirements?.event?.description || 'Attend the yearly partner event',
       completed: partner.hasCompletedYearlyEvent,
       icon: 'Presentation',
     },

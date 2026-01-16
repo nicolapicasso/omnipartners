@@ -1,6 +1,6 @@
 'use client'
 
-import { useTranslation, Language } from '@/lib/contexts/LanguageContext'
+import { useTranslation, Language, LANGUAGES, LANGUAGE_NAMES, LANGUAGE_FLAGS } from '@/lib/contexts/LanguageContext'
 import { Globe } from 'lucide-react'
 
 export default function LanguageSelector() {
@@ -14,8 +14,11 @@ export default function LanguageSelector() {
         onChange={(e) => setLanguage(e.target.value as Language)}
         className="bg-white border border-gray-300 rounded-md px-2 py-1 text-sm focus:ring-2 focus:ring-omniwallet-primary focus:border-transparent cursor-pointer"
       >
-        <option value="es">Español</option>
-        <option value="en">English</option>
+        {LANGUAGES.map((lang) => (
+          <option key={lang} value={lang}>
+            {LANGUAGE_FLAGS[lang]} {LANGUAGE_NAMES[lang]}
+          </option>
+        ))}
       </select>
     </div>
   )

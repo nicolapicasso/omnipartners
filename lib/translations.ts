@@ -1,6 +1,65 @@
 import en from './locales/en.json'
 import es from './locales/es.json'
+import it from './locales/it.json'
+import fr from './locales/fr.json'
+import de from './locales/de.json'
+import pt from './locales/pt.json'
 
-export function getTranslations(locale: string = 'en') {
-  return locale === 'es' ? es : en
+export type SupportedLocale = 'es' | 'en' | 'it' | 'fr' | 'de' | 'pt'
+
+export const SUPPORTED_LOCALES: SupportedLocale[] = ['es', 'en', 'it', 'fr', 'de', 'pt']
+
+export const LOCALE_NAMES: Record<SupportedLocale, string> = {
+  es: 'Español',
+  en: 'English',
+  it: 'Italiano',
+  fr: 'Français',
+  de: 'Deutsch',
+  pt: 'Português',
+}
+
+export const LOCALE_FLAGS: Record<SupportedLocale, string> = {
+  es: '🇪🇸',
+  en: '🇬🇧',
+  it: '🇮🇹',
+  fr: '🇫🇷',
+  de: '🇩🇪',
+  pt: '🇵🇹',
+}
+
+const translations: Record<SupportedLocale, Record<string, unknown>> = {
+  es,
+  en,
+  it,
+  fr,
+  de,
+  pt,
+}
+
+export function getTranslations(locale: string = 'en'): Record<string, unknown> {
+  const normalizedLocale = locale.toLowerCase().split('-')[0] as SupportedLocale
+
+  // If locale is supported and has translations, use it
+  if (SUPPORTED_LOCALES.includes(normalizedLocale)) {
+    const localeTranslations = translations[normalizedLocale]
+    // If translations exist (not empty), use them
+    if (localeTranslations && Object.keys(localeTranslations).length > 0) {
+      return localeTranslations
+    }
+  }
+
+  // Fallback to English, then Spanish
+  if (Object.keys(en).length > 0) {
+    return en
+  }
+  return es
+}
+
+export function isLocaleSupported(locale: string): boolean {
+  const normalizedLocale = locale.toLowerCase().split('-')[0] as SupportedLocale
+  return SUPPORTED_LOCALES.includes(normalizedLocale)
+}
+
+export function getDefaultLocale(): SupportedLocale {
+  return 'en'
 }
