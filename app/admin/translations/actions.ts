@@ -391,3 +391,53 @@ export async function exportTranslations(locale: SupportedLanguage) {
     return { success: false, error: error instanceof Error ? error.message : 'Unknown error' }
   }
 }
+
+// Import translations from JSON string
+export async function importTranslations(locale: SupportedLanguage, jsonContent: string) {
+  await getAdminSession()
+
+  if (locale === 'es') {
+    return { success: false, error: 'Cannot import to source language (Spanish)' }
+  }
+
+  try {
+    const content = JSON.parse(jsonContent)
+    await saveTranslationFile(locale, content)
+    revalidatePath('/admin/translations')
+    return { success: true }
+  } catch (error) {
+    console.error('Import translations error:', error)
+    return { success: false, error: error instanceof Error ? error.message : 'Invalid JSON format' }
+  }
+}
+
+// Get certification translation stats
+export async function getCertificationTranslationStats() {
+  await getAdminSession()
+
+  const questions = await prisma.certificationQuestion.findMany({
+    where: { isActive: true },
+  })
+
+  const contents = await prisma.certificationContent.findMany({
+    where: { isPublished: true },
+  })
+
+  const locales = ['en', 'it', 'fr', 'de', 'pt'] as const
+  const stats: Record<string, { questions: { total: number; translated: number }; content: { total: number; translated: number } }> = {}
+
+  for (const locale of locales) {
+    const questionField = `question_${locale}` as keyof typeof questions[0]
+    const titleField = `title_${locale}` as keyof typeof contents[0]
+
+    const translatedQuestions = questions.filter(q => q[questionField] && (q[questionField] as string).trim() !== '').length
+    const translatedContents = contents.filter(c => c[titleField] && (c[titleField] as string).trim() !== '').length
+
+    stats[locale] = {
+      questions: { total: questions.length, translated: translatedQuestions },
+      content: { total: contents.length, translated: translatedContents },
+    }
+  }
+
+  return stats
+}

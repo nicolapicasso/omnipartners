@@ -1,6 +1,6 @@
 'use client'
 
-import { useState } from 'react'
+import { useState, useEffect, useRef } from 'react'
 import {
   Settings,
   Globe,
@@ -13,6 +13,7 @@ import {
   BookOpen,
   HelpCircle,
   Download,
+  Upload,
 } from 'lucide-react'
 import {
   saveOpenAIApiKey,
@@ -22,6 +23,8 @@ import {
   translateCertificationQuestions,
   translateCertificationContent,
   exportTranslations,
+  importTranslations,
+  getCertificationTranslationStats,
 } from './actions'
 
 const LANGUAGES = [
@@ -48,6 +51,13 @@ interface TranslationEntry {
   isTranslated: boolean
 }
 
+interface CertificationStats {
+  [key: string]: {
+    questions: { total: number; translated: number }
+    content: { total: number; translated: number }
+  }
+}
+
 export default function TranslationsContent({
   isOpenAIConfigured,
   initialStats,
@@ -69,6 +79,14 @@ export default function TranslationsContent({
   const [editValue, setEditValue] = useState('')
   const [savingTranslation, setSavingTranslation] = useState(false)
   const [translatingCert, setTranslatingCert] = useState<string | null>(null)
+  const [certStats, setCertStats] = useState<CertificationStats>({})
+  const [importing, setImporting] = useState<string | null>(null)
+  const fileInputRef = useRef<HTMLInputElement>(null)
+
+  // Load certification stats on mount
+  useEffect(() => {
+    getCertificationTranslationStats().then(setCertStats)
+  }, [])
 
   const handleSaveApiKey = async () => {
     setSavingApiKey(true)
@@ -174,6 +192,26 @@ export default function TranslationsContent({
     } else {
       alert(`Error: ${result.error}`)
     }
+  }
+
+  const handleImportTranslations = async (locale: string, file: File) => {
+    setImporting(locale)
+    try {
+      const content = await file.text()
+      const result = await importTranslations(locale as 'en' | 'it' | 'fr' | 'de' | 'pt', content)
+      if (result.success) {
+        alert('Traducciones importadas correctamente')
+        // Refresh if viewing this language
+        if (selectedLanguage === locale) {
+          handleViewTranslations(locale)
+        }
+      } else {
+        alert(`Error: ${result.error}`)
+      }
+    } catch {
+      alert('Error al leer el archivo')
+    }
+    setImporting(null)
   }
 
   const filteredTranslations = translations.filter(
@@ -314,6 +352,30 @@ export default function TranslationsContent({
                   >
                     <Download className="w-3 h-3" />
                   </button>
+                  {!lang.isSource && (
+                    <label
+                      className="bg-blue-100 text-blue-700 px-3 py-1.5 rounded-lg text-xs font-medium hover:bg-blue-200 transition flex items-center justify-center gap-1 cursor-pointer"
+                      title="Importar JSON"
+                    >
+                      {importing === lang.code ? (
+                        <Loader2 className="w-3 h-3 animate-spin" />
+                      ) : (
+                        <Upload className="w-3 h-3" />
+                      )}
+                      <input
+                        type="file"
+                        accept=".json"
+                        className="hidden"
+                        onChange={(e) => {
+                          const file = e.target.files?.[0]
+                          if (file) {
+                            handleImportTranslations(lang.code, file)
+                            e.target.value = ''
+                          }
+                        }}
+                      />
+                    </label>
+                  )}
                 </div>
               </div>
             )
@@ -336,12 +398,35 @@ export default function TranslationsContent({
         </div>
 
         <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
-          {LANGUAGES.filter((l) => !l.isSource).map((lang) => (
+          {LANGUAGES.filter((l) => !l.isSource).map((lang) => {
+            const langCertStats = certStats[lang.code]
+            return (
             <div key={lang.code} className="border border-gray-200 rounded-lg p-4">
               <div className="flex items-center gap-2 mb-3">
                 <span className="text-xl">{lang.flag}</span>
                 <span className="font-medium text-gray-900">{lang.name}</span>
               </div>
+
+              {/* Translation status indicators */}
+              {langCertStats && (
+                <div className="mb-3 space-y-1 text-xs">
+                  <div className="flex items-center justify-between">
+                    <span className="text-gray-500">Preguntas:</span>
+                    <span className={langCertStats.questions.translated === langCertStats.questions.total ? 'text-green-600' : 'text-amber-600'}>
+                      {langCertStats.questions.translated}/{langCertStats.questions.total}
+                      {langCertStats.questions.translated === langCertStats.questions.total ? ' ✓' : ''}
+                    </span>
+                  </div>
+                  <div className="flex items-center justify-between">
+                    <span className="text-gray-500">Contenido:</span>
+                    <span className={langCertStats.content.translated === langCertStats.content.total ? 'text-green-600' : 'text-amber-600'}>
+                      {langCertStats.content.translated}/{langCertStats.content.total}
+                      {langCertStats.content.translated === langCertStats.content.total ? ' ✓' : ''}
+                    </span>
+                  </div>
+                </div>
+              )}
+
               <div className="flex gap-2">
                 <button
                   onClick={() => handleTranslateCertification(lang.code, 'questions')}
@@ -369,7 +454,8 @@ export default function TranslationsContent({
                 </button>
               </div>
             </div>
-          ))}
+            )
+          })}
         </div>
       </div>
 
