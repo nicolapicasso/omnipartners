@@ -63,6 +63,15 @@ export const authOptions: NextAuthOptions = {
             throw new Error('Tu cuenta no está activa. Contacta al administrador.')
           }
 
+          // If this is an affiliate with a temporary password, clear it on first login
+          if (partner.temporaryPassword) {
+            await prisma.partner.update({
+              where: { id: partner.id },
+              data: { temporaryPassword: null },
+            })
+            console.log(`[Auth] Cleared temporary password for affiliate: ${partner.email}`)
+          }
+
           return {
             id: partner.id,
             email: partner.email,

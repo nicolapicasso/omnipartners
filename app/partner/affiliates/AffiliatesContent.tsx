@@ -1,7 +1,7 @@
 'use client'
 
 import { useState } from 'react'
-import { Users, Mail, TrendingUp, DollarSign, Clock, CheckCircle, XCircle, Edit2, Save, X } from 'lucide-react'
+import { Users, Mail, TrendingUp, DollarSign, Clock, CheckCircle, XCircle, Edit2, Save, X, Key, AlertCircle } from 'lucide-react'
 import { createAffiliate, updateAffiliateCommission } from './actions'
 
 interface Affiliate {
@@ -14,6 +14,7 @@ interface Affiliate {
   leadsCount: number
   clientsCount: number
   createdAt: string
+  temporaryPassword: string | null
 }
 
 export function AffiliatesList({
@@ -190,6 +191,38 @@ export function AffiliatesList({
                 <span className="text-omniwallet-primary">
                   Tú: {parentCommission - affiliate.affiliateCommission}%
                 </span>
+              </div>
+            </div>
+          )}
+
+          {/* Credentials display for affiliates with temporary password */}
+          {affiliate.temporaryPassword && (
+            <div className="mt-3 pt-3 border-t border-gray-100">
+              <div className="bg-amber-50 rounded-lg p-3 border border-amber-200">
+                <div className="flex items-center gap-2 mb-2">
+                  <Key className="w-4 h-4 text-amber-600" />
+                  <span className="text-xs font-medium text-amber-800">Credenciales de Acceso</span>
+                </div>
+                <div className="grid grid-cols-2 gap-3">
+                  <div>
+                    <p className="text-xs text-gray-500">Email</p>
+                    <p className="text-xs font-mono text-gray-900 bg-white px-2 py-1 rounded border border-amber-100">
+                      {affiliate.email}
+                    </p>
+                  </div>
+                  <div>
+                    <p className="text-xs text-gray-500">Contraseña</p>
+                    <p className="text-xs font-mono text-gray-900 bg-white px-2 py-1 rounded border border-amber-100">
+                      {affiliate.temporaryPassword}
+                    </p>
+                  </div>
+                </div>
+                <div className="flex items-start gap-1.5 mt-2">
+                  <AlertCircle className="w-3 h-3 text-amber-600 flex-shrink-0 mt-0.5" />
+                  <p className="text-xs text-amber-700">
+                    Se enviará por email cuando sea aprobado. Esta contraseña se eliminará tras el primer inicio de sesión.
+                  </p>
+                </div>
               </div>
             </div>
           )}

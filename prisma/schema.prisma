@@ -62,6 +62,7 @@ model Partner {
   parentPartner        Partner? @relation("PartnerAffiliates", fields: [parentPartnerId], references: [id])
   affiliates           Partner[] @relation("PartnerAffiliates")
   affiliateCommission  Float?                     // Comisión del afiliado (asignada por el padre)
+  temporaryPassword    String?                    // Contraseña temporal para afiliados (se borra tras primer login)
 
   // Relaciones
   users                 User[]

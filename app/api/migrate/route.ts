@@ -165,6 +165,16 @@ export async function GET(request: Request) {
       results.push(`commissionRate: ${e instanceof Error ? e.message : 'already exists or error'}`)
     }
 
+    // Migration: Add temporaryPassword to partners (for affiliate credentials)
+    try {
+      await prisma.$executeRawUnsafe(`
+        ALTER TABLE "partners" ADD COLUMN IF NOT EXISTS "temporaryPassword" TEXT;
+      `)
+      results.push('Added temporaryPassword to partners')
+    } catch (e) {
+      results.push(`temporaryPassword: ${e instanceof Error ? e.message : 'already exists or error'}`)
+    }
+
     return NextResponse.json({
       success: true,
       message: 'Migrations completed',

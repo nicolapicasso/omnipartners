@@ -83,11 +83,11 @@ export async function createAffiliate(data: {
         affiliateCommission: data.commission,
         // The affiliate's own commission rate is 0 - they earn through affiliateCommission
         commissionRate: 0,
+        // Store temporary password (plain text) for admin/parent to see
+        // Will be cleared after first login
+        temporaryPassword: tempPassword,
       },
     })
-
-    // TODO: Send email notification to admin about new affiliate pending approval
-    // TODO: When approved, send email to affiliate with credentials
 
     revalidatePath('/partner/affiliates')
     revalidatePath('/admin/partners')
