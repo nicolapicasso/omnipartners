@@ -1,6 +1,6 @@
 'use client'
 
-import { Info, Target, Calendar, CheckCircle } from 'lucide-react'
+import { Info, Target, Calendar, CheckCircle, Archive } from 'lucide-react'
 
 export default function LeadStatusLegend() {
   return (
@@ -29,6 +29,13 @@ export default function LeadStatusLegend() {
           <div>
             <span className="font-medium text-gray-900 text-sm">Client:</span>
             <span className="text-gray-700 text-sm ml-1">Active customer who has signed a contract and generates revenue.</span>
+          </div>
+        </div>
+        <div className="flex items-start gap-2">
+          <Archive className="w-4 h-4 text-amber-600 mt-0.5 flex-shrink-0" />
+          <div>
+            <span className="font-medium text-gray-900 text-sm">Archived:</span>
+            <span className="text-gray-700 text-sm ml-1">Inactive lead that has been archived for historical reference.</span>
           </div>
         </div>
       </div>

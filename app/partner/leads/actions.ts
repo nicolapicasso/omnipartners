@@ -262,6 +262,11 @@ export async function deletePartnerLead(leadId: string) {
     // Verify lead belongs to partner
     const lead = await prisma.lead.findUnique({
       where: { id: leadId },
+      include: {
+        _count: {
+          select: { payments: true },
+        },
+      },
     })
 
     if (!lead || lead.partnerId !== partnerId) {
@@ -270,7 +275,15 @@ export async function deletePartnerLead(leadId: string) {
 
     // Only allow deletion if lead hasn't been converted to client
     if (lead.status === LeadStatus.CLIENT) {
-      return { success: false, error: 'Cannot delete a client' }
+      return { success: false, error: 'No se puede eliminar un cliente. Considera archivarlo.' }
+    }
+
+    // Check if lead has payments
+    if (lead._count.payments > 0) {
+      return {
+        success: false,
+        error: `No se puede eliminar el lead porque tiene ${lead._count.payments} pago(s) registrado(s). Considera archivarlo en su lugar.`,
+      }
     }
 
     await prisma.lead.delete({
@@ -283,6 +296,67 @@ export async function deletePartnerLead(leadId: string) {
   } catch (error) {
     console.error('Error deleting lead:', error)
     return { success: false, error: 'Failed to delete lead' }
+  }
+}
+
+export async function archivePartnerLead(leadId: string) {
+  try {
+    const session = await getPartnerSession()
+    const partnerId = session.user.partnerId!
+
+    // Verify lead belongs to partner
+    const lead = await prisma.lead.findUnique({
+      where: { id: leadId },
+    })
+
+    if (!lead || lead.partnerId !== partnerId) {
+      return { success: false, error: 'Lead not found or unauthorized' }
+    }
+
+    await prisma.lead.update({
+      where: { id: leadId },
+      data: { status: LeadStatus.ARCHIVED },
+    })
+
+    console.log(`[Partner] Lead archived: ${lead.companyName} (${leadId})`)
+
+    revalidatePath('/partner/leads')
+    revalidatePath(`/partner/leads/${leadId}`)
+    return { success: true }
+  } catch (error) {
+    console.error('Error archiving lead:', error)
+    return { success: false, error: 'Failed to archive lead' }
+  }
+}
+
+export async function unarchivePartnerLead(leadId: string) {
+  try {
+    const session = await getPartnerSession()
+    const partnerId = session.user.partnerId!
+
+    // Verify lead belongs to partner
+    const lead = await prisma.lead.findUnique({
+      where: { id: leadId },
+    })
+
+    if (!lead || lead.partnerId !== partnerId) {
+      return { success: false, error: 'Lead not found or unauthorized' }
+    }
+
+    // Restore to LEAD status
+    await prisma.lead.update({
+      where: { id: leadId },
+      data: { status: LeadStatus.LEAD },
+    })
+
+    console.log(`[Partner] Lead unarchived: ${lead.companyName} (${leadId})`)
+
+    revalidatePath('/partner/leads')
+    revalidatePath(`/partner/leads/${leadId}`)
+    return { success: true }
+  } catch (error) {
+    console.error('Error unarchiving lead:', error)
+    return { success: false, error: 'Failed to unarchive lead' }
   }
 }
 

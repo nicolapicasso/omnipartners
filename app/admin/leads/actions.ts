@@ -235,3 +235,85 @@ export async function reassignLead(leadId: string, newPartnerId: string) {
     return { success: false, error: 'Failed to reassign lead' }
   }
 }
+
+export async function archiveLead(leadId: string) {
+  try {
+    await getAdminSession() // Verify admin
+
+    const lead = await prisma.lead.update({
+      where: { id: leadId },
+      data: { status: LeadStatus.ARCHIVED },
+    })
+
+    console.log(`[Admin] Lead archived: ${lead.companyName} (${leadId})`)
+
+    revalidatePath('/admin/leads')
+    revalidatePath(`/admin/leads/${leadId}`)
+    return { success: true }
+  } catch (error) {
+    console.error('Error archiving lead:', error)
+    return { success: false, error: 'Failed to archive lead' }
+  }
+}
+
+export async function unarchiveLead(leadId: string) {
+  try {
+    await getAdminSession() // Verify admin
+
+    // Restore to LEAD status
+    const lead = await prisma.lead.update({
+      where: { id: leadId },
+      data: { status: LeadStatus.LEAD },
+    })
+
+    console.log(`[Admin] Lead unarchived: ${lead.companyName} (${leadId})`)
+
+    revalidatePath('/admin/leads')
+    revalidatePath(`/admin/leads/${leadId}`)
+    return { success: true }
+  } catch (error) {
+    console.error('Error unarchiving lead:', error)
+    return { success: false, error: 'Failed to unarchive lead' }
+  }
+}
+
+export async function deleteLead(leadId: string) {
+  try {
+    await getAdminSession() // Verify admin
+
+    // Get lead info before deletion
+    const lead = await prisma.lead.findUnique({
+      where: { id: leadId },
+      include: {
+        _count: {
+          select: { payments: true },
+        },
+      },
+    })
+
+    if (!lead) {
+      return { success: false, error: 'Lead not found' }
+    }
+
+    // Check if lead has payments - cannot delete
+    if (lead._count.payments > 0) {
+      return {
+        success: false,
+        error: `No se puede eliminar el lead porque tiene ${lead._count.payments} pago(s) registrado(s). Considera archivarlo en su lugar.`,
+      }
+    }
+
+    // Delete the lead (cascade will handle related records like notes, contacts)
+    await prisma.lead.delete({
+      where: { id: leadId },
+    })
+
+    console.log(`[Admin] Lead deleted: ${lead.companyName} (${leadId})`)
+
+    revalidatePath('/admin/leads')
+    return { success: true, redirect: '/admin/leads' }
+  } catch (error) {
+    console.error('Error deleting lead:', error)
+    return { success: false, error: 'Failed to delete lead' }
+  }
+}
