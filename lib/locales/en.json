@@ -83,7 +83,9 @@
     "partners": "Partners",
     "settings": "Settings",
     "profile": "Profile",
-    "content": "Content"
+    "content": "Content",
+    "affiliates": "My Affiliates",
+    "affiliateLeads": "Affiliate Leads"
   },
   "navigation": {
     "dashboard": "Dashboard",
