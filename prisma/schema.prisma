@@ -416,9 +416,35 @@ model Notification {
 model CertificationContent {
   id          String   @id @default(cuid())
 
+  // Original content (Spanish - base language)
   title       String
   content     String   // Markdown or rich text content
   description String?
+
+  // Translations - English
+  title_en       String?
+  content_en     String?
+  description_en String?
+
+  // Translations - Italian
+  title_it       String?
+  content_it     String?
+  description_it String?
+
+  // Translations - French
+  title_fr       String?
+  content_fr     String?
+  description_fr String?
+
+  // Translations - German
+  title_de       String?
+  content_de     String?
+  description_de String?
+
+  // Translations - Portuguese
+  title_pt       String?
+  content_pt     String?
+  description_pt String?
 
   // Type: VIDEO, DOCUMENT, TEXT, EXTERNAL_LINK
   type        String
@@ -441,16 +467,40 @@ model CertificationContent {
 model CertificationQuestion {
   id            String   @id @default(cuid())
 
+  // Original content (Spanish - base language)
   question      String
-
   // Options stored as JSON array: ["Option A", "Option B", "Option C", "Option D"]
   options       String
-
-  // Correct answer index (0-based)
-  correctAnswer Int
-
   // Optional explanation shown after answering
   explanation   String?
+
+  // Translations - English
+  question_en    String?
+  options_en     String?  // JSON array
+  explanation_en String?
+
+  // Translations - Italian
+  question_it    String?
+  options_it     String?  // JSON array
+  explanation_it String?
+
+  // Translations - French
+  question_fr    String?
+  options_fr     String?  // JSON array
+  explanation_fr String?
+
+  // Translations - German
+  question_de    String?
+  options_de     String?  // JSON array
+  explanation_de String?
+
+  // Translations - Portuguese
+  question_pt    String?
+  options_pt     String?  // JSON array
+  explanation_pt String?
+
+  // Correct answer index (0-based) - same for all languages
+  correctAnswer Int
 
   // Order for displaying questions
   order         Int      @default(0)
@@ -509,6 +559,26 @@ model CertificationSettings {
   updatedAt             DateTime @updatedAt
 
   @@map("certification_settings")
+}
+
+// ============================================
+// SYSTEM SETTINGS
+// ============================================
+
+model SystemSettings {
+  id          String   @id @default(cuid())
+
+  key         String   @unique  // Setting key (e.g., "openai_api_key", "default_language")
+  value       String             // Setting value
+  description String?            // Human-readable description
+
+  // Encrypt sensitive values like API keys
+  isEncrypted Boolean  @default(false)
+
+  createdAt   DateTime @default(now())
+  updatedAt   DateTime @updatedAt
+
+  @@map("system_settings")
 }
 
 // ============================================

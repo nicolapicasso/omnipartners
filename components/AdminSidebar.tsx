@@ -2,7 +2,7 @@
 
 import Link from 'next/link'
 import { usePathname } from 'next/navigation'
-import { LayoutDashboard, Users, TrendingUp, FileText, Award, Webhook, X } from 'lucide-react'
+import { LayoutDashboard, Users, TrendingUp, FileText, Award, Webhook, X, Languages } from 'lucide-react'
 import { useTranslation } from '@/lib/contexts/LanguageContext'
 import { useSidebar } from '@/lib/contexts/SidebarContext'
 import Logo from './Logo'
@@ -48,6 +48,12 @@ export default function AdminSidebar() {
       label: 'Webhooks',
       icon: Webhook,
       active: pathname?.startsWith('/admin/webhooks')
+    },
+    {
+      href: '/admin/translations',
+      label: 'Traducciones',
+      icon: Languages,
+      active: pathname?.startsWith('/admin/translations')
     }
   ]
 
