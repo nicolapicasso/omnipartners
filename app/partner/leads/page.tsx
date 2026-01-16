@@ -1,3 +1,4 @@
+import { cookies } from 'next/headers'
 import { prisma } from '@/lib/prisma'
 import { getPartnerSession } from '@/lib/session'
 import { LeadStatus } from '@/types'
@@ -6,17 +7,21 @@ import { Eye, Plus } from 'lucide-react'
 import PartnerDashboardHeader from '@/components/PartnerDashboardHeader'
 import PartnerSidebar from '@/components/PartnerSidebar'
 import LeadStatusLegend from '@/components/LeadStatusLegend'
+import { getTranslations } from '@/lib/translations'
 
 export default async function PartnerLeadsPage() {
   const session = await getPartnerSession()
   const partnerId = session.user.partnerId!
+  const cookieStore = await cookies()
+  const locale = cookieStore.get('language')?.value || 'es'
+  const t = getTranslations(locale)
 
   const partner = await prisma.partner.findUnique({
     where: { id: partnerId },
   })
 
   if (!partner) {
-    return <div>Partner not found</div>
+    return <div>{t.common?.notFound || 'Partner not found'}</div>
   }
 
   const leads = await prisma.lead.findMany({
@@ -61,9 +66,9 @@ export default async function PartnerLeadsPage() {
         {/* Page Title */}
         <div className="mb-8 flex justify-between items-start">
           <div>
-            <h1 className="text-2xl font-semibold text-gray-900">Mis Leads</h1>
+            <h1 className="text-2xl font-semibold text-gray-900">{t.nav?.myLeads || 'Mis Leads'}</h1>
             <p className="text-sm text-gray-500 mt-1">
-              {leadCount} Leads · {prospectCount} Prospects · {clientCount} Clients
+              {leadCount} {t.statusLabels?.lead || 'Leads'} · {prospectCount} {t.statusLabels?.prospect || 'Prospects'} · {clientCount} {t.statusLabels?.client || 'Clients'}
             </p>
           </div>
           <Link
@@ -71,23 +76,23 @@ export default async function PartnerLeadsPage() {
             className="bg-omniwallet-primary text-white px-4 py-2 rounded-md text-sm font-medium hover:bg-omniwallet-secondary transition inline-flex items-center gap-2"
           >
             <Plus className="w-4 h-4" />
-            Crear Lead
+            {t.leads?.createLead || 'Crear Lead'}
           </Link>
         </div>
         {/* Stats Cards */}
         <div className="grid grid-cols-1 md:grid-cols-3 gap-6 mb-8">
           <div className="bg-white rounded-lg shadow-sm border border-gray-200 p-6">
-            <p className="text-sm font-medium text-gray-500">Leads</p>
+            <p className="text-sm font-medium text-gray-500">{t.statusLabels?.lead || 'Leads'}</p>
             <p className="text-2xl font-semibold text-gray-900 mt-2">{leadCount}</p>
           </div>
 
           <div className="bg-white rounded-lg shadow-sm border border-gray-200 p-6">
-            <p className="text-sm font-medium text-gray-500">Prospects</p>
+            <p className="text-sm font-medium text-gray-500">{t.statusLabels?.prospect || 'Prospects'}</p>
             <p className="text-2xl font-semibold text-gray-900 mt-2">{prospectCount}</p>
           </div>
 
           <div className="bg-white rounded-lg shadow-sm border border-gray-200 p-6">
-            <p className="text-sm font-medium text-gray-500">Clients</p>
+            <p className="text-sm font-medium text-gray-500">{t.statusLabels?.client || 'Clients'}</p>
             <p className="text-2xl font-semibold text-gray-900 mt-2">{clientCount}</p>
           </div>
         </div>
@@ -102,13 +107,13 @@ export default async function PartnerLeadsPage() {
           <div className="overflow-x-auto">
             {leads.length === 0 ? (
               <div className="text-center py-16">
-                <p className="text-gray-500 mb-4">Aún no hay leads</p>
+                <p className="text-gray-500 mb-4">{t.dashboard?.noLeadsYet || 'Aún no hay leads'}</p>
                 <Link
                   href="/partner/leads/new"
                   className="inline-flex items-center gap-2 bg-omniwallet-primary text-white px-4 py-2 rounded-md text-sm font-medium hover:bg-omniwallet-secondary transition"
                 >
                   <Plus className="w-4 h-4" />
-                  Crea tu primer lead
+                  {t.dashboard?.createFirstLead || 'Crea tu primer lead'}
                 </Link>
               </div>
             ) : (
@@ -116,22 +121,22 @@ export default async function PartnerLeadsPage() {
                 <thead className="bg-gray-50">
                   <tr>
                     <th className="px-4 py-3 text-left text-xs font-medium text-gray-500 uppercase">
-                      Empresa
+                      {t.affiliateLeads?.company || 'Empresa'}
                     </th>
                     <th className="px-4 py-3 text-left text-xs font-medium text-gray-500 uppercase">
-                      Contacto
+                      {t.affiliateLeads?.contact || 'Contacto'}
                     </th>
                     <th className="px-4 py-3 text-left text-xs font-medium text-gray-500 uppercase">
-                      Estado
+                      {t.affiliateLeads?.status || 'Estado'}
                     </th>
                     <th className="px-4 py-3 text-left text-xs font-medium text-gray-500 uppercase">
-                      Comisión
+                      {t.affiliateLeads?.commission || 'Comisión'}
                     </th>
                     <th className="px-4 py-3 text-left text-xs font-medium text-gray-500 uppercase">
-                      Pagos
+                      {t.affiliateLeads?.payments || 'Pagos'}
                     </th>
                     <th className="px-4 py-3 text-left text-xs font-medium text-gray-500 uppercase">
-                      Acciones
+                      {t.common?.actions || 'Acciones'}
                     </th>
                   </tr>
                 </thead>
@@ -153,7 +158,7 @@ export default async function PartnerLeadsPage() {
                             lead.status
                           )}`}
                         >
-                          {lead.status}
+                          {t.statusLabels?.[lead.status.toLowerCase()] || lead.status}
                         </span>
                       </td>
                       <td className="px-4 py-3 whitespace-nowrap text-sm font-medium text-gray-900">
@@ -168,7 +173,7 @@ export default async function PartnerLeadsPage() {
                           className="text-omniwallet-primary hover:text-omniwallet-secondary inline-flex items-center gap-1"
                         >
                           <Eye className="w-4 h-4" />
-                          Ver
+                          {t.common?.view || 'Ver'}
                         </Link>
                       </td>
                     </tr>

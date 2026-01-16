@@ -32,7 +32,10 @@
     "submitting": "Enviando...",
     "totalPaid": "Total Pagado",
     "yourCommissions": "Tus Comisiones",
-    "backToLeads": "Volver a Leads"
+    "backToLeads": "Volver a Leads",
+    "partnerPortal": "Portal de Partners",
+    "registerAsPartner": "Regístrate como Partner",
+    "notFound": "No encontrado"
   },
   "login": {
     "title": "Iniciar Sesión",
@@ -378,5 +381,49 @@
     "helpTitle": "¿Necesitas Ayuda?",
     "helpDescription": "Si tienes preguntas sobre algún requisito o necesitas asistencia, contacta a tu gerente de partnership de Omniwallet o comunícate con nuestro equipo de soporte.",
     "contactSupport": "Contactar Soporte"
+  },
+  "affiliates": {
+    "title": "Mis Afiliados",
+    "subtitle": "Gestiona tu red de afiliados y sus comisiones",
+    "totalAffiliates": "Total Afiliados",
+    "activeAffiliates": "Afiliados Activos",
+    "affiliateLeads": "Leads de Afiliados",
+    "affiliateClients": "Clientes de Afiliados",
+    "commissionStructure": "Estructura de Comisiones",
+    "commissionDescription": "Tu comisión base es del {rate}%. Cuando asignas una comisión a un afiliado, esta se resta de tu comisión.",
+    "commissionExample": "Por ejemplo, si asignas 10% a un afiliado, tú recibirás {parentRate}% y el afiliado recibirá 10%.",
+    "affiliateList": "Lista de Afiliados",
+    "pendingApproval": "pendiente de aprobación",
+    "pendingApprovalsPlural": "pendientes de aprobación",
+    "addAffiliate": "Añadir Nuevo Afiliado"
+  },
+  "affiliateLeads": {
+    "title": "Leads de Afiliados",
+    "subtitle": "Visualiza todos los leads generados por tus afiliados",
+    "backToAffiliates": "Volver a Mis Afiliados",
+    "total": "Total",
+    "leads": "Leads",
+    "prospects": "Prospects",
+    "clients": "Clientes",
+    "archived": "Archivados",
+    "allLeads": "Todos los Leads de Afiliados",
+    "activeAffiliates": "afiliados activos",
+    "noLeads": "No hay leads de afiliados",
+    "noLeadsDescription": "Tus afiliados aún no han generado leads",
+    "affiliate": "Afiliado",
+    "company": "Empresa",
+    "contact": "Contacto",
+    "status": "Estado",
+    "commission": "Comisión",
+    "payments": "Pagos",
+    "date": "Fecha",
+    "note": "Nota",
+    "noteText": "Los leads mostrados aquí son generados por tus afiliados activos. Las comisiones de estos leads se dividen entre tú y el afiliado según la configuración establecida."
+  },
+  "statusLabels": {
+    "lead": "Lead",
+    "prospect": "Prospect",
+    "client": "Cliente",
+    "archived": "Archivado"
   }
 }

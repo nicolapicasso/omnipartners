@@ -1,3 +1,4 @@
+import { cookies } from 'next/headers'
 import { prisma } from '@/lib/prisma'
 import { getPartnerSession } from '@/lib/session'
 import { redirect } from 'next/navigation'
@@ -6,10 +7,14 @@ import { UserPlus, Users, TrendingUp, DollarSign, Clock } from 'lucide-react'
 import PartnerDashboardHeader from '@/components/PartnerDashboardHeader'
 import PartnerSidebar from '@/components/PartnerSidebar'
 import { AffiliatesList, CreateAffiliateForm } from './AffiliatesContent'
+import { getTranslations } from '@/lib/translations'
 
 export default async function AffiliatesPage() {
   const session = await getPartnerSession()
   const partnerId = session.user.partnerId!
+  const cookieStore = await cookies()
+  const locale = cookieStore.get('language')?.value || 'es'
+  const t = getTranslations(locale)
 
   const partner = await prisma.partner.findUnique({
     where: { id: partnerId },
@@ -49,7 +54,7 @@ export default async function AffiliatesPage() {
   const passwordMap = new Map(affiliatesWithPasswords.map(a => [a.id, a.temporaryPassword]))
 
   if (!partner) {
-    return <div>Partner no encontrado</div>
+    return <div>{t.common?.notFound || 'Partner no encontrado'}</div>
   }
 
   // If partner cannot have affiliates, redirect to dashboard
@@ -78,9 +83,9 @@ export default async function AffiliatesPage() {
       <main className="lg:ml-64 pt-28 lg:pt-28 px-4 sm:px-6 lg:px-8 py-6 lg:py-8">
         {/* Page Header */}
         <div className="mb-8">
-          <h1 className="text-2xl font-semibold text-gray-900">Mis Afiliados</h1>
+          <h1 className="text-2xl font-semibold text-gray-900">{t.affiliates?.title || 'Mis Afiliados'}</h1>
           <p className="text-sm text-gray-500 mt-1">
-            Gestiona tu red de afiliados y sus comisiones
+            {t.affiliates?.subtitle || 'Gestiona tu red de afiliados y sus comisiones'}
           </p>
         </div>
 
@@ -92,7 +97,7 @@ export default async function AffiliatesPage() {
                 <Users className="w-5 h-5 text-purple-600" />
               </div>
             </div>
-            <p className="text-sm font-medium text-gray-500">Total Afiliados</p>
+            <p className="text-sm font-medium text-gray-500">{t.affiliates?.totalAffiliates || 'Total Afiliados'}</p>
             <p className="text-2xl font-semibold text-gray-900 mt-1">{totalAffiliates}</p>
           </div>
 
@@ -102,7 +107,7 @@ export default async function AffiliatesPage() {
                 <UserPlus className="w-5 h-5 text-green-600" />
               </div>
             </div>
-            <p className="text-sm font-medium text-gray-500">Afiliados Activos</p>
+            <p className="text-sm font-medium text-gray-500">{t.affiliates?.activeAffiliates || 'Afiliados Activos'}</p>
             <p className="text-2xl font-semibold text-gray-900 mt-1">{activeAffiliates}</p>
           </div>
 
@@ -112,7 +117,7 @@ export default async function AffiliatesPage() {
                 <TrendingUp className="w-5 h-5 text-blue-600" />
               </div>
             </div>
-            <p className="text-sm font-medium text-gray-500">Leads de Afiliados</p>
+            <p className="text-sm font-medium text-gray-500">{t.affiliates?.affiliateLeads || 'Leads de Afiliados'}</p>
             <p className="text-2xl font-semibold text-gray-900 mt-1">{totalAffiliateLeads}</p>
           </div>
 
@@ -122,7 +127,7 @@ export default async function AffiliatesPage() {
                 <DollarSign className="w-5 h-5 text-omniwallet-primary" />
               </div>
             </div>
-            <p className="text-sm font-medium text-gray-500">Clientes de Afiliados</p>
+            <p className="text-sm font-medium text-gray-500">{t.affiliates?.affiliateClients || 'Clientes de Afiliados'}</p>
             <p className="text-2xl font-semibold text-gray-900 mt-1">{totalAffiliateClients}</p>
           </div>
         </div>
@@ -134,11 +139,11 @@ export default async function AffiliatesPage() {
               <DollarSign className="w-5 h-5 text-purple-600" />
             </div>
             <div>
-              <p className="text-sm font-medium text-purple-900">Estructura de Comisiones</p>
+              <p className="text-sm font-medium text-purple-900">{t.affiliates?.commissionStructure || 'Estructura de Comisiones'}</p>
               <p className="text-sm text-purple-700 mt-1">
-                Tu comisión base es del <strong>{partner.commissionRate || 0}%</strong>.
-                Cuando asignas una comisión a un afiliado, esta se resta de tu comisión.
-                Por ejemplo, si asignas 10% a un afiliado, tú recibirás {(partner.commissionRate || 0) - 10}% y el afiliado recibirá 10%.
+                {(t.affiliates?.commissionDescription || 'Tu comisión base es del {rate}%. Cuando asignas una comisión a un afiliado, esta se resta de tu comisión.').replace('{rate}', String(partner.commissionRate || 0))}
+                {' '}
+                {(t.affiliates?.commissionExample || 'Por ejemplo, si asignas 10% a un afiliado, tú recibirás {parentRate}% y el afiliado recibirá 10%.').replace('{parentRate}', String((partner.commissionRate || 0) - 10))}
               </p>
             </div>
           </div>
@@ -150,12 +155,12 @@ export default async function AffiliatesPage() {
             <div className="bg-white rounded-lg shadow-sm border border-gray-200">
               <div className="px-6 py-4 border-b border-gray-100 flex justify-between items-center">
                 <h2 className="text-base font-semibold text-gray-900">
-                  Lista de Afiliados ({totalAffiliates})
+                  {t.affiliates?.affiliateList || 'Lista de Afiliados'} ({totalAffiliates})
                 </h2>
                 {pendingAffiliates > 0 && (
                   <span className="flex items-center gap-1 text-xs text-yellow-700 bg-yellow-50 px-2 py-1 rounded-full">
                     <Clock className="w-3 h-3" />
-                    {pendingAffiliates} pendiente{pendingAffiliates !== 1 ? 's' : ''} de aprobación
+                    {pendingAffiliates} {pendingAffiliates !== 1 ? t.affiliates?.pendingApprovalsPlural || 'pendientes de aprobación' : t.affiliates?.pendingApproval || 'pendiente de aprobación'}
                   </span>
                 )}
               </div>
@@ -181,7 +186,7 @@ export default async function AffiliatesPage() {
           <div>
             <div className="bg-white rounded-lg shadow-sm border border-gray-200 p-6">
               <h3 className="text-base font-semibold text-gray-900 mb-4">
-                Añadir Nuevo Afiliado
+                {t.affiliates?.addAffiliate || 'Añadir Nuevo Afiliado'}
               </h3>
               <CreateAffiliateForm
                 parentPartnerId={partner.id}

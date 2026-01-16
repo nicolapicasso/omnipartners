@@ -1,3 +1,4 @@
+import { cookies } from 'next/headers'
 import { prisma } from '@/lib/prisma'
 import { getPartnerSession } from '@/lib/session'
 import { UserRole } from '@/types'
@@ -6,17 +7,21 @@ import { Users, UserPlus, Mail, Shield } from 'lucide-react'
 import { InviteTeamMemberForm, RemoveTeamMemberButton, UpdateRoleButton } from './components/TeamActions'
 import PartnerDashboardHeader from '@/components/PartnerDashboardHeader'
 import PartnerSidebar from '@/components/PartnerSidebar'
+import { getTranslations } from '@/lib/translations'
 
 export default async function PartnerTeamPage() {
   const session = await getPartnerSession()
   const partnerId = session.user.partnerId!
+  const cookieStore = await cookies()
+  const locale = cookieStore.get('language')?.value || 'es'
+  const t = getTranslations(locale)
 
   const partner = await prisma.partner.findUnique({
     where: { id: partnerId },
   })
 
   if (!partner) {
-    return <div>Partner not found</div>
+    return <div>{t.common?.notFound || 'Partner not found'}</div>
   }
 
   const teamMembers = await prisma.user.findMany({
@@ -45,9 +50,9 @@ export default async function PartnerTeamPage() {
   const getRoleLabel = (role: string) => {
     switch (role) {
       case UserRole.PARTNER_OWNER:
-        return 'Propietario'
+        return t.team?.owner || 'Propietario'
       case UserRole.PARTNER_USER:
-        return 'Usuario'
+        return t.team?.user || 'Usuario'
       default:
         return role
     }
@@ -64,9 +69,9 @@ export default async function PartnerTeamPage() {
       <main className="lg:ml-64 pt-28 lg:pt-28 px-4 sm:px-6 lg:px-8 py-6 lg:py-8">
         {/* Page Title */}
         <div className="mb-8">
-          <h1 className="text-2xl font-semibold text-gray-900">Mi Equipo</h1>
+          <h1 className="text-2xl font-semibold text-gray-900">{t.team?.title || 'Mi Equipo'}</h1>
           <p className="text-sm text-gray-500 mt-1">
-            {teamMembers.length} miembros del equipo
+            {teamMembers.length} {t.team?.teamMembers?.toLowerCase() || 'miembros del equipo'}
           </p>
         </div>
         <div className="grid grid-cols-1 lg:grid-cols-3 gap-6">
@@ -74,7 +79,7 @@ export default async function PartnerTeamPage() {
           <div className="lg:col-span-2">
             <div className="bg-white rounded-lg shadow-sm border border-gray-200">
               <div className="px-6 py-4 border-b border-gray-100">
-                <h2 className="text-base font-semibold text-gray-900">Miembros del Equipo</h2>
+                <h2 className="text-base font-semibold text-gray-900">{t.team?.teamMembers || 'Miembros del Equipo'}</h2>
               </div>
               <div className="divide-y divide-gray-200">
                 {teamMembers.map((member) => (
@@ -103,7 +108,7 @@ export default async function PartnerTeamPage() {
                             {getRoleLabel(member.role)}
                           </span>
                           <span className="text-sm text-gray-500">
-                            {member._count.leadsCreated} leads creados
+                            {member._count.leadsCreated} {t.team?.leadsCreated || 'leads creados'}
                           </span>
                         </div>
                       </div>
@@ -128,7 +133,7 @@ export default async function PartnerTeamPage() {
               <div className="bg-white rounded-lg shadow-sm border border-gray-200 p-6">
                 <h3 className="text-base font-semibold text-gray-900 mb-4 flex items-center gap-2">
                   <UserPlus className="w-5 h-5" />
-                  Invitar Miembro
+                  {t.team?.inviteMember || 'Invitar Miembro'}
                 </h3>
                 <InviteTeamMemberForm />
               </div>
@@ -136,27 +141,27 @@ export default async function PartnerTeamPage() {
               <div className="bg-omniwallet-primary/10 border border-omniwallet-primary/30 rounded-md p-6">
                 <Shield className="w-8 h-8 text-omniwallet-primary mb-3" />
                 <p className="text-sm text-omniwallet-secondary">
-                  Solo el propietario del partner puede invitar nuevos miembros al equipo.
+                  {t.team?.onlyOwnerCanInvite || 'Solo el propietario del partner puede invitar nuevos miembros al equipo.'}
                 </p>
               </div>
             )}
 
             {/* Stats Card */}
             <div className="bg-white rounded-lg shadow-sm border border-gray-200 p-6">
-              <h3 className="text-base font-semibold text-gray-900 mb-4">Estadísticas</h3>
+              <h3 className="text-base font-semibold text-gray-900 mb-4">{t.team?.statistics || 'Estadísticas'}</h3>
               <div className="space-y-3">
                 <div className="flex justify-between items-center">
-                  <span className="text-sm text-gray-600">Total Miembros</span>
+                  <span className="text-sm text-gray-600">{t.team?.totalMembers || 'Total Miembros'}</span>
                   <span className="text-xl font-bold text-gray-900">{teamMembers.length}</span>
                 </div>
                 <div className="flex justify-between items-center">
-                  <span className="text-sm text-gray-600">Propietarios</span>
+                  <span className="text-sm text-gray-600">{t.team?.owners || 'Propietarios'}</span>
                   <span className="text-xl font-bold text-omniwallet-primary">
                     {teamMembers.filter((m) => m.role === UserRole.PARTNER_OWNER).length}
                   </span>
                 </div>
                 <div className="flex justify-between items-center">
-                  <span className="text-sm text-gray-600">Usuarios</span>
+                  <span className="text-sm text-gray-600">{t.team?.users || 'Usuarios'}</span>
                   <span className="text-xl font-bold text-blue-600">
                     {teamMembers.filter((m) => m.role === UserRole.PARTNER_USER).length}
                   </span>
