@@ -1,3 +1,4 @@
+import { cookies } from 'next/headers'
 import { prisma } from '@/lib/prisma'
 import { getPartnerSession } from '@/lib/session'
 import { ContentType, ContentCategory, ContentStatus } from '@/types'
@@ -5,6 +6,7 @@ import Link from 'next/link'
 import { FileText, Video, BookOpen, FileCheck, Award, Star, Search } from 'lucide-react'
 import PartnerDashboardHeader from '@/components/PartnerDashboardHeader'
 import PartnerSidebar from '@/components/PartnerSidebar'
+import { getTranslations } from '@/lib/translations'
 
 export default async function PartnerResourcesPage({
   searchParams,
@@ -13,13 +15,16 @@ export default async function PartnerResourcesPage({
 }) {
   const session = await getPartnerSession()
   const partnerId = session.user.partnerId!
+  const cookieStore = await cookies()
+  const locale = cookieStore.get('language')?.value || 'es'
+  const t = getTranslations(locale)
 
   const partner = await prisma.partner.findUnique({
     where: { id: partnerId },
   })
 
   if (!partner) {
-    return <div>Partner not found</div>
+    return <div>{t.common?.notFound || 'Partner not found'}</div>
   }
 
   // Try to find user (for team members) or use empty favorites for partner owners
@@ -86,12 +91,17 @@ export default async function PartnerResourcesPage({
     }
   }
 
+  const getCategoryLabel = (category: string) => {
+    const key = category.toLowerCase() as keyof typeof t.resourceCategories
+    return t.resourceCategories?.[key] || category
+  }
+
   const categories = [
-    { value: ContentCategory.COMMERCIAL, label: 'Comercial', color: 'purple' },
-    { value: ContentCategory.TECHNICAL, label: 'Técnico', color: 'blue' },
-    { value: ContentCategory.STRATEGIC, label: 'Estratégico', color: 'indigo' },
-    { value: ContentCategory.LEGAL, label: 'Legal', color: 'red' },
-    { value: ContentCategory.GENERAL, label: 'General', color: 'gray' },
+    { value: ContentCategory.COMMERCIAL, labelKey: 'commercial' as const },
+    { value: ContentCategory.TECHNICAL, labelKey: 'technical' as const },
+    { value: ContentCategory.STRATEGIC, labelKey: 'strategic' as const },
+    { value: ContentCategory.LEGAL, labelKey: 'legal' as const },
+    { value: ContentCategory.GENERAL, labelKey: 'general' as const },
   ]
 
   const favoriteIds = contentFavorites.map((f) => f.contentId)
@@ -107,8 +117,8 @@ export default async function PartnerResourcesPage({
       <main className="lg:ml-64 pt-28 lg:pt-28 px-4 sm:px-6 lg:px-8 py-6 lg:py-8">
         {/* Page Title */}
         <div className="mb-6">
-          <h1 className="text-2xl font-semibold text-gray-900">Biblioteca de Recursos</h1>
-          <p className="text-sm text-gray-500 mt-1">{contents.length} recursos disponibles</p>
+          <h1 className="text-2xl font-semibold text-gray-900">{t.resources?.title || 'Resource Library'}</h1>
+          <p className="text-sm text-gray-500 mt-1">{contents.length} {t.resources?.resourcesAvailable || 'resources available'}</p>
         </div>
 
         {/* Search, Categories and Favorites Row */}
@@ -122,7 +132,7 @@ export default async function PartnerResourcesPage({
                   type="text"
                   name="search"
                   defaultValue={searchParams.search}
-                  placeholder="Buscar recursos..."
+                  placeholder={t.resources?.searchResources || 'Search resources...'}
                   className="w-full border border-gray-300 rounded-lg pl-10 pr-3 py-2.5 focus:ring-2 focus:ring-omniwallet-primary focus:border-transparent"
                 />
               </div>
@@ -130,7 +140,7 @@ export default async function PartnerResourcesPage({
                 type="submit"
                 className="bg-omniwallet-primary text-white px-4 py-2.5 rounded-md text-sm font-medium hover:bg-omniwallet-secondary transition"
               >
-                Buscar
+                {t.common?.search || 'Search'}
               </button>
             </div>
           </form>
@@ -141,7 +151,7 @@ export default async function PartnerResourcesPage({
             className="bg-omniwallet-primary text-white px-4 py-2.5 rounded-md text-sm font-medium hover:bg-omniwallet-secondary transition inline-flex items-center justify-center gap-2 whitespace-nowrap"
           >
             <Star className="w-4 h-4" />
-            Mis Favoritos
+            {t.resources?.myFavorites || 'My Favorites'}
           </Link>
         </div>
 
@@ -156,7 +166,7 @@ export default async function PartnerResourcesPage({
                   : 'bg-white text-gray-700 border border-gray-200 hover:bg-gray-50'
               }`}
             >
-              Todos
+              {t.common?.all || 'All'}
             </Link>
             {categories.map((cat) => (
               <Link
@@ -168,7 +178,7 @@ export default async function PartnerResourcesPage({
                     : 'bg-white text-gray-700 border border-gray-200 hover:bg-gray-50'
                 }`}
               >
-                {cat.label}
+                {t.resourceCategories?.[cat.labelKey] || cat.value}
               </Link>
             ))}
           </div>
@@ -179,7 +189,7 @@ export default async function PartnerResourcesPage({
           <div className="mb-8">
             <h2 className="text-lg font-semibold text-gray-900 mb-4 flex items-center gap-2">
               <Star className="w-5 h-5 text-yellow-500" />
-              Recursos Destacados
+              {t.resources?.featuredResources || 'Featured Resources'}
             </h2>
             <div className="grid grid-cols-1 md:grid-cols-3 gap-6">
               {featured.map((content) => (
@@ -207,7 +217,7 @@ export default async function PartnerResourcesPage({
                             content.category
                           )}`}
                         >
-                          {content.category}
+                          {getCategoryLabel(content.category)}
                         </span>
                       </div>
                     </div>
@@ -227,7 +237,7 @@ export default async function PartnerResourcesPage({
                             content.category
                           )}`}
                         >
-                          {content.category}
+                          {getCategoryLabel(content.category)}
                         </span>
                       </div>
                     </div>
@@ -248,18 +258,18 @@ export default async function PartnerResourcesPage({
         <div>
           <h3 className="text-base font-semibold text-gray-900 mb-4">
             {searchParams.category
-              ? `Recursos de ${categories.find((c) => c.value === searchParams.category)?.label}`
-              : 'Todos los Recursos'}
+              ? `${t.resources?.resourcesOf || 'Resources of'} ${t.resourceCategories?.[categories.find((c) => c.value === searchParams.category)?.labelKey || 'general'] || searchParams.category}`
+              : t.resources?.allResources || 'All Resources'}
           </h3>
           {contents.length === 0 ? (
             <div className="text-center py-16 bg-white rounded-lg shadow-sm border border-gray-200">
               <FileText className="w-16 h-16 text-gray-300 mx-auto mb-4" />
-              <p className="text-gray-500 mb-4">No hay recursos disponibles</p>
+              <p className="text-gray-500 mb-4">{t.resources?.noResources || 'No resources available'}</p>
               <Link
                 href="/partner/resources"
                 className="text-omniwallet-primary hover:text-omniwallet-secondary text-sm font-medium"
               >
-                Ver todos los recursos
+                {t.resources?.viewAllResources || 'View all resources'}
               </Link>
             </div>
           ) : (
@@ -289,7 +299,7 @@ export default async function PartnerResourcesPage({
                             content.category
                           )}`}
                         >
-                          {content.category}
+                          {getCategoryLabel(content.category)}
                         </span>
                       </div>
                       <div className="absolute bottom-2 right-2 bg-white/90 rounded px-2 py-1">
@@ -314,7 +324,7 @@ export default async function PartnerResourcesPage({
                             content.category
                           )}`}
                         >
-                          {content.category}
+                          {getCategoryLabel(content.category)}
                         </span>
                       </div>
                     </div>
@@ -327,7 +337,7 @@ export default async function PartnerResourcesPage({
                       </p>
                     )}
                     <div className="text-xs text-gray-500">
-                      {content.viewCount} vistas · {content.downloadCount} descargas
+                      {content.viewCount} {t.resources?.views || 'views'} · {content.downloadCount} {t.resources?.downloads || 'downloads'}
                     </div>
                   </div>
                 </Link>

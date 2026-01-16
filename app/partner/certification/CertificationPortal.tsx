@@ -175,27 +175,27 @@ export default function CertificationPortal({
               <div className="p-2 bg-amber-100 rounded-full">
                 <AlertTriangle className="w-6 h-6 text-amber-600" />
               </div>
-              <h3 className="text-lg font-semibold text-gray-900">Preguntas sin responder</h3>
+              <h3 className="text-lg font-semibold text-gray-900">{t('certification.exam.unansweredTitle')}</h3>
             </div>
             <p className="text-gray-600 mb-4">
-              Tienes {getUnansweredQuestions().length} pregunta(s) sin responder:
+              {t('certification.exam.unansweredCount').replace('{count}', String(getUnansweredQuestions().length))}
               <span className="font-semibold"> {getUnansweredQuestions().join(', ')}</span>
             </p>
             <p className="text-gray-600 mb-6">
-              Las preguntas sin responder contarán como incorrectas. ¿Estás seguro de que deseas finalizar el examen?
+              {t('certification.exam.unansweredWarning')}
             </p>
             <div className="flex gap-3">
               <button
                 onClick={() => setShowConfirmModal(false)}
                 className="flex-1 px-4 py-2 bg-gray-200 text-gray-700 rounded-md font-medium hover:bg-gray-300 transition"
               >
-                Volver al examen
+                {t('certification.exam.backToExam')}
               </button>
               <button
                 onClick={submitExam}
                 className="flex-1 px-4 py-2 bg-red-600 text-white rounded-md font-medium hover:bg-red-700 transition"
               >
-                Finalizar sin responder
+                {t('certification.exam.finishWithout')}
               </button>
             </div>
           </div>
@@ -249,15 +249,15 @@ export default function CertificationPortal({
             <div className="bg-white rounded-lg shadow-sm border border-gray-200 p-6 mb-8">
               <div className="flex items-center gap-3 mb-4">
                 <Code className="w-6 h-6 text-omniwallet-primary" />
-                <h2 className="text-xl font-semibold text-gray-900">Sello de Certificación para tu Web</h2>
+                <h2 className="text-xl font-semibold text-gray-900">{t('certification.badge.title')}</h2>
               </div>
               <p className="text-sm text-gray-600 mb-6">
-                Añade el sello de Partner Certificado a tu página web para que tus clientes sepan que estás certificado por Omniwallet.
+                {t('certification.badge.description')}
               </p>
 
               {/* Theme Selector */}
               <div className="flex items-center gap-4 mb-4">
-                <span className="text-sm font-medium text-gray-700">Tema del sello:</span>
+                <span className="text-sm font-medium text-gray-700">{t('certification.badge.themeLabel')}</span>
                 <div className="flex gap-2">
                   <button
                     onClick={() => setSelectedTheme('light')}
@@ -268,7 +268,7 @@ export default function CertificationPortal({
                     }`}
                   >
                     <Sun className="w-4 h-4" />
-                    Claro
+                    {t('certification.badge.light')}
                   </button>
                   <button
                     onClick={() => setSelectedTheme('dark')}
@@ -279,7 +279,7 @@ export default function CertificationPortal({
                     }`}
                   >
                     <Moon className="w-4 h-4" />
-                    Oscuro
+                    {t('certification.badge.dark')}
                   </button>
                 </div>
               </div>
@@ -287,10 +287,10 @@ export default function CertificationPortal({
               {/* Preview */}
               {(selectedTheme === 'light' ? badgeLightUrl : badgeDarkUrl) && (
                 <div className={`p-4 rounded-lg mb-6 ${selectedTheme === 'dark' ? 'bg-gray-800' : 'bg-gray-100'}`}>
-                  <p className="text-sm text-gray-500 mb-2">Vista previa:</p>
+                  <p className="text-sm text-gray-500 mb-2">{t('certification.badge.preview')}</p>
                   <img
                     src={selectedTheme === 'light' ? badgeLightUrl! : badgeDarkUrl!}
-                    alt="Sello de certificación"
+                    alt={t('certification.badge.altText')}
                     className="h-16 object-contain"
                   />
                 </div>
@@ -301,7 +301,7 @@ export default function CertificationPortal({
                 {/* JavaScript Option */}
                 <div>
                   <div className="flex items-center justify-between mb-2">
-                    <label className="text-sm font-medium text-gray-700">Opción 1: Script JavaScript (Recomendado)</label>
+                    <label className="text-sm font-medium text-gray-700">{t('certification.badge.option1Title')}</label>
                     <button
                       onClick={() => {
                         const code = `<script src="${baseUrl}/api/badge/${partnerId}?format=js&theme=${selectedTheme}"></script>`
@@ -312,21 +312,21 @@ export default function CertificationPortal({
                       className="flex items-center gap-1 text-sm text-omniwallet-primary hover:text-omniwallet-secondary"
                     >
                       {copiedCode === 'js' ? <Check className="w-4 h-4" /> : <Copy className="w-4 h-4" />}
-                      {copiedCode === 'js' ? 'Copiado' : 'Copiar'}
+                      {copiedCode === 'js' ? t('certification.badge.copied') : t('certification.badge.copy')}
                     </button>
                   </div>
                   <pre className="bg-gray-900 text-gray-100 p-4 rounded-lg text-sm overflow-x-auto">
                     <code>{`<script src="${baseUrl}/api/badge/${partnerId}?format=js&theme=${selectedTheme}"></script>`}</code>
                   </pre>
                   <p className="text-xs text-gray-500 mt-1">
-                    Coloca este código donde quieras que aparezca el sello (generalmente en el footer).
+                    {t('certification.badge.option1Hint')}
                   </p>
                 </div>
 
                 {/* Iframe Option */}
                 <div>
                   <div className="flex items-center justify-between mb-2">
-                    <label className="text-sm font-medium text-gray-700">Opción 2: Iframe</label>
+                    <label className="text-sm font-medium text-gray-700">{t('certification.badge.option2Title')}</label>
                     <button
                       onClick={() => {
                         const code = `<iframe src="${baseUrl}/badge/${partnerId}?theme=${selectedTheme}" width="200" height="80" frameborder="0" scrolling="no"></iframe>`
@@ -337,14 +337,14 @@ export default function CertificationPortal({
                       className="flex items-center gap-1 text-sm text-omniwallet-primary hover:text-omniwallet-secondary"
                     >
                       {copiedCode === 'iframe' ? <Check className="w-4 h-4" /> : <Copy className="w-4 h-4" />}
-                      {copiedCode === 'iframe' ? 'Copiado' : 'Copiar'}
+                      {copiedCode === 'iframe' ? t('certification.badge.copied') : t('certification.badge.copy')}
                     </button>
                   </div>
                   <pre className="bg-gray-900 text-gray-100 p-4 rounded-lg text-sm overflow-x-auto">
                     <code>{`<iframe src="${baseUrl}/badge/${partnerId}?theme=${selectedTheme}" width="200" height="80" frameborder="0" scrolling="no"></iframe>`}</code>
                   </pre>
                   <p className="text-xs text-gray-500 mt-1">
-                    Usa esta opción si prefieres un iframe aislado.
+                    {t('certification.badge.option2Hint')}
                   </p>
                 </div>
               </div>
@@ -352,8 +352,7 @@ export default function CertificationPortal({
               {expiresAt && (
                 <div className="mt-4 p-3 bg-amber-50 border border-amber-200 rounded-lg">
                   <p className="text-sm text-amber-700">
-                    Tu certificación expira el <strong>{new Date(expiresAt).toLocaleDateString()}</strong>.
-                    Después de esta fecha, el sello aparecerá como caducado.
+                    {t('certification.badge.expirationWarning').replace('{date}', new Date(expiresAt).toLocaleDateString())}
                   </p>
                 </div>
               )}
@@ -645,12 +644,12 @@ export default function CertificationPortal({
                   {currentResult.correct ? (
                     <>
                       <CheckCircle className="w-5 h-5 text-green-600" />
-                      <span className="font-semibold text-green-700">¡Correcto!</span>
+                      <span className="font-semibold text-green-700">{t('certification.exam.correct')}</span>
                     </>
                   ) : (
                     <>
                       <XCircle className="w-5 h-5 text-red-600" />
-                      <span className="font-semibold text-red-700">Incorrecto</span>
+                      <span className="font-semibold text-red-700">{t('certification.exam.incorrect')}</span>
                     </>
                   )}
                 </div>

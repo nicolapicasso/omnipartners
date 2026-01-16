@@ -342,7 +342,32 @@
     "noStudyMaterials": "Non ci sono ancora materiali di studio disponibili",
     "answerAllQuestions": "Per favore rispondi a tutte le domande prima di inviare",
     "answered": "risposte",
-    "previous": "Precedente"
+    "previous": "Precedente",
+    "badge": {
+      "title": "Badge di Certificazione per il tuo Sito Web",
+      "description": "Aggiungi il badge di Partner Certificato al tuo sito web per far sapere ai tuoi clienti che sei certificato da Omniwallet.",
+      "themeLabel": "Tema del badge:",
+      "light": "Chiaro",
+      "dark": "Scuro",
+      "preview": "Anteprima:",
+      "altText": "Badge di certificazione",
+      "option1Title": "Opzione 1: Script JavaScript (Consigliato)",
+      "option1Hint": "Posiziona questo codice dove vuoi che appaia il badge (di solito nel footer).",
+      "option2Title": "Opzione 2: Iframe",
+      "option2Hint": "Usa questa opzione se preferisci un iframe isolato.",
+      "copied": "Copiato",
+      "copy": "Copia",
+      "expirationWarning": "La tua certificazione scade il {date}. Dopo questa data, il badge apparirà come scaduto."
+    },
+    "exam": {
+      "unansweredTitle": "Domande senza risposta",
+      "unansweredCount": "Hai {count} domanda/e senza risposta:",
+      "unansweredWarning": "Le domande senza risposta conteranno come errate. Sei sicuro di voler terminare l'esame?",
+      "backToExam": "Torna all'esame",
+      "finishWithout": "Termina senza rispondere",
+      "correct": "Corretto!",
+      "incorrect": "Sbagliato"
+    }
   },
   "requirements": {
     "title": "Requisiti del Partner",
@@ -425,5 +450,19 @@
     "prospect": "Prospect",
     "client": "Cliente",
     "archived": "Archiviato"
+  },
+  "leadStatusGuide": {
+    "title": "Guida agli Stati dei Lead",
+    "leadDescription": "Contatto iniziale o potenziale cliente che ha mostrato interesse.",
+    "prospectDescription": "Lead qualificato che ha ricevuto una demo o presentazione del prodotto.",
+    "clientDescription": "Cliente attivo che ha firmato un contratto e genera entrate.",
+    "archivedDescription": "Lead inattivo che è stato archiviato per riferimento storico."
+  },
+  "resourceCategories": {
+    "commercial": "Commerciale",
+    "technical": "Tecnico",
+    "strategic": "Strategico",
+    "legal": "Legale",
+    "general": "Generale"
   }
 }
