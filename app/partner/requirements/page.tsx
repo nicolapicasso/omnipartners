@@ -39,7 +39,7 @@ async function getPartnerRequirements(partnerId: string, locale: string) {
   const prospectsThisYear = leadsThisYear.filter((lead) => lead.status === LeadStatus.PROSPECT || lead.status === LeadStatus.CLIENT)
   const clientsThisYear = leadsThisYear.filter((lead) => lead.status === LeadStatus.CLIENT)
 
-  const t = getTranslations(locale) as { requirements: Record<string, { title: string; description: string }> }
+  const t = getTranslations(locale)
 
   const requirements = [
     {
