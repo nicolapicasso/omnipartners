@@ -2,7 +2,7 @@
 
 import Link from 'next/link'
 import { usePathname } from 'next/navigation'
-import { LayoutDashboard, TrendingUp, DollarSign, FileText, Users, CheckCircle, Award, X, UserPlus } from 'lucide-react'
+import { LayoutDashboard, TrendingUp, DollarSign, FileText, Users, CheckCircle, Award, X, UserPlus, UsersRound } from 'lucide-react'
 import { useTranslation } from '@/lib/contexts/LanguageContext'
 import { useSidebar } from '@/lib/contexts/SidebarContext'
 import Logo from './Logo'
@@ -59,13 +59,21 @@ export default function PartnerSidebar({ canHaveAffiliates = false }: PartnerSid
       icon: Users,
       active: pathname?.startsWith('/partner/team')
     },
-    // Conditionally add affiliates nav item
-    ...(canHaveAffiliates ? [{
-      href: '/partner/affiliates',
-      label: t('nav.affiliates') || 'Mis Afiliados',
-      icon: UserPlus,
-      active: pathname?.startsWith('/partner/affiliates')
-    }] : [])
+    // Conditionally add affiliates nav items
+    ...(canHaveAffiliates ? [
+      {
+        href: '/partner/affiliates',
+        label: t('nav.affiliates'),
+        icon: UserPlus,
+        active: pathname === '/partner/affiliates'
+      },
+      {
+        href: '/partner/affiliates/leads',
+        label: t('nav.affiliateLeads'),
+        icon: UsersRound,
+        active: pathname?.startsWith('/partner/affiliates/leads')
+      }
+    ] : [])
   ]
 
   return (
