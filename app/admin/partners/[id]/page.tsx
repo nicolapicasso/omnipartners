@@ -3,7 +3,7 @@ import { getAdminSession } from '@/lib/session'
 import { PartnerStatus } from '@/types'
 import Link from 'next/link'
 import { ArrowLeft, Mail, Phone, Globe, MapPin, Calendar, Users, TrendingUp } from 'lucide-react'
-import { UpdateCategoryButton, ToggleStatusButton, UpdateContractForm, UpdateOmniwalletAccountForm, ToggleYearlyEventButton } from '../components/PartnerActions'
+import { UpdateCategoryButton, ToggleStatusButton, UpdateContractForm, UpdateOmniwalletAccountForm, ToggleYearlyEventButton, ToggleAffiliatesButton, UpdateCommissionRateForm } from '../components/PartnerActions'
 import AdminDashboardHeader from '@/components/AdminDashboardHeader'
 import AdminSidebar from '@/components/AdminSidebar'
 
@@ -31,6 +31,20 @@ export default async function PartnerDetailPage({
       invoices: {
         orderBy: { createdAt: 'desc' },
         take: 5,
+      },
+      affiliates: {
+        select: {
+          id: true,
+          companyName: true,
+          status: true,
+          affiliateCommission: true,
+        },
+      },
+      parentPartner: {
+        select: {
+          id: true,
+          companyName: true,
+        },
       },
     },
   })
@@ -283,6 +297,12 @@ export default async function PartnerDetailPage({
               </div>
             </div>
 
+            {/* Commission Rate Card */}
+            <div className="bg-white rounded-lg shadow-sm border border-gray-200 p-6">
+              <h3 className="text-lg font-semibold text-gray-800 mb-4">Comisión</h3>
+              <UpdateCommissionRateForm partnerId={partner.id} currentRate={partner.commissionRate} />
+            </div>
+
             {/* Contract Card */}
             <div className="bg-white rounded-lg shadow-sm border border-gray-200 p-6">
               <h3 className="text-lg font-semibold text-gray-800 mb-4">Contrato del Partner</h3>
@@ -300,6 +320,63 @@ export default async function PartnerDetailPage({
               <h3 className="text-lg font-semibold text-gray-800 mb-4">Requisitos Anuales</h3>
               <ToggleYearlyEventButton partnerId={partner.id} hasCompletedYearlyEvent={partner.hasCompletedYearlyEvent} />
             </div>
+
+            {/* Affiliates Card - Only show if not an affiliate themselves */}
+            {!partner.parentPartnerId && (
+              <div className="bg-white rounded-lg shadow-sm border border-gray-200 p-6">
+                <h3 className="text-lg font-semibold text-gray-800 mb-4">Sistema de Afiliados</h3>
+                <ToggleAffiliatesButton
+                  partnerId={partner.id}
+                  canHaveAffiliates={partner.canHaveAffiliates}
+                  affiliatesCount={partner.affiliates.length}
+                />
+                {partner.affiliates.length > 0 && (
+                  <div className="mt-4 pt-4 border-t">
+                    <p className="text-sm font-medium text-gray-700 mb-2">Afiliados:</p>
+                    <div className="space-y-2">
+                      {partner.affiliates.map((affiliate) => (
+                        <Link
+                          key={affiliate.id}
+                          href={`/admin/partners/${affiliate.id}`}
+                          className="flex items-center justify-between p-2 bg-gray-50 rounded hover:bg-gray-100 transition"
+                        >
+                          <span className="text-sm text-gray-900">{affiliate.companyName}</span>
+                          <span className="text-xs text-purple-600 font-medium">
+                            {affiliate.affiliateCommission}%
+                          </span>
+                        </Link>
+                      ))}
+                    </div>
+                  </div>
+                )}
+              </div>
+            )}
+
+            {/* Parent Partner Card - Only show if this is an affiliate */}
+            {partner.parentPartner && (
+              <div className="bg-white rounded-lg shadow-sm border border-gray-200 p-6">
+                <h3 className="text-lg font-semibold text-gray-800 mb-4">Partner Padre</h3>
+                <div className="flex items-center gap-3">
+                  <div className="p-2 rounded-lg bg-purple-100">
+                    <Users className="w-5 h-5 text-purple-600" />
+                  </div>
+                  <div>
+                    <p className="text-sm text-gray-500">Este partner es afiliado de:</p>
+                    <Link
+                      href={`/admin/partners/${partner.parentPartner.id}`}
+                      className="text-omniwallet-primary hover:text-omniwallet-secondary font-medium"
+                    >
+                      {partner.parentPartner.companyName}
+                    </Link>
+                    {partner.affiliateCommission && (
+                      <p className="text-xs text-gray-500 mt-1">
+                        Comisión asignada: <span className="font-medium text-purple-600">{partner.affiliateCommission}%</span>
+                      </p>
+                    )}
+                  </div>
+                </div>
+              </div>
+            )}
 
             {/* Users Card */}
             <div className="bg-white rounded-lg shadow-sm border border-gray-200 p-6">

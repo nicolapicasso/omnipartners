@@ -12,11 +12,26 @@ export default async function NewPartnerLeadPage() {
 
   const partner = await prisma.partner.findUnique({
     where: { id: partnerId },
+    include: {
+      // Only fetch active affiliates
+      affiliates: {
+        where: { status: 'ACTIVE' },
+        select: {
+          id: true,
+          companyName: true,
+          affiliateCommission: true,
+        },
+        orderBy: { companyName: 'asc' },
+      },
+    },
   })
 
   if (!partner) {
     return <div>Partner not found</div>
   }
+
+  // Only show affiliates if partner can have affiliates
+  const affiliates = partner.canHaveAffiliates ? partner.affiliates : []
 
   return (
     <div className="min-h-screen bg-gray-50">
@@ -24,7 +39,7 @@ export default async function NewPartnerLeadPage() {
         userName={session.user.name || 'Partner'}
         companyName={partner.companyName}
       />
-      <PartnerSidebar />
+      <PartnerSidebar canHaveAffiliates={partner.canHaveAffiliates} />
 
       <main className="lg:ml-64 pt-28 lg:pt-28 px-4 sm:px-6 lg:px-8 py-6 lg:py-8">
         <div className="max-w-4xl mx-auto">
@@ -45,7 +60,11 @@ export default async function NewPartnerLeadPage() {
 
           {/* Form Card */}
           <div className="bg-white rounded-lg shadow-sm border border-gray-200 p-6">
-            <CreatePartnerLeadForm />
+            <CreatePartnerLeadForm
+              affiliates={affiliates}
+              parentPartnerId={partner.id}
+              parentCommission={partner.commissionRate}
+            />
           </div>
         </div>
       </main>

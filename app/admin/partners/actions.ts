@@ -138,3 +138,43 @@ export async function updatePartnerYearlyEvent(partnerId: string, hasCompletedYe
     return { success: false, error: 'Failed to update yearly event status' }
   }
 }
+
+export async function updatePartnerCanHaveAffiliates(partnerId: string, canHaveAffiliates: boolean) {
+  try {
+    await getAdminSession() // Verify admin
+
+    await prisma.partner.update({
+      where: { id: partnerId },
+      data: { canHaveAffiliates },
+    })
+
+    revalidatePath('/admin/partners')
+    revalidatePath(`/admin/partners/${partnerId}`)
+    return { success: true }
+  } catch (error) {
+    console.error('Error updating partner canHaveAffiliates:', error)
+    return { success: false, error: 'Failed to update affiliate permission' }
+  }
+}
+
+export async function updatePartnerCommissionRate(partnerId: string, commissionRate: number) {
+  try {
+    await getAdminSession() // Verify admin
+
+    if (commissionRate < 0 || commissionRate > 100) {
+      return { success: false, error: 'Commission rate must be between 0 and 100' }
+    }
+
+    await prisma.partner.update({
+      where: { id: partnerId },
+      data: { commissionRate },
+    })
+
+    revalidatePath('/admin/partners')
+    revalidatePath(`/admin/partners/${partnerId}`)
+    return { success: true }
+  } catch (error) {
+    console.error('Error updating partner commission rate:', error)
+    return { success: false, error: 'Failed to update commission rate' }
+  }
+}
