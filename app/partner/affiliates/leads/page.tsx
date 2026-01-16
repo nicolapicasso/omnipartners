@@ -201,7 +201,7 @@ export default async function AffiliateLeadsPage() {
                             lead.status
                           )}`}
                         >
-                          {t.statusLabels?.[lead.status.toLowerCase()] || lead.status}
+                          {t.statusLabels[lead.status.toLowerCase() as keyof typeof t.statusLabels] || lead.status}
                         </span>
                       </td>
                       <td className="px-4 py-3 whitespace-nowrap text-sm font-medium text-gray-900">
