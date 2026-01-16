@@ -214,3 +214,47 @@ export async function updatePartnerCommissionRate(partnerId: string, commissionR
     return { success: false, error: 'Failed to update commission rate' }
   }
 }
+
+export async function deletePartner(partnerId: string) {
+  try {
+    await getAdminSession() // Verify admin
+
+    // Get partner info before deletion
+    const partner = await prisma.partner.findUnique({
+      where: { id: partnerId },
+      include: {
+        _count: {
+          select: {
+            leads: true,
+            affiliates: true,
+          },
+        },
+      },
+    })
+
+    if (!partner) {
+      return { success: false, error: 'Partner not found' }
+    }
+
+    // Check if partner has affiliates - cannot delete
+    if (partner._count.affiliates > 0) {
+      return {
+        success: false,
+        error: `No se puede eliminar el partner porque tiene ${partner._count.affiliates} afiliado(s). Elimina primero los afiliados.`,
+      }
+    }
+
+    // Delete the partner (cascade will handle related records)
+    await prisma.partner.delete({
+      where: { id: partnerId },
+    })
+
+    console.log(`[Admin] Partner deleted: ${partner.companyName} (${partnerId})`)
+
+    revalidatePath('/admin/partners')
+    return { success: true, redirect: '/admin/partners' }
+  } catch (error) {
+    console.error('Error deleting partner:', error)
+    return { success: false, error: 'Failed to delete partner' }
+  }
+}

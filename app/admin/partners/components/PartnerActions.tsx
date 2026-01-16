@@ -2,8 +2,9 @@
 
 import { useState } from 'react'
 import { PartnerStatus, PartnerCategory } from '@/types'
-import { updatePartnerCategory, suspendPartner, activatePartner, updatePartnerContract, updatePartnerOmniwalletAccount, updatePartnerYearlyEvent, updatePartnerCanHaveAffiliates, updatePartnerCommissionRate } from '../actions'
-import { Shield, ShieldOff, Tag, FileText, Save, X, Wallet, Presentation, CheckCircle, Circle, Users, UserPlus, Percent } from 'lucide-react'
+import { updatePartnerCategory, suspendPartner, activatePartner, updatePartnerContract, updatePartnerOmniwalletAccount, updatePartnerYearlyEvent, updatePartnerCanHaveAffiliates, updatePartnerCommissionRate, deletePartner } from '../actions'
+import { Shield, ShieldOff, Tag, FileText, Save, X, Wallet, Presentation, CheckCircle, Circle, Users, UserPlus, Percent, Trash2, AlertTriangle } from 'lucide-react'
+import { useRouter } from 'next/navigation'
 
 export function UpdateCategoryButton({
   partnerId,
@@ -593,5 +594,87 @@ export function UpdateCommissionRateForm({
         </button>
       </div>
     </form>
+  )
+}
+
+export function DeletePartnerButton({
+  partnerId,
+  partnerName,
+}: {
+  partnerId: string
+  partnerName: string
+}) {
+  const [loading, setLoading] = useState(false)
+  const [showConfirm, setShowConfirm] = useState(false)
+  const [error, setError] = useState<string | null>(null)
+  const router = useRouter()
+
+  const handleDelete = async () => {
+    setLoading(true)
+    setError(null)
+
+    const result = await deletePartner(partnerId)
+
+    if (result.success) {
+      router.push('/admin/partners')
+    } else {
+      setError(result.error || 'Error al eliminar el partner')
+      setShowConfirm(false)
+    }
+
+    setLoading(false)
+  }
+
+  if (showConfirm) {
+    return (
+      <div className="bg-red-50 border border-red-200 rounded-lg p-4">
+        <div className="flex items-start gap-3">
+          <AlertTriangle className="w-5 h-5 text-red-600 flex-shrink-0 mt-0.5" />
+          <div className="flex-1">
+            <p className="text-sm font-medium text-red-800 mb-2">
+              ¿Eliminar partner permanentemente?
+            </p>
+            <p className="text-xs text-red-700 mb-4">
+              Se eliminará <strong>{partnerName}</strong> y todos sus datos asociados (leads, usuarios, facturas, etc.).
+              Esta acción no se puede deshacer.
+            </p>
+            <div className="flex gap-2">
+              <button
+                onClick={handleDelete}
+                disabled={loading}
+                className="inline-flex items-center gap-2 bg-red-600 text-white px-4 py-2 rounded-md text-sm font-medium hover:bg-red-700 transition disabled:opacity-50"
+              >
+                <Trash2 className="w-4 h-4" />
+                {loading ? 'Eliminando...' : 'Sí, eliminar'}
+              </button>
+              <button
+                onClick={() => setShowConfirm(false)}
+                disabled={loading}
+                className="inline-flex items-center gap-2 bg-white text-gray-700 px-4 py-2 rounded-md text-sm font-medium border border-gray-300 hover:bg-gray-50 transition disabled:opacity-50"
+              >
+                Cancelar
+              </button>
+            </div>
+          </div>
+        </div>
+      </div>
+    )
+  }
+
+  return (
+    <div>
+      {error && (
+        <div className="bg-red-50 border border-red-200 rounded-lg p-3 mb-3">
+          <p className="text-sm text-red-700">{error}</p>
+        </div>
+      )}
+      <button
+        onClick={() => setShowConfirm(true)}
+        className="inline-flex items-center gap-2 text-red-600 hover:text-red-700 text-sm font-medium transition"
+      >
+        <Trash2 className="w-4 h-4" />
+        Eliminar partner
+      </button>
+    </div>
   )
 }

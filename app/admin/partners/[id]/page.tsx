@@ -3,7 +3,7 @@ import { getAdminSession } from '@/lib/session'
 import { PartnerStatus } from '@/types'
 import Link from 'next/link'
 import { ArrowLeft, Mail, Phone, Globe, MapPin, Calendar, Users, TrendingUp, Key, AlertCircle } from 'lucide-react'
-import { UpdateCategoryButton, ToggleStatusButton, UpdateContractForm, UpdateOmniwalletAccountForm, ToggleYearlyEventButton, ToggleAffiliatesButton, UpdateCommissionRateForm } from '../components/PartnerActions'
+import { UpdateCategoryButton, ToggleStatusButton, UpdateContractForm, UpdateOmniwalletAccountForm, ToggleYearlyEventButton, ToggleAffiliatesButton, UpdateCommissionRateForm, DeletePartnerButton } from '../components/PartnerActions'
 import AdminDashboardHeader from '@/components/AdminDashboardHeader'
 import AdminSidebar from '@/components/AdminSidebar'
 
@@ -215,6 +215,15 @@ export default async function PartnerDetailPage({
                 <ToggleStatusButton
                   partnerId={partner.id}
                   currentStatus={partner.status}
+                />
+              </div>
+
+              {/* Danger Zone */}
+              <div className="mt-6 pt-6 border-t border-gray-200">
+                <h3 className="text-sm font-medium text-gray-700 mb-3">Zona de peligro</h3>
+                <DeletePartnerButton
+                  partnerId={partner.id}
+                  partnerName={partner.companyName}
                 />
               </div>
             </div>

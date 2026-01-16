@@ -69,7 +69,7 @@ export default async function FavoritesPage() {
         userName={session.user.name || 'Partner'}
         companyName={partner.companyName}
       />
-      <PartnerSidebar />
+      <PartnerSidebar canHaveAffiliates={partner.canHaveAffiliates} />
 
       <main className="lg:ml-64 pt-28 lg:pt-28 px-4 sm:px-6 lg:px-8 py-6 lg:py-8">
         {/* Page Header */}
