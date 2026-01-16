@@ -1,5 +1,3 @@
-'use server'
-
 import { createTransport, Transporter } from 'nodemailer'
 
 // ============================================
