@@ -32,7 +32,10 @@
     "submitting": "Invio in corso...",
     "totalPaid": "Totale Pagato",
     "yourCommissions": "Le Tue Commissioni",
-    "backToLeads": "Torna ai Leads"
+    "backToLeads": "Torna ai Leads",
+    "partnerPortal": "Portale dei Partner",
+    "registerAsPartner": "Registrati come Partner",
+    "notFound": "Non trovato"
   },
   "login": {
     "title": "Accedi",
@@ -378,6 +381,21 @@
     "helpTitle": "Hai Bisogno di Aiuto?",
     "helpDescription": "Se hai domande su qualche requisito o hai bisogno di assistenza, contatta il tuo manager di partnership di Omniwallet o contatta il nostro team di supporto.",
     "contactSupport": "Contattare Supporto"
+  },
+  "affiliates": {
+    "title": "I Miei Affiliati",
+    "subtitle": "Gestisci la tua rete di affiliati e le loro commissioni",
+    "totalAffiliates": "Totale Affiliati",
+    "activeAffiliates": "Affiliati Attivi",
+    "affiliateLeads": "Lead degli Affiliati",
+    "affiliateClients": "Clienti degli Affiliati",
+    "commissionStructure": "Struttura delle Commissioni",
+    "commissionDescription": "La tua commissione base è del {rate}%. Quando assegni una commissione a un affiliato, questa viene sottratta dalla tua commissione.",
+    "commissionExample": "Ad esempio, se assegni il 10% a un affiliato, tu riceverai il {parentRate}% e l'affiliato riceverà il 10%.",
+    "affiliateList": "Lista degli Affiliati",
+    "pendingApproval": "in attesa di approvazione",
+    "pendingApprovalsPlural": "in attesa di approvazione",
+    "addAffiliate": "Aggiungi Nuovo Affiliato"
   },
   "affiliateLeads": {
     "title": "Lead degli Affiliati",
