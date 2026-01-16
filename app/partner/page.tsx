@@ -228,7 +228,7 @@ export default async function PartnerDashboard() {
                               : 'bg-gray-50 text-gray-700'
                           }`}
                         >
-                          {t.statusLabels?.[lead.status.toLowerCase()] || lead.status}
+                          {t.statusLabels[lead.status.toLowerCase() as keyof typeof t.statusLabels] || lead.status}
                         </span>
                       </div>
                     </Link>
