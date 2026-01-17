@@ -14,6 +14,7 @@ import {
   HelpCircle,
   Download,
   Upload,
+  Wrench,
 } from 'lucide-react'
 import {
   saveOpenAIApiKey,
@@ -25,6 +26,7 @@ import {
   exportTranslations,
   importTranslations,
   getCertificationTranslationStats,
+  fixBadgeConflict,
 } from './actions'
 
 const LANGUAGES = [
@@ -81,6 +83,7 @@ export default function TranslationsContent({
   const [translatingCert, setTranslatingCert] = useState<string | null>(null)
   const [certStats, setCertStats] = useState<CertificationStats>({})
   const [importing, setImporting] = useState<string | null>(null)
+  const [fixingConflict, setFixingConflict] = useState(false)
   const fileInputRef = useRef<HTMLInputElement>(null)
 
   // Load certification stats on mount
@@ -214,6 +217,22 @@ export default function TranslationsContent({
     setImporting(null)
   }
 
+  const handleFixBadgeConflict = async () => {
+    setFixingConflict(true)
+    try {
+      const result = await fixBadgeConflict()
+      if (result.success) {
+        const messages = Object.entries(result.results)
+          .map(([locale, msg]) => `${locale}: ${msg}`)
+          .join('\n')
+        alert(`Reparación completada:\n\n${messages}`)
+      }
+    } catch (error) {
+      alert(`Error: ${error instanceof Error ? error.message : 'Unknown error'}`)
+    }
+    setFixingConflict(false)
+  }
+
   const filteredTranslations = translations.filter(
     (t) =>
       t.key.toLowerCase().includes(searchQuery.toLowerCase()) ||
@@ -267,6 +286,23 @@ export default function TranslationsContent({
               <Save className="w-4 h-4" />
             )}
             Guardar
+          </button>
+        </div>
+
+        {/* Maintenance Tools */}
+        <div className="mt-4 pt-4 border-t border-gray-200">
+          <p className="text-xs text-gray-500 mb-2">Herramientas de mantenimiento:</p>
+          <button
+            onClick={handleFixBadgeConflict}
+            disabled={fixingConflict}
+            className="bg-amber-100 text-amber-700 px-4 py-2 rounded-lg text-sm font-medium hover:bg-amber-200 transition disabled:opacity-50 flex items-center gap-2"
+          >
+            {fixingConflict ? (
+              <Loader2 className="w-4 h-4 animate-spin" />
+            ) : (
+              <Wrench className="w-4 h-4" />
+            )}
+            Reparar conflicto badge
           </button>
         </div>
       </div>
