@@ -196,19 +196,47 @@ function flattenObject(obj: Record<string, unknown>, prefix = ''): Record<string
 function unflattenObject(obj: Record<string, string>): Record<string, unknown> {
   const result: Record<string, unknown> = {}
 
-  for (const [key, value] of Object.entries(obj)) {
+  // Sort keys so that parent keys (e.g., "certification.badge") come before
+  // child keys (e.g., "certification.badge.title"). This helps detect conflicts.
+  const sortedKeys = Object.keys(obj).sort((a, b) => a.length - b.length)
+
+  for (const key of sortedKeys) {
+    const value = obj[key]
     const keys = key.split('.')
     let current = result
 
+    let skipKey = false
     for (let i = 0; i < keys.length - 1; i++) {
       const k = keys[i]
       if (!(k in current)) {
         current[k] = {}
+      } else if (typeof current[k] === 'string') {
+        // Conflict: trying to create nested property on a string value
+        // Rename the string key to avoid conflict (e.g., "badge" -> "badgeLabel")
+        const stringValue = current[k] as string
+        current[k] = { _label: stringValue }
+      }
+
+      if (typeof current[k] !== 'object' || current[k] === null) {
+        // Cannot traverse further, skip this key
+        console.warn(`Skipping key "${key}" due to type conflict`)
+        skipKey = true
+        break
       }
       current = current[k] as Record<string, unknown>
     }
 
-    current[keys[keys.length - 1]] = value
+    if (!skipKey) {
+      const lastKey = keys[keys.length - 1]
+      // If the last key already exists as a string and we're trying to set an object path,
+      // that was handled above. Here we just set the final value.
+      if (typeof current[lastKey] === 'object' && current[lastKey] !== null && '_label' in (current[lastKey] as Record<string, unknown>)) {
+        // There was a conflict - keep the object structure but don't overwrite
+        // The nested properties will be set by other keys
+      } else {
+        current[lastKey] = value
+      }
+    }
   }
 
   return result
@@ -440,4 +468,44 @@ export async function getCertificationTranslationStats() {
   }
 
   return stats
+}
+
+// Fix locale files that have certification.badge as string instead of object
+export async function fixBadgeConflict() {
+  await getAdminSession()
+
+  const results: Record<string, string> = {}
+
+  for (const locale of SUPPORTED_LANGUAGES) {
+    if (locale === 'es') continue // Skip source language
+
+    try {
+      const file = await getTranslationFile(locale)
+
+      // Check if certification.badge exists and is a string
+      if (
+        file.certification &&
+        typeof file.certification === 'object' &&
+        'badge' in (file.certification as Record<string, unknown>) &&
+        typeof (file.certification as Record<string, unknown>).badge === 'string'
+      ) {
+        const cert = file.certification as Record<string, unknown>
+        const badgeValue = cert.badge as string
+
+        // Rename badge to badgeLabel
+        cert.badgeLabel = badgeValue
+        delete cert.badge
+
+        await saveTranslationFile(locale, file)
+        results[locale] = `Fixed: renamed badge "${badgeValue}" to badgeLabel`
+      } else {
+        results[locale] = 'No conflict found'
+      }
+    } catch (error) {
+      results[locale] = `Error: ${error instanceof Error ? error.message : 'Unknown'}`
+    }
+  }
+
+  revalidatePath('/admin/translations')
+  return { success: true, results }
 }
