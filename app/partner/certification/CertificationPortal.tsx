@@ -225,7 +225,7 @@ export default function CertificationPortal({
                 </p>
                 <div className="mt-4 inline-flex items-center gap-2 bg-white px-4 py-2 rounded-lg shadow-sm border border-green-200">
                   <Award className="w-5 h-5 text-green-600" />
-                  <span className="font-semibold text-green-900">{t('certification.badge')}</span>
+                  <span className="font-semibold text-green-900">{t('certification.badgeLabel')}</span>
                 </div>
               </div>
             ) : (
@@ -735,7 +735,7 @@ export default function CertificationPortal({
             {examResults.passed ? (
               <div className="inline-flex items-center gap-2 bg-white px-4 py-2 rounded-lg shadow-sm border border-green-200">
                 <Award className="w-5 h-5 text-green-600" />
-                <span className="font-semibold text-green-900">{t('certification.badge')}</span>
+                <span className="font-semibold text-green-900">{t('certification.badgeLabel')}</span>
               </div>
             ) : (
               <p className="text-sm text-red-600">

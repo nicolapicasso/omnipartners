@@ -277,7 +277,7 @@
   },
   "certification": {
     "title": "Loyalty Partner Certification",
-    "badge": "Certified Loyalty Partner",
+    "badgeLabel": "Certified Loyalty Partner",
     "notCertified": "Not Certified",
     "certified": "Certified",
     "certifiedSince": "Certified since",
