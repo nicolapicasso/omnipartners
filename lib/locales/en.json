@@ -342,7 +342,32 @@
     "noStudyMaterials": "No study materials available yet",
     "answerAllQuestions": "Please answer all questions before submitting",
     "answered": "answered",
-    "previous": "Previous"
+    "previous": "Previous",
+    "badge": {
+      "title": "Certification Badge for Your Website",
+      "description": "Add the Certified Partner badge to your website so your customers know you are certified by Omniwallet.",
+      "themeLabel": "Badge theme:",
+      "light": "Light",
+      "dark": "Dark",
+      "preview": "Preview:",
+      "altText": "Certification badge",
+      "option1Title": "Option 1: JavaScript Script (Recommended)",
+      "option1Hint": "Place this code where you want the badge to appear (usually in the footer).",
+      "option2Title": "Option 2: Iframe",
+      "option2Hint": "Use this option if you prefer an isolated iframe.",
+      "copied": "Copied",
+      "copy": "Copy",
+      "expirationWarning": "Your certification expires on {date}. After this date, the badge will appear as expired."
+    },
+    "exam": {
+      "unansweredTitle": "Unanswered questions",
+      "unansweredCount": "You have {count} unanswered question(s):",
+      "unansweredWarning": "Unanswered questions will count as incorrect. Are you sure you want to finish the exam?",
+      "backToExam": "Back to exam",
+      "finishWithout": "Finish without answering",
+      "correct": "Correct!",
+      "incorrect": "Incorrect"
+    }
   },
   "requirements": {
     "title": "Partner Requirements",
@@ -425,5 +450,19 @@
     "prospect": "Prospect",
     "client": "Client",
     "archived": "Archived"
+  },
+  "leadStatusGuide": {
+    "title": "Lead Status Guide",
+    "leadDescription": "Initial contact or potential client who has shown interest.",
+    "prospectDescription": "Qualified lead who has received a product demo or presentation.",
+    "clientDescription": "Active customer who has signed a contract and generates revenue.",
+    "archivedDescription": "Inactive lead that has been archived for historical reference."
+  },
+  "resourceCategories": {
+    "commercial": "Commercial",
+    "technical": "Technical",
+    "strategic": "Strategic",
+    "legal": "Legal",
+    "general": "General"
   }
 }
