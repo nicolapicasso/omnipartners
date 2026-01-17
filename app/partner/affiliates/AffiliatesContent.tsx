@@ -3,6 +3,7 @@
 import { useState } from 'react'
 import { Users, Mail, TrendingUp, DollarSign, Clock, CheckCircle, XCircle, Edit2, Save, X, Key, AlertCircle } from 'lucide-react'
 import { createAffiliate, updateAffiliateCommission } from './actions'
+import { useTranslation } from '@/lib/contexts/LanguageContext'
 
 interface Affiliate {
   id: string
@@ -24,6 +25,7 @@ export function AffiliatesList({
   affiliates: Affiliate[]
   parentCommission: number
 }) {
+  const { t } = useTranslation()
   const [editingId, setEditingId] = useState<string | null>(null)
   const [editCommission, setEditCommission] = useState<number>(0)
   const [loading, setLoading] = useState(false)
@@ -40,11 +42,11 @@ export function AffiliatesList({
 
   const handleEditSave = async (affiliateId: string) => {
     if (editCommission > parentCommission) {
-      alert(`La comisión no puede ser mayor que tu comisión base (${parentCommission}%)`)
+      alert(t('affiliates.commissionTooHigh').replace('{max}', String(parentCommission)))
       return
     }
     if (editCommission < 0) {
-      alert('La comisión no puede ser negativa')
+      alert(t('affiliates.commissionNegative'))
       return
     }
 
@@ -54,7 +56,7 @@ export function AffiliatesList({
       setEditingId(null)
       window.location.reload()
     } else {
-      alert(result.error || 'Error al actualizar la comisión')
+      alert(result.error || t('affiliates.errorUpdatingCommission'))
     }
     setLoading(false)
   }
@@ -65,21 +67,21 @@ export function AffiliatesList({
         return (
           <span className="flex items-center gap-1 text-xs text-green-700 bg-green-50 px-2 py-1 rounded-full">
             <CheckCircle className="w-3 h-3" />
-            Activo
+            {t('affiliates.statusActive')}
           </span>
         )
       case 'PENDING':
         return (
           <span className="flex items-center gap-1 text-xs text-yellow-700 bg-yellow-50 px-2 py-1 rounded-full">
             <Clock className="w-3 h-3" />
-            Pendiente
+            {t('affiliates.statusPending')}
           </span>
         )
       case 'SUSPENDED':
         return (
           <span className="flex items-center gap-1 text-xs text-red-700 bg-red-50 px-2 py-1 rounded-full">
             <XCircle className="w-3 h-3" />
-            Suspendido
+            {t('affiliates.statusSuspended')}
           </span>
         )
       default:
@@ -95,9 +97,9 @@ export function AffiliatesList({
     return (
       <div className="text-center py-12">
         <Users className="w-12 h-12 mx-auto text-gray-300 mb-4" />
-        <p className="text-sm text-gray-500 mb-2">Aún no tienes afiliados</p>
+        <p className="text-sm text-gray-500 mb-2">{t('affiliates.noAffiliates')}</p>
         <p className="text-xs text-gray-400">
-          Añade tu primer afiliado usando el formulario
+          {t('affiliates.addFirstAffiliate')}
         </p>
       </div>
     )
@@ -123,7 +125,7 @@ export function AffiliatesList({
             <div className="flex items-center gap-4">
               {/* Commission */}
               <div className="text-right">
-                <p className="text-xs text-gray-500 mb-1">Comisión</p>
+                <p className="text-xs text-gray-500 mb-1">{t('affiliates.commission')}</p>
                 {editingId === affiliate.id ? (
                   <div className="flex items-center gap-2">
                     <input
@@ -169,11 +171,11 @@ export function AffiliatesList({
               {/* Stats */}
               <div className="flex items-center gap-3">
                 <div className="text-center">
-                  <p className="text-xs text-gray-500">Leads</p>
+                  <p className="text-xs text-gray-500">{t('affiliates.leads')}</p>
                   <p className="text-sm font-semibold text-gray-900">{affiliate.leadsCount}</p>
                 </div>
                 <div className="text-center">
-                  <p className="text-xs text-gray-500">Clientes</p>
+                  <p className="text-xs text-gray-500">{t('affiliates.clients')}</p>
                   <p className="text-sm font-semibold text-green-600">{affiliate.clientsCount}</p>
                 </div>
               </div>
@@ -184,12 +186,12 @@ export function AffiliatesList({
           {affiliate.affiliateCommission && affiliate.status === 'ACTIVE' && (
             <div className="mt-3 pt-3 border-t border-gray-100">
               <div className="flex items-center gap-4 text-xs">
-                <span className="text-gray-500">Desglose por lead:</span>
+                <span className="text-gray-500">{t('affiliates.breakdownPerLead')}</span>
                 <span className="text-purple-600">
-                  Afiliado: {affiliate.affiliateCommission}%
+                  {t('affiliates.affiliateLabel')} {affiliate.affiliateCommission}%
                 </span>
                 <span className="text-omniwallet-primary">
-                  Tú: {parentCommission - affiliate.affiliateCommission}%
+                  {t('affiliates.youLabel')} {parentCommission - affiliate.affiliateCommission}%
                 </span>
               </div>
             </div>
@@ -201,17 +203,17 @@ export function AffiliatesList({
               <div className="bg-amber-50 rounded-lg p-3 border border-amber-200">
                 <div className="flex items-center gap-2 mb-2">
                   <Key className="w-4 h-4 text-amber-600" />
-                  <span className="text-xs font-medium text-amber-800">Credenciales de Acceso</span>
+                  <span className="text-xs font-medium text-amber-800">{t('affiliates.accessCredentials')}</span>
                 </div>
                 <div className="grid grid-cols-2 gap-3">
                   <div>
-                    <p className="text-xs text-gray-500">Email</p>
+                    <p className="text-xs text-gray-500">{t('affiliates.email')}</p>
                     <p className="text-xs font-mono text-gray-900 bg-white px-2 py-1 rounded border border-amber-100">
                       {affiliate.email}
                     </p>
                   </div>
                   <div>
-                    <p className="text-xs text-gray-500">Contraseña</p>
+                    <p className="text-xs text-gray-500">{t('affiliates.password')}</p>
                     <p className="text-xs font-mono text-gray-900 bg-white px-2 py-1 rounded border border-amber-100">
                       {affiliate.temporaryPassword}
                     </p>
@@ -220,7 +222,7 @@ export function AffiliatesList({
                 <div className="flex items-start gap-1.5 mt-2">
                   <AlertCircle className="w-3 h-3 text-amber-600 flex-shrink-0 mt-0.5" />
                   <p className="text-xs text-amber-700">
-                    Se enviará por email cuando sea aprobado. Esta contraseña se eliminará tras el primer inicio de sesión.
+                    {t('affiliates.credentialsNote')}
                   </p>
                 </div>
               </div>
@@ -239,6 +241,7 @@ export function CreateAffiliateForm({
   parentPartnerId: string
   parentCommission: number
 }) {
+  const { t } = useTranslation()
   const [loading, setLoading] = useState(false)
   const [message, setMessage] = useState<{ type: 'success' | 'error'; text: string } | null>(null)
   const [formData, setFormData] = useState({
@@ -258,7 +261,7 @@ export function CreateAffiliateForm({
     if (formData.commission > parentCommission) {
       setMessage({
         type: 'error',
-        text: `La comisión no puede ser mayor que tu comisión base (${parentCommission}%)`,
+        text: t('affiliates.commissionTooHigh').replace('{max}', String(parentCommission)),
       })
       setLoading(false)
       return
@@ -267,7 +270,7 @@ export function CreateAffiliateForm({
     if (formData.commission < 0) {
       setMessage({
         type: 'error',
-        text: 'La comisión no puede ser negativa',
+        text: t('affiliates.commissionNegative'),
       })
       setLoading(false)
       return
@@ -281,7 +284,7 @@ export function CreateAffiliateForm({
     if (result.success) {
       setMessage({
         type: 'success',
-        text: 'Afiliado creado correctamente. Recibirá un email con sus credenciales cuando sea aprobado.',
+        text: t('affiliates.form.successMessage'),
       })
       setFormData({
         companyName: '',
@@ -296,7 +299,7 @@ export function CreateAffiliateForm({
     } else {
       setMessage({
         type: 'error',
-        text: result.error || 'Error al crear el afiliado',
+        text: result.error || t('affiliates.form.errorCreating'),
       })
     }
 
@@ -307,7 +310,7 @@ export function CreateAffiliateForm({
     <form onSubmit={handleSubmit} className="space-y-4">
       <div>
         <label htmlFor="companyName" className="block text-sm font-medium text-gray-700 mb-1">
-          Nombre de Empresa *
+          {t('affiliates.form.companyName')} *
         </label>
         <input
           type="text"
@@ -321,7 +324,7 @@ export function CreateAffiliateForm({
 
       <div>
         <label htmlFor="contactName" className="block text-sm font-medium text-gray-700 mb-1">
-          Nombre de Contacto *
+          {t('affiliates.form.contactName')} *
         </label>
         <input
           type="text"
@@ -335,7 +338,7 @@ export function CreateAffiliateForm({
 
       <div>
         <label htmlFor="email" className="block text-sm font-medium text-gray-700 mb-1">
-          Email *
+          {t('affiliates.form.email')} *
         </label>
         <input
           type="email"
@@ -349,7 +352,7 @@ export function CreateAffiliateForm({
 
       <div>
         <label htmlFor="phone" className="block text-sm font-medium text-gray-700 mb-1">
-          Teléfono
+          {t('affiliates.form.phone')}
         </label>
         <input
           type="tel"
@@ -362,7 +365,7 @@ export function CreateAffiliateForm({
 
       <div>
         <label htmlFor="country" className="block text-sm font-medium text-gray-700 mb-1">
-          País *
+          {t('affiliates.form.country')} *
         </label>
         <input
           type="text"
@@ -376,7 +379,7 @@ export function CreateAffiliateForm({
 
       <div>
         <label htmlFor="commission" className="block text-sm font-medium text-gray-700 mb-1">
-          Comisión del Afiliado *
+          {t('affiliates.form.affiliateCommission')} *
         </label>
         <div className="flex items-center gap-2">
           <input
@@ -393,11 +396,11 @@ export function CreateAffiliateForm({
           <span className="text-sm text-gray-500">%</span>
         </div>
         <p className="text-xs text-gray-500 mt-1">
-          Máximo: {parentCommission}% (tu comisión base)
+          {t('affiliates.form.maxCommission').replace('{max}', String(parentCommission))}
         </p>
         {formData.commission > 0 && (
           <p className="text-xs text-purple-600 mt-1">
-            Tu comisión restante: {parentCommission - formData.commission}%
+            {t('affiliates.form.remainingCommission').replace('{remaining}', String(parentCommission - formData.commission))}
           </p>
         )}
       </div>
@@ -419,11 +422,11 @@ export function CreateAffiliateForm({
         disabled={loading}
         className="w-full bg-purple-600 text-white px-4 py-2 rounded-md text-sm font-medium hover:bg-purple-700 transition disabled:opacity-50"
       >
-        {loading ? 'Creando...' : 'Crear Afiliado'}
+        {loading ? t('affiliates.form.creating') : t('affiliates.form.createAffiliate')}
       </button>
 
       <p className="text-xs text-gray-500 text-center">
-        El afiliado quedará pendiente de aprobación por Omniwallet
+        {t('affiliates.form.pendingApprovalNote')}
       </p>
     </form>
   )
