@@ -3,13 +3,21 @@
 import { useState } from 'react'
 import { UserRole } from '@/types'
 import { inviteTeamMember, removeTeamMember, updateTeamMemberRole } from '../actions'
-import { User, Mail, Shield, Trash2, Check } from 'lucide-react'
+import { User, Mail, Shield, Trash2, Check, Copy, CheckCircle } from 'lucide-react'
+
+interface CreatedUser {
+  name: string
+  email: string
+  tempPassword: string
+  emailSent: boolean
+  createdAt: Date
+}
 
 export function InviteTeamMemberForm() {
   const [loading, setLoading] = useState(false)
   const [error, setError] = useState('')
-  const [success, setSuccess] = useState('')
-  const [tempPassword, setTempPassword] = useState('')
+  const [createdUsers, setCreatedUsers] = useState<CreatedUser[]>([])
+  const [copiedIndex, setCopiedIndex] = useState<number | null>(null)
 
   const [formData, setFormData] = useState({
     name: '',
@@ -21,8 +29,6 @@ export function InviteTeamMemberForm() {
     e.preventDefault()
     setLoading(true)
     setError('')
-    setSuccess('')
-    setTempPassword('')
 
     if (!formData.name || !formData.email) {
       setError('Por favor completa todos los campos')
@@ -32,9 +38,18 @@ export function InviteTeamMemberForm() {
 
     const result = await inviteTeamMember(formData)
 
-    if (result.success) {
-      setSuccess('Miembro invitado correctamente')
-      setTempPassword(result.tempPassword || '')
+    if (result.success && result.tempPassword) {
+      // Add new user to the list of created users
+      setCreatedUsers(prev => [
+        {
+          name: formData.name,
+          email: formData.email,
+          tempPassword: result.tempPassword!,
+          emailSent: result.emailSent ?? false,
+          createdAt: new Date(),
+        },
+        ...prev,
+      ])
       setFormData({ name: '', email: '', role: UserRole.PARTNER_USER })
     } else {
       setError(result.error || 'Error al invitar al miembro')
@@ -43,87 +58,139 @@ export function InviteTeamMemberForm() {
     setLoading(false)
   }
 
+  const handleCopyPassword = async (password: string, index: number) => {
+    try {
+      await navigator.clipboard.writeText(password)
+      setCopiedIndex(index)
+      setTimeout(() => setCopiedIndex(null), 2000)
+    } catch {
+      // Fallback for browsers that don't support clipboard API
+      alert(`Contraseña: ${password}`)
+    }
+  }
+
+  const handleDismissUser = (index: number) => {
+    setCreatedUsers(prev => prev.filter((_, i) => i !== index))
+  }
+
   return (
-    <form onSubmit={handleSubmit} className="space-y-4">
-      {error && (
-        <div className="bg-red-50 border border-red-200 text-red-700 px-3 py-2 rounded-lg text-sm">
-          {error}
-        </div>
-      )}
-
-      {success && (
-        <div className="bg-green-50 border border-green-200 rounded-lg p-3">
-          <div className="flex items-center gap-2 text-green-800 font-semibold text-sm mb-2">
-            <Check className="w-4 h-4" />
-            {success}
-          </div>
-          {tempPassword && (
-            <div className="mt-2 p-2 bg-white rounded border border-green-200">
-              <p className="text-xs text-gray-600 mb-1">Contraseña temporal:</p>
-              <code className="text-sm font-mono text-green-700 bg-green-50 px-2 py-1 rounded">
-                {tempPassword}
-              </code>
-              <p className="text-xs text-gray-500 mt-1">
-                Comparte esta contraseña de forma segura con el nuevo miembro
-              </p>
+    <div className="space-y-4">
+      {/* List of recently created users */}
+      {createdUsers.length > 0 && (
+        <div className="space-y-3">
+          <h4 className="text-sm font-medium text-gray-700">
+            Usuarios creados en esta sesión ({createdUsers.length}):
+          </h4>
+          {createdUsers.map((user, index) => (
+            <div
+              key={`${user.email}-${index}`}
+              className="bg-green-50 border border-green-200 rounded-lg p-3"
+            >
+              <div className="flex items-start justify-between">
+                <div className="flex items-center gap-2 text-green-800 font-semibold text-sm mb-2">
+                  <CheckCircle className="w-4 h-4" />
+                  {user.name}
+                </div>
+                <button
+                  onClick={() => handleDismissUser(index)}
+                  className="text-gray-400 hover:text-gray-600 text-xs"
+                  title="Descartar"
+                >
+                  ✕
+                </button>
+              </div>
+              <p className="text-xs text-gray-600 mb-2">{user.email}</p>
+              <div className="p-2 bg-white rounded border border-green-200">
+                <p className="text-xs text-gray-600 mb-1">Contraseña temporal:</p>
+                <div className="flex items-center gap-2">
+                  <code className="flex-1 text-sm font-mono text-green-700 bg-green-50 px-2 py-1 rounded">
+                    {user.tempPassword}
+                  </code>
+                  <button
+                    onClick={() => handleCopyPassword(user.tempPassword, index)}
+                    className="p-1 text-gray-500 hover:text-omniwallet-primary transition"
+                    title="Copiar contraseña"
+                  >
+                    {copiedIndex === index ? (
+                      <Check className="w-4 h-4 text-green-600" />
+                    ) : (
+                      <Copy className="w-4 h-4" />
+                    )}
+                  </button>
+                </div>
+                <p className="text-xs text-gray-500 mt-1">
+                  {user.emailSent
+                    ? '✉️ Se ha enviado un email con los datos de acceso.'
+                    : '⚠️ Comparte esta contraseña de forma segura con el nuevo miembro.'}
+                </p>
+              </div>
             </div>
-          )}
+          ))}
         </div>
       )}
 
-      <div>
-        <label className="block text-sm font-medium text-gray-700 mb-2">Nombre</label>
-        <div className="flex items-center gap-2">
-          <User className="w-4 h-4 text-gray-400" />
-          <input
-            type="text"
-            value={formData.name}
-            onChange={(e) => setFormData({ ...formData, name: e.target.value })}
-            className="flex-1 border border-gray-300 rounded-lg px-3 py-2 text-sm focus:ring-2 focus:ring-omniwallet-primary focus:border-transparent"
-            placeholder="Nombre completo"
-            required
-          />
-        </div>
-      </div>
+      {/* Form */}
+      <form onSubmit={handleSubmit} className="space-y-4">
+        {error && (
+          <div className="bg-red-50 border border-red-200 text-red-700 px-3 py-2 rounded-lg text-sm">
+            {error}
+          </div>
+        )}
 
-      <div>
-        <label className="block text-sm font-medium text-gray-700 mb-2">Email</label>
-        <div className="flex items-center gap-2">
-          <Mail className="w-4 h-4 text-gray-400" />
-          <input
-            type="email"
-            value={formData.email}
-            onChange={(e) => setFormData({ ...formData, email: e.target.value })}
-            className="flex-1 border border-gray-300 rounded-lg px-3 py-2 text-sm focus:ring-2 focus:ring-omniwallet-primary focus:border-transparent"
-            placeholder="email@ejemplo.com"
-            required
-          />
+        <div>
+          <label className="block text-sm font-medium text-gray-700 mb-2">Nombre</label>
+          <div className="flex items-center gap-2">
+            <User className="w-4 h-4 text-gray-400" />
+            <input
+              type="text"
+              value={formData.name}
+              onChange={(e) => setFormData({ ...formData, name: e.target.value })}
+              className="flex-1 border border-gray-300 rounded-lg px-3 py-2 text-sm focus:ring-2 focus:ring-omniwallet-primary focus:border-transparent"
+              placeholder="Nombre completo"
+              required
+            />
+          </div>
         </div>
-      </div>
 
-      <div>
-        <label className="block text-sm font-medium text-gray-700 mb-2">Rol</label>
-        <div className="flex items-center gap-2">
-          <Shield className="w-4 h-4 text-gray-400" />
-          <select
-            value={formData.role}
-            onChange={(e) => setFormData({ ...formData, role: e.target.value as UserRole })}
-            className="flex-1 border border-gray-300 rounded-lg px-3 py-2 text-sm focus:ring-2 focus:ring-omniwallet-primary focus:border-transparent"
-          >
-            <option value={UserRole.PARTNER_USER}>Usuario</option>
-            <option value={UserRole.PARTNER_OWNER}>Propietario</option>
-          </select>
+        <div>
+          <label className="block text-sm font-medium text-gray-700 mb-2">Email</label>
+          <div className="flex items-center gap-2">
+            <Mail className="w-4 h-4 text-gray-400" />
+            <input
+              type="email"
+              value={formData.email}
+              onChange={(e) => setFormData({ ...formData, email: e.target.value })}
+              className="flex-1 border border-gray-300 rounded-lg px-3 py-2 text-sm focus:ring-2 focus:ring-omniwallet-primary focus:border-transparent"
+              placeholder="email@ejemplo.com"
+              required
+            />
+          </div>
         </div>
-      </div>
 
-      <button
-        type="submit"
-        disabled={loading}
-        className="w-full bg-omniwallet-primary text-white px-4 py-2 rounded-lg font-semibold hover:bg-omniwallet-secondary transition disabled:opacity-50"
-      >
-        {loading ? 'Invitando...' : 'Invitar Miembro'}
-      </button>
-    </form>
+        <div>
+          <label className="block text-sm font-medium text-gray-700 mb-2">Rol</label>
+          <div className="flex items-center gap-2">
+            <Shield className="w-4 h-4 text-gray-400" />
+            <select
+              value={formData.role}
+              onChange={(e) => setFormData({ ...formData, role: e.target.value as UserRole })}
+              className="flex-1 border border-gray-300 rounded-lg px-3 py-2 text-sm focus:ring-2 focus:ring-omniwallet-primary focus:border-transparent"
+            >
+              <option value={UserRole.PARTNER_USER}>Usuario</option>
+              <option value={UserRole.PARTNER_OWNER}>Propietario</option>
+            </select>
+          </div>
+        </div>
+
+        <button
+          type="submit"
+          disabled={loading}
+          className="w-full bg-omniwallet-primary text-white px-4 py-2 rounded-lg font-semibold hover:bg-omniwallet-secondary transition disabled:opacity-50"
+        >
+          {loading ? 'Invitando...' : 'Invitar Miembro'}
+        </button>
+      </form>
+    </div>
   )
 }
 

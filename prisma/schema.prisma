@@ -106,6 +106,21 @@ model User {
 }
 
 // ============================================
+// PASSWORD RESET TOKENS
+// ============================================
+
+model PasswordResetToken {
+  id        String   @id @default(cuid())
+  token     String   @unique
+  email     String
+  expiresAt DateTime
+  used      Boolean  @default(false)
+  createdAt DateTime @default(now())
+
+  @@map("password_reset_tokens")
+}
+
+// ============================================
 // LEADS (Clientes potenciales y actuales)
 // ============================================
 
