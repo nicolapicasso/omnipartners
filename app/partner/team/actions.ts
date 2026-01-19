@@ -5,6 +5,8 @@ import { revalidatePath } from 'next/cache'
 import { getPartnerSession } from '@/lib/session'
 import { UserRole, NotificationType } from '@/types'
 import bcrypt from 'bcryptjs'
+import { sendTeamMemberInvitationEmail } from '@/lib/email'
+import { headers } from 'next/headers'
 
 export async function inviteTeamMember(data: {
   name: string
@@ -28,6 +30,12 @@ export async function inviteTeamMember(data: {
     if (existingUser) {
       return { success: false, error: 'Este email ya está registrado' }
     }
+
+    // Get partner info for email
+    const partner = await prisma.partner.findUnique({
+      where: { id: partnerId },
+      select: { companyName: true },
+    })
 
     // Generate temporary password
     const tempPassword = Math.random().toString(36).slice(-8)
@@ -54,8 +62,23 @@ export async function inviteTeamMember(data: {
       },
     })
 
+    // Send invitation email
+    const headersList = await headers()
+    const host = headersList.get('host') || 'partners.omniwallet.net'
+    const protocol = host.includes('localhost') ? 'http' : 'https'
+    const loginUrl = `${protocol}://${host}/login`
+
+    const emailResult = await sendTeamMemberInvitationEmail({
+      recipientEmail: data.email,
+      recipientName: data.name,
+      temporaryPassword: tempPassword,
+      partnerName: partner?.companyName || 'Partner',
+      inviterName: session.user.name || 'Tu equipo',
+      loginUrl,
+    })
+
     revalidatePath('/partner/team')
-    return { success: true, tempPassword }
+    return { success: true, tempPassword, emailSent: emailResult.success }
   } catch (error) {
     console.error('Error inviting team member:', error)
     return { success: false, error: 'Error al invitar al miembro' }
