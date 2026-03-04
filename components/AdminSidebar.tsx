@@ -2,7 +2,7 @@
 
 import Link from 'next/link'
 import { usePathname } from 'next/navigation'
-import { LayoutDashboard, Users, TrendingUp, FileText, Award, Webhook, X, Languages, Target } from 'lucide-react'
+import { LayoutDashboard, Users, TrendingUp, FileText, Award, Webhook, X, Languages, Target, FileSignature } from 'lucide-react'
 import { useTranslation } from '@/lib/contexts/LanguageContext'
 import { useSidebar } from '@/lib/contexts/SidebarContext'
 import Logo from './Logo'
@@ -48,6 +48,12 @@ export default function AdminSidebar() {
       label: 'Requisitos',
       icon: Target,
       active: pathname?.startsWith('/admin/requirements')
+    },
+    {
+      href: '/admin/contracts',
+      label: 'Contratos',
+      icon: FileSignature,
+      active: pathname?.startsWith('/admin/contracts')
     },
     {
       href: '/admin/webhooks',

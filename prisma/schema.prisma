@@ -70,6 +70,7 @@ model Partner {
   invoices              Invoice[]
   notifications         Notification[]
   certificationAttempts CertificationAttempt[]
+  contracts             Contract[]
 
   @@map("partners")
 }
@@ -737,4 +738,93 @@ model WebhookLog {
   createdAt       DateTime @default(now())
 
   @@map("webhook_logs")
+}
+
+// ============================================
+// CONTRACT SYSTEM
+// ============================================
+
+// Plantillas de contratos (configurables por admin)
+model ContractTemplate {
+  id          String   @id @default(cuid())
+
+  name        String   // Nombre interno de la plantilla
+
+  // Partner category this template applies to (null = all categories)
+  partnerCategory String?  // AGENCY_PARTNER, TECH_PARTNER, REFERRAL, CUSTOM
+
+  // Template content with variables: {companyName}, {cif}, {address}, {contactName}, {email}, {date}, etc.
+  content     String   @db.Text
+
+  // Translations
+  content_en  String?  @db.Text
+  content_it  String?  @db.Text
+  content_fr  String?  @db.Text
+  content_de  String?  @db.Text
+  content_pt  String?  @db.Text
+
+  // Requirements shown in the contract (populated from PartnerRequirementConfig)
+  includeRequirements Boolean @default(true)
+
+  // Status
+  isActive    Boolean  @default(true)
+  isDefault   Boolean  @default(false)  // Default template for the category
+
+  // Order for selection
+  order       Int      @default(0)
+
+  createdAt   DateTime @default(now())
+  updatedAt   DateTime @updatedAt
+
+  // Contracts generated from this template
+  contracts   Contract[]
+
+  @@map("contract_templates")
+}
+
+// Contratos de partners (firmados o pendientes)
+model Contract {
+  id              String   @id @default(cuid())
+
+  partnerId       String
+  partner         Partner  @relation(fields: [partnerId], references: [id], onDelete: Cascade)
+
+  templateId      String?
+  template        ContractTemplate? @relation(fields: [templateId], references: [id])
+
+  // Status: DRAFT, PENDING_SIGNATURE, SIGNED, EXPIRED, CANCELLED
+  status          String   @default("PENDING_SIGNATURE")
+
+  // Generated contract content (after variable substitution)
+  content         String   @db.Text
+
+  // Signatory data (filled by partner during signature)
+  signatoryName       String?
+  signatoryDni        String?  // DNI/NIE del firmante
+  signatoryPosition   String?  // Cargo del firmante
+  companyCif          String?  // CIF de la empresa
+  companyAddress      String?  // Dirección fiscal
+
+  // Acceptance checkboxes (stored as JSON)
+  acceptanceData      String?  // {"termsAccepted": true, "privacyAccepted": true, "dataProcessingAccepted": true}
+
+  // Signature data
+  signedAt            DateTime?
+  signatureIp         String?   // IP desde donde se firmó
+  signatureUserAgent  String?   // User agent del navegador
+
+  // PDF generation
+  pdfUrl              String?   // URL del PDF generado
+
+  // Validity
+  validFrom           DateTime?
+  validUntil          DateTime?
+
+  // Notes (admin only)
+  adminNotes          String?
+
+  createdAt           DateTime @default(now())
+  updatedAt           DateTime @updatedAt
+
+  @@map("contracts")
 }

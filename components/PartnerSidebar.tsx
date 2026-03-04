@@ -2,7 +2,7 @@
 
 import Link from 'next/link'
 import { usePathname } from 'next/navigation'
-import { LayoutDashboard, TrendingUp, DollarSign, FileText, Users, CheckCircle, Award, X, UserPlus, UsersRound } from 'lucide-react'
+import { LayoutDashboard, TrendingUp, DollarSign, FileText, Users, CheckCircle, Award, X, UserPlus, UsersRound, FileSignature } from 'lucide-react'
 import { useTranslation } from '@/lib/contexts/LanguageContext'
 import { useSidebar } from '@/lib/contexts/SidebarContext'
 import Logo from './Logo'
@@ -46,6 +46,12 @@ export default function PartnerSidebar({ canHaveAffiliates = false }: PartnerSid
       label: t('nav.requirements'),
       icon: CheckCircle,
       active: pathname?.startsWith('/partner/requirements')
+    },
+    {
+      href: '/partner/contract',
+      label: t('nav.contract'),
+      icon: FileSignature,
+      active: pathname?.startsWith('/partner/contract')
     },
     {
       href: '/partner/certification',
