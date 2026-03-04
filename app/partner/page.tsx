@@ -8,6 +8,7 @@ import PartnerDashboardHeader from '@/components/PartnerDashboardHeader'
 import PartnerSidebar from '@/components/PartnerSidebar'
 import RequirementsSummary from '@/components/RequirementsSummary'
 import { getTranslations } from '@/lib/translations'
+import { getRequirementsForPartner, DEFAULT_REQUIREMENTS } from '@/app/admin/requirements/actions'
 
 async function getPartnerStats(partnerId: string): Promise<PartnerDashboardStats> {
   const [totalLeads, totalProspects, totalClients] = await Promise.all([
@@ -89,6 +90,18 @@ export default async function PartnerDashboard() {
     where: { partnerId },
     orderBy: { createdAt: 'desc' },
   })
+
+  // Get dynamic requirements for this partner
+  const reqResult = await getRequirementsForPartner(partnerId)
+  const requirementTargets = reqResult.data ? {
+    leadsPerYear: reqResult.data.leadsPerYear,
+    prospectsPerYear: reqResult.data.prospectsPerYear,
+    clientsPerYear: reqResult.data.clientsPerYear,
+    eventsPerYear: reqResult.data.eventsPerYear,
+    certificationRequired: reqResult.data.certificationRequired,
+    contractRequired: reqResult.data.contractRequired,
+    omniwalletRequired: reqResult.data.omniwalletRequired,
+  } : DEFAULT_REQUIREMENTS
 
   return (
     <div className="min-h-screen bg-gray-50">
@@ -372,7 +385,9 @@ export default async function PartnerDashboard() {
           contractUrl={partner.contractUrl}
           omniwalletAccountUrl={partner.omniwalletAccountUrl}
           hasCompletedYearlyEvent={partner.hasCompletedYearlyEvent}
+          isCertified={partner.isCertified}
           leads={partner.leads}
+          targets={requirementTargets}
         />
 
         {/* Quick Actions */}

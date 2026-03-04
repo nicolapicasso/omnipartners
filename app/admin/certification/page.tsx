@@ -20,6 +20,11 @@ export default async function AdminCertificationPage() {
   // Fetch certification settings
   const settings = await prisma.certificationSettings.findFirst()
 
+  // Fetch certification objectives
+  const objectives = await prisma.certificationObjective.findMany({
+    orderBy: { order: 'asc' },
+  })
+
   // Fetch all partners with certification info and best score
   const partners = await prisma.partner.findMany({
     where: {
@@ -60,6 +65,7 @@ export default async function AdminCertificationPage() {
           questions={questions}
           settings={settings}
           partners={partnersData}
+          objectives={objectives}
         />
       </main>
     </div>

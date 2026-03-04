@@ -5,18 +5,43 @@ import { CheckCircle2, Circle, ArrowRight } from 'lucide-react'
 import Link from 'next/link'
 import { useTranslation } from '@/lib/contexts/LanguageContext'
 
+interface RequirementTargets {
+  leadsPerYear: number
+  prospectsPerYear: number
+  clientsPerYear: number
+  eventsPerYear: number
+  certificationRequired: boolean
+  contractRequired: boolean
+  omniwalletRequired: boolean
+}
+
 interface RequirementsSummaryProps {
   contractUrl: string | null
   omniwalletAccountUrl: string | null
   hasCompletedYearlyEvent: boolean
+  isCertified: boolean
   leads: Array<{ status: string; createdAt: Date }>
+  targets?: RequirementTargets
+}
+
+// Default targets (fallback if not provided)
+const DEFAULT_TARGETS: RequirementTargets = {
+  leadsPerYear: 10,
+  prospectsPerYear: 5,
+  clientsPerYear: 2,
+  eventsPerYear: 1,
+  certificationRequired: true,
+  contractRequired: true,
+  omniwalletRequired: true,
 }
 
 export default function RequirementsSummary({
   contractUrl,
   omniwalletAccountUrl,
   hasCompletedYearlyEvent,
+  isCertified,
   leads,
+  targets = DEFAULT_TARGETS,
 }: RequirementsSummaryProps) {
   const { t } = useTranslation()
   const currentYear = new Date().getFullYear()
@@ -33,14 +58,36 @@ export default function RequirementsSummary({
   )
   const clientsThisYear = leadsThisYear.filter((lead) => lead.status === LeadStatus.CLIENT)
 
-  const requirements = [
-    { title: t('requirements.contract.title'), completed: !!contractUrl },
-    { title: t('requirements.account.title'), completed: !!omniwalletAccountUrl },
-    { title: t('requirements.leads.title'), completed: leadsThisYear.length >= 10 },
-    { title: t('requirements.prospects.title'), completed: prospectsThisYear.length >= 5 },
-    { title: t('requirements.clients.title'), completed: clientsThisYear.length >= 2 },
-    { title: t('requirements.event.title'), completed: hasCompletedYearlyEvent },
-  ]
+  // Build requirements array based on what's required
+  const requirements: Array<{ title: string; completed: boolean }> = []
+
+  if (targets.contractRequired) {
+    requirements.push({ title: t('requirements.contract.title'), completed: !!contractUrl })
+  }
+
+  if (targets.omniwalletRequired) {
+    requirements.push({ title: t('requirements.account.title'), completed: !!omniwalletAccountUrl })
+  }
+
+  if (targets.leadsPerYear > 0) {
+    requirements.push({ title: t('requirements.leads.title'), completed: leadsThisYear.length >= targets.leadsPerYear })
+  }
+
+  if (targets.prospectsPerYear > 0) {
+    requirements.push({ title: t('requirements.prospects.title'), completed: prospectsThisYear.length >= targets.prospectsPerYear })
+  }
+
+  if (targets.clientsPerYear > 0) {
+    requirements.push({ title: t('requirements.clients.title'), completed: clientsThisYear.length >= targets.clientsPerYear })
+  }
+
+  if (targets.eventsPerYear > 0) {
+    requirements.push({ title: t('requirements.event.title'), completed: hasCompletedYearlyEvent })
+  }
+
+  if (targets.certificationRequired) {
+    requirements.push({ title: t('requirements.certification.title'), completed: isCertified })
+  }
 
   const completedCount = requirements.filter((r) => r.completed).length
   const completionPercentage = Math.round((completedCount / requirements.length) * 100)

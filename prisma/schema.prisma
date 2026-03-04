@@ -70,6 +70,7 @@ model Partner {
   invoices              Invoice[]
   notifications         Notification[]
   certificationAttempts CertificationAttempt[]
+  contracts             Contract[]
 
   @@map("partners")
 }
@@ -555,6 +556,90 @@ model CertificationAttempt {
   @@map("certification_attempts")
 }
 
+// Objetivos de certificación (configurables por admin)
+model CertificationObjective {
+  id          String   @id @default(cuid())
+
+  // Original content (Spanish - base language)
+  title       String
+  description String?
+
+  // Translations - English
+  title_en       String?
+  description_en String?
+
+  // Translations - Italian
+  title_it       String?
+  description_it String?
+
+  // Translations - French
+  title_fr       String?
+  description_fr String?
+
+  // Translations - German
+  title_de       String?
+  description_de String?
+
+  // Translations - Portuguese
+  title_pt       String?
+  description_pt String?
+
+  // Icon identifier (for UI rendering)
+  icon        String   @default("target")
+
+  // Order for displaying objectives
+  order       Int      @default(0)
+
+  // Visibility
+  isPublished Boolean  @default(false)
+
+  createdAt   DateTime @default(now())
+  updatedAt   DateTime @updatedAt
+
+  @@map("certification_objectives")
+}
+
+// ============================================
+// PARTNER REQUIREMENTS CONFIGURATION
+// ============================================
+
+// Configuración de requisitos por partner/categoría/global
+model PartnerRequirementConfig {
+  id              String   @id @default(cuid())
+
+  // Scope: GLOBAL (defaults), BY_CATEGORY (per partner type), BY_PARTNER (individual override)
+  scope           String   @default("GLOBAL")
+
+  // If BY_CATEGORY, which partner category this applies to
+  partnerCategory String?  // AGENCY_PARTNER, TECH_PARTNER, REFERRAL, CUSTOM
+
+  // If BY_PARTNER, which specific partner this applies to
+  partnerId       String?  @unique
+
+  // Requirements - Annual targets
+  leadsPerYear       Int   @default(10)   // Leads cualificados por año
+  prospectsPerYear   Int   @default(5)    // Prospects/demos por año
+  clientsPerYear     Int   @default(2)    // Clientes convertidos por año
+  eventsPerYear      Int   @default(1)    // Eventos/webinars por año
+
+  // Boolean requirements
+  certificationRequired  Boolean @default(true)   // Debe completar certificación
+  contractRequired       Boolean @default(true)   // Debe tener contrato firmado
+  omniwalletRequired     Boolean @default(true)   // Debe tener cuenta Omniwallet
+
+  // Labels customizables (opcional, para el contrato)
+  leadsLabel          String?
+  prospectsLabel      String?
+  clientsLabel        String?
+  eventsLabel         String?
+
+  createdAt       DateTime @default(now())
+  updatedAt       DateTime @updatedAt
+
+  @@unique([scope, partnerCategory])
+  @@map("partner_requirement_configs")
+}
+
 // Configuración global del sello de certificación
 model CertificationSettings {
   id                    String   @id @default(cuid())
@@ -653,4 +738,93 @@ model WebhookLog {
   createdAt       DateTime @default(now())
 
   @@map("webhook_logs")
+}
+
+// ============================================
+// CONTRACT SYSTEM
+// ============================================
+
+// Plantillas de contratos (configurables por admin)
+model ContractTemplate {
+  id          String   @id @default(cuid())
+
+  name        String   // Nombre interno de la plantilla
+
+  // Partner category this template applies to (null = all categories)
+  partnerCategory String?  // AGENCY_PARTNER, TECH_PARTNER, REFERRAL, CUSTOM
+
+  // Template content with variables: {companyName}, {cif}, {address}, {contactName}, {email}, {date}, etc.
+  content     String   @db.Text
+
+  // Translations
+  content_en  String?  @db.Text
+  content_it  String?  @db.Text
+  content_fr  String?  @db.Text
+  content_de  String?  @db.Text
+  content_pt  String?  @db.Text
+
+  // Requirements shown in the contract (populated from PartnerRequirementConfig)
+  includeRequirements Boolean @default(true)
+
+  // Status
+  isActive    Boolean  @default(true)
+  isDefault   Boolean  @default(false)  // Default template for the category
+
+  // Order for selection
+  order       Int      @default(0)
+
+  createdAt   DateTime @default(now())
+  updatedAt   DateTime @updatedAt
+
+  // Contracts generated from this template
+  contracts   Contract[]
+
+  @@map("contract_templates")
+}
+
+// Contratos de partners (firmados o pendientes)
+model Contract {
+  id              String   @id @default(cuid())
+
+  partnerId       String
+  partner         Partner  @relation(fields: [partnerId], references: [id], onDelete: Cascade)
+
+  templateId      String?
+  template        ContractTemplate? @relation(fields: [templateId], references: [id])
+
+  // Status: DRAFT, PENDING_SIGNATURE, SIGNED, EXPIRED, CANCELLED
+  status          String   @default("PENDING_SIGNATURE")
+
+  // Generated contract content (after variable substitution)
+  content         String   @db.Text
+
+  // Signatory data (filled by partner during signature)
+  signatoryName       String?
+  signatoryDni        String?  // DNI/NIE del firmante
+  signatoryPosition   String?  // Cargo del firmante
+  companyCif          String?  // CIF de la empresa
+  companyAddress      String?  // Dirección fiscal
+
+  // Acceptance checkboxes (stored as JSON)
+  acceptanceData      String?  // {"termsAccepted": true, "privacyAccepted": true, "dataProcessingAccepted": true}
+
+  // Signature data
+  signedAt            DateTime?
+  signatureIp         String?   // IP desde donde se firmó
+  signatureUserAgent  String?   // User agent del navegador
+
+  // PDF generation
+  pdfUrl              String?   // URL del PDF generado
+
+  // Validity
+  validFrom           DateTime?
+  validUntil          DateTime?
+
+  // Notes (admin only)
+  adminNotes          String?
+
+  createdAt           DateTime @default(now())
+  updatedAt           DateTime @updatedAt
+
+  @@map("contracts")
 }

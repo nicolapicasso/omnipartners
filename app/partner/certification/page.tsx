@@ -76,6 +76,26 @@ export default async function PartnerCertificationPage() {
   // Fetch certification settings for badge URLs
   const settings = await prisma.certificationSettings.findFirst()
 
+  // Fetch published objectives with translations
+  const rawObjectives = await prisma.certificationObjective.findMany({
+    where: { isPublished: true },
+    orderBy: { order: 'asc' },
+  })
+
+  // Transform objectives based on locale
+  const objectives = rawObjectives.map((obj) => {
+    const titleField = `title_${locale}` as keyof typeof obj
+    const descriptionField = `description_${locale}` as keyof typeof obj
+
+    return {
+      id: obj.id,
+      title: (obj[titleField] as string) || obj.title,
+      description: (obj[descriptionField] as string) || obj.description,
+      icon: obj.icon,
+      order: obj.order,
+    }
+  })
+
   // Get base URL from environment or default
   const baseUrl = process.env.NEXTAUTH_URL || process.env.NEXT_PUBLIC_APP_URL || 'https://partners.omniwallet.com'
 
@@ -96,6 +116,7 @@ export default async function PartnerCertificationPage() {
           contents={contents}
           questions={questions}
           attempts={attempts}
+          objectives={objectives}
           badgeLightUrl={settings?.badgeLightUrl || null}
           badgeDarkUrl={settings?.badgeDarkUrl || null}
           baseUrl={baseUrl}

@@ -83,6 +83,7 @@
     "myTeam": "My Team",
     "resources": "Resources",
     "requirements": "Requirements",
+    "contract": "Contract",
     "partners": "Partners",
     "settings": "Settings",
     "profile": "Profile",
@@ -217,7 +218,28 @@
     "contractUrl": "Contract URL",
     "pasteUrl": "Paste the URL of the contract document (e.g., Google Drive, Dropbox, etc.)",
     "updateSuccess": "Contract URL updated successfully",
-    "updateError": "Failed to update contract"
+    "updateError": "Failed to update contract",
+    "noContract": "No contract assigned",
+    "noContractDescription": "You don't have a contract assigned yet. The administrator will assign one soon.",
+    "signed": "Contract Signed",
+    "signedDescription": "Your contract has been signed successfully.",
+    "signContract": "Sign Your Contract",
+    "signDescription": "Review the contract and complete the data to sign it",
+    "pendingSignature": "Pending signature",
+    "signedSuccess": "Contract signed successfully. Redirecting...",
+    "content": "Contract Content",
+    "signatureData": "Signature Data",
+    "signatoryName": "Signatory full name",
+    "signatoryDni": "Signatory ID (DNI/NIE)",
+    "signatoryPosition": "Position in the company",
+    "companyCif": "Company Tax ID (CIF)",
+    "companyAddress": "Fiscal address",
+    "acceptTerms": "I accept the terms and conditions of the collaboration agreement",
+    "acceptPrivacy": "I accept the privacy policy",
+    "acceptDataProcessing": "I authorize the processing of my personal data",
+    "signing": "Signing...",
+    "signButton": "Sign Contract",
+    "legalNote": "By signing, you confirm that you have the legal authority to represent the company."
   },
   "omniwalletAccount": {
     "title": "Your Omniwallet Account",
@@ -367,6 +389,10 @@
       "finishWithout": "Finish without answering",
       "correct": "Correct!",
       "incorrect": "Incorrect"
+    },
+    "objectives": {
+      "title": "Certification Objectives",
+      "description": "Upon completing this certification, you will be able to:"
     }
   },
   "requirements": {
@@ -402,6 +428,10 @@
     "event": {
       "title": "Host/Attend Joint Event",
       "description": "Participate in at least one webinar or joint event with Omniwallet per year"
+    },
+    "certification": {
+      "title": "Complete Certification",
+      "description": "Complete the Loyalty Partner certification exam"
     },
     "helpTitle": "Need Help?",
     "helpDescription": "If you have questions about any requirements or need assistance, please contact your Omniwallet partnership manager or reach out to our support team.",

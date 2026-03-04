@@ -301,3 +301,151 @@ export async function updatePartnerLandingUrl(partnerId: string, url: string) {
     return { success: false, error: 'Failed to update landing URL' }
   }
 }
+
+// ============================================
+// CERTIFICATION OBJECTIVES ACTIONS
+// ============================================
+
+export async function getCertificationObjectives() {
+  try {
+    const objectives = await prisma.certificationObjective.findMany({
+      orderBy: { order: 'asc' },
+    })
+    return { success: true, data: objectives }
+  } catch (error) {
+    console.error('Error fetching certification objectives:', error)
+    return { success: false, error: 'Failed to fetch objectives', data: [] }
+  }
+}
+
+export async function getPublishedCertificationObjectives() {
+  try {
+    const objectives = await prisma.certificationObjective.findMany({
+      where: { isPublished: true },
+      orderBy: { order: 'asc' },
+    })
+    return { success: true, data: objectives }
+  } catch (error) {
+    console.error('Error fetching published certification objectives:', error)
+    return { success: false, error: 'Failed to fetch objectives', data: [] }
+  }
+}
+
+export async function createCertificationObjective(data: {
+  title: string
+  description?: string
+  title_en?: string
+  description_en?: string
+  title_it?: string
+  description_it?: string
+  title_fr?: string
+  description_fr?: string
+  title_de?: string
+  description_de?: string
+  title_pt?: string
+  description_pt?: string
+  icon?: string
+  order: number
+  isPublished: boolean
+}) {
+  try {
+    await getAdminSession()
+
+    await prisma.certificationObjective.create({
+      data: {
+        title: data.title,
+        description: data.description || null,
+        title_en: data.title_en || null,
+        description_en: data.description_en || null,
+        title_it: data.title_it || null,
+        description_it: data.description_it || null,
+        title_fr: data.title_fr || null,
+        description_fr: data.description_fr || null,
+        title_de: data.title_de || null,
+        description_de: data.description_de || null,
+        title_pt: data.title_pt || null,
+        description_pt: data.description_pt || null,
+        icon: data.icon || 'target',
+        order: data.order,
+        isPublished: data.isPublished,
+      },
+    })
+
+    revalidatePath('/admin/certification')
+    revalidatePath('/partner/certification')
+    return { success: true }
+  } catch (error) {
+    console.error('Error creating certification objective:', error)
+    return { success: false, error: 'Failed to create objective' }
+  }
+}
+
+export async function updateCertificationObjective(
+  id: string,
+  data: {
+    title: string
+    description?: string
+    title_en?: string
+    description_en?: string
+    title_it?: string
+    description_it?: string
+    title_fr?: string
+    description_fr?: string
+    title_de?: string
+    description_de?: string
+    title_pt?: string
+    description_pt?: string
+    icon?: string
+    order: number
+    isPublished: boolean
+  }
+) {
+  try {
+    await getAdminSession()
+
+    await prisma.certificationObjective.update({
+      where: { id },
+      data: {
+        title: data.title,
+        description: data.description || null,
+        title_en: data.title_en || null,
+        description_en: data.description_en || null,
+        title_it: data.title_it || null,
+        description_it: data.description_it || null,
+        title_fr: data.title_fr || null,
+        description_fr: data.description_fr || null,
+        title_de: data.title_de || null,
+        description_de: data.description_de || null,
+        title_pt: data.title_pt || null,
+        description_pt: data.description_pt || null,
+        icon: data.icon || 'target',
+        order: data.order,
+        isPublished: data.isPublished,
+      },
+    })
+
+    revalidatePath('/admin/certification')
+    revalidatePath('/partner/certification')
+    return { success: true }
+  } catch (error) {
+    console.error('Error updating certification objective:', error)
+    return { success: false, error: 'Failed to update objective' }
+  }
+}
+
+export async function deleteCertificationObjective(id: string) {
+  try {
+    await getAdminSession()
+
+    await prisma.certificationObjective.delete({
+      where: { id },
+    })
+
+    revalidatePath('/admin/certification')
+    revalidatePath('/partner/certification')
+    return { success: true }
+  } catch (error) {
+    console.error('Error deleting certification objective:', error)
+    return { success: false, error: 'Failed to delete objective' }
+  }
+}
