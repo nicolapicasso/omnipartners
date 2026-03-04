@@ -185,10 +185,23 @@ export default function ContractsManagement({
           includeRequirements: templateForm.includeRequirements,
           isDefault: templateForm.isDefault,
         })
-        if (result.success) {
-          setTemplates([...templates, { ...result.data, _count: { contracts: 0 } }])
+        if (result.success && result.data) {
+          const newTemplate: Template = {
+            id: result.data.id,
+            name: result.data.name,
+            partnerCategory: result.data.partnerCategory,
+            content: result.data.content,
+            content_en: result.data.content_en,
+            content_it: result.data.content_it,
+            includeRequirements: result.data.includeRequirements,
+            isActive: result.data.isActive,
+            isDefault: result.data.isDefault,
+            order: result.data.order,
+            _count: { contracts: 0 }
+          }
+          setTemplates([...templates, newTemplate])
           resetTemplateForm()
-        } else {
+        } else if (!result.success) {
           setError(result.error || 'Error al crear')
         }
       }
