@@ -1,7 +1,7 @@
 'use client'
 
 import { useState } from 'react'
-import { Plus, Edit2, Trash2, Save, X, Award, Users, Settings, CheckCircle, XCircle, ExternalLink, Image, Clock } from 'lucide-react'
+import { Plus, Edit2, Trash2, Save, X, Award, Users, Settings, CheckCircle, XCircle, ExternalLink, Image, Clock, Target } from 'lucide-react'
 import {
   createCertificationContent,
   updateCertificationContent,
@@ -13,6 +13,9 @@ import {
   grantCertification,
   revokeCertification,
   updatePartnerLandingUrl,
+  createCertificationObjective,
+  updateCertificationObjective,
+  deleteCertificationObjective,
 } from './actions'
 import { useTranslation } from '@/lib/contexts/LanguageContext'
 
@@ -64,19 +67,42 @@ type PartnerItem = {
   attemptCount: number
 }
 
+type ObjectiveItem = {
+  id: string
+  title: string
+  description: string | null
+  title_en: string | null
+  description_en: string | null
+  title_it: string | null
+  description_it: string | null
+  title_fr: string | null
+  description_fr: string | null
+  title_de: string | null
+  description_de: string | null
+  title_pt: string | null
+  description_pt: string | null
+  icon: string
+  order: number
+  isPublished: boolean
+  createdAt: Date
+  updatedAt: Date
+}
+
 export default function CertificationManagement({
   contents,
   questions,
   settings,
   partners,
+  objectives,
 }: {
   contents: ContentItem[]
   questions: QuestionItem[]
   settings: SettingsItem
   partners: PartnerItem[]
+  objectives: ObjectiveItem[]
 }) {
   const { t } = useTranslation()
-  const [activeTab, setActiveTab] = useState<'content' | 'questions' | 'settings' | 'partners'>('content')
+  const [activeTab, setActiveTab] = useState<'content' | 'questions' | 'objectives' | 'settings' | 'partners'>('content')
 
   return (
     <div>
@@ -103,6 +129,17 @@ export default function CertificationManagement({
           }`}
         >
           {t('certification.adminQuestions.title')}
+        </button>
+        <button
+          onClick={() => setActiveTab('objectives')}
+          className={`px-6 py-3 font-medium text-sm transition whitespace-nowrap flex items-center gap-2 ${
+            activeTab === 'objectives'
+              ? 'border-b-2 border-omniwallet-primary text-omniwallet-primary'
+              : 'text-gray-600 hover:text-gray-900'
+          }`}
+        >
+          <Target className="w-4 h-4" />
+          Objetivos
         </button>
         <button
           onClick={() => setActiveTab('settings')}
@@ -133,6 +170,9 @@ export default function CertificationManagement({
 
       {/* Questions Tab */}
       {activeTab === 'questions' && <QuestionManagement questions={questions} />}
+
+      {/* Objectives Tab */}
+      {activeTab === 'objectives' && <ObjectivesManagement objectives={objectives} />}
 
       {/* Settings Tab */}
       {activeTab === 'settings' && <BadgeSettingsManagement settings={settings} />}
@@ -1072,6 +1112,432 @@ function QuestionManagement({ questions }: { questions: QuestionItem[] }) {
               </div>
             )
           })
+        )}
+      </div>
+    </div>
+  )
+}
+
+// Objectives Management Component
+function ObjectivesManagement({ objectives }: { objectives: ObjectiveItem[] }) {
+  const { t } = useTranslation()
+  const [showForm, setShowForm] = useState(false)
+  const [editingId, setEditingId] = useState<string | null>(null)
+  const [loading, setLoading] = useState(false)
+  const [showTranslations, setShowTranslations] = useState(false)
+  const [formData, setFormData] = useState({
+    title: '',
+    description: '',
+    title_en: '',
+    description_en: '',
+    title_it: '',
+    description_it: '',
+    title_fr: '',
+    description_fr: '',
+    title_de: '',
+    description_de: '',
+    title_pt: '',
+    description_pt: '',
+    icon: 'target',
+    order: objectives.length,
+    isPublished: true,
+  })
+
+  const iconOptions = [
+    { value: 'target', label: 'Objetivo (Target)' },
+    { value: 'award', label: 'Premio (Award)' },
+    { value: 'star', label: 'Estrella (Star)' },
+    { value: 'check-circle', label: 'Check Circle' },
+    { value: 'book-open', label: 'Libro (Book)' },
+    { value: 'briefcase', label: 'Maletín (Briefcase)' },
+    { value: 'users', label: 'Usuarios (Users)' },
+    { value: 'trending-up', label: 'Crecimiento (Trending Up)' },
+    { value: 'shield', label: 'Escudo (Shield)' },
+    { value: 'zap', label: 'Rayo (Zap)' },
+  ]
+
+  const resetForm = () => {
+    setFormData({
+      title: '',
+      description: '',
+      title_en: '',
+      description_en: '',
+      title_it: '',
+      description_it: '',
+      title_fr: '',
+      description_fr: '',
+      title_de: '',
+      description_de: '',
+      title_pt: '',
+      description_pt: '',
+      icon: 'target',
+      order: objectives.length,
+      isPublished: true,
+    })
+    setEditingId(null)
+    setShowForm(false)
+    setShowTranslations(false)
+  }
+
+  const handleEdit = (objective: ObjectiveItem) => {
+    setFormData({
+      title: objective.title,
+      description: objective.description || '',
+      title_en: objective.title_en || '',
+      description_en: objective.description_en || '',
+      title_it: objective.title_it || '',
+      description_it: objective.description_it || '',
+      title_fr: objective.title_fr || '',
+      description_fr: objective.description_fr || '',
+      title_de: objective.title_de || '',
+      description_de: objective.description_de || '',
+      title_pt: objective.title_pt || '',
+      description_pt: objective.description_pt || '',
+      icon: objective.icon,
+      order: objective.order,
+      isPublished: objective.isPublished,
+    })
+    setEditingId(objective.id)
+    setShowForm(true)
+  }
+
+  const handleSubmit = async (e: React.FormEvent) => {
+    e.preventDefault()
+    setLoading(true)
+
+    const result = editingId
+      ? await updateCertificationObjective(editingId, formData)
+      : await createCertificationObjective(formData)
+
+    if (result.success) {
+      resetForm()
+      window.location.reload()
+    } else {
+      alert(result.error)
+    }
+
+    setLoading(false)
+  }
+
+  const handleDelete = async (id: string) => {
+    if (!confirm('¿Eliminar este objetivo?')) return
+
+    setLoading(true)
+    const result = await deleteCertificationObjective(id)
+
+    if (result.success) {
+      window.location.reload()
+    } else {
+      alert(result.error)
+    }
+
+    setLoading(false)
+  }
+
+  return (
+    <div>
+      <div className="flex justify-between items-center mb-6">
+        <div>
+          <h2 className="text-xl font-semibold text-gray-900">Objetivos de Certificación</h2>
+          <p className="text-sm text-gray-500 mt-1">
+            Define los objetivos que los partners verán en el portal de certificación
+          </p>
+        </div>
+        {!showForm && (
+          <button
+            onClick={() => setShowForm(true)}
+            className="inline-flex items-center gap-2 bg-omniwallet-primary text-white px-4 py-2 rounded-md text-sm font-medium hover:bg-omniwallet-secondary transition"
+          >
+            <Plus className="w-4 h-4" />
+            Agregar Objetivo
+          </button>
+        )}
+      </div>
+
+      {/* Form */}
+      {showForm && (
+        <form onSubmit={handleSubmit} className="bg-white rounded-lg shadow-sm border border-gray-200 p-6 mb-6">
+          <h3 className="text-lg font-semibold text-gray-900 mb-4">
+            {editingId ? 'Editar Objetivo' : 'Nuevo Objetivo'}
+          </h3>
+
+          <div className="space-y-4">
+            {/* Spanish (base) */}
+            <div className="p-4 bg-gray-50 rounded-lg">
+              <h4 className="font-medium text-gray-700 mb-3 flex items-center gap-2">
+                🇪🇸 Español (idioma base)
+              </h4>
+              <div className="space-y-3">
+                <div>
+                  <label className="block text-sm font-medium text-gray-700 mb-1">Título *</label>
+                  <input
+                    type="text"
+                    value={formData.title}
+                    onChange={(e) => setFormData({ ...formData, title: e.target.value })}
+                    className="w-full border border-gray-300 rounded-md px-3 py-2 text-sm focus:ring-2 focus:ring-omniwallet-primary focus:border-transparent"
+                    required
+                    placeholder="Ej: Dominar el Loyalty Marketing"
+                  />
+                </div>
+                <div>
+                  <label className="block text-sm font-medium text-gray-700 mb-1">Descripción</label>
+                  <textarea
+                    value={formData.description}
+                    onChange={(e) => setFormData({ ...formData, description: e.target.value })}
+                    rows={2}
+                    className="w-full border border-gray-300 rounded-md px-3 py-2 text-sm focus:ring-2 focus:ring-omniwallet-primary focus:border-transparent"
+                    placeholder="Breve descripción del objetivo..."
+                  />
+                </div>
+              </div>
+            </div>
+
+            {/* Translations toggle */}
+            <button
+              type="button"
+              onClick={() => setShowTranslations(!showTranslations)}
+              className="text-sm text-omniwallet-primary hover:underline"
+            >
+              {showTranslations ? '▼ Ocultar traducciones' : '▶ Mostrar traducciones (EN, IT, FR, DE, PT)'}
+            </button>
+
+            {/* Translations */}
+            {showTranslations && (
+              <div className="space-y-4 border-t pt-4">
+                {/* English */}
+                <div className="p-4 bg-blue-50 rounded-lg">
+                  <h4 className="font-medium text-gray-700 mb-3">🇬🇧 English</h4>
+                  <div className="grid grid-cols-1 md:grid-cols-2 gap-3">
+                    <input
+                      type="text"
+                      value={formData.title_en}
+                      onChange={(e) => setFormData({ ...formData, title_en: e.target.value })}
+                      className="border border-gray-300 rounded-md px-3 py-2 text-sm"
+                      placeholder="Title"
+                    />
+                    <input
+                      type="text"
+                      value={formData.description_en}
+                      onChange={(e) => setFormData({ ...formData, description_en: e.target.value })}
+                      className="border border-gray-300 rounded-md px-3 py-2 text-sm"
+                      placeholder="Description"
+                    />
+                  </div>
+                </div>
+
+                {/* Italian */}
+                <div className="p-4 bg-green-50 rounded-lg">
+                  <h4 className="font-medium text-gray-700 mb-3">🇮🇹 Italiano</h4>
+                  <div className="grid grid-cols-1 md:grid-cols-2 gap-3">
+                    <input
+                      type="text"
+                      value={formData.title_it}
+                      onChange={(e) => setFormData({ ...formData, title_it: e.target.value })}
+                      className="border border-gray-300 rounded-md px-3 py-2 text-sm"
+                      placeholder="Titolo"
+                    />
+                    <input
+                      type="text"
+                      value={formData.description_it}
+                      onChange={(e) => setFormData({ ...formData, description_it: e.target.value })}
+                      className="border border-gray-300 rounded-md px-3 py-2 text-sm"
+                      placeholder="Descrizione"
+                    />
+                  </div>
+                </div>
+
+                {/* French */}
+                <div className="p-4 bg-purple-50 rounded-lg">
+                  <h4 className="font-medium text-gray-700 mb-3">🇫🇷 Français</h4>
+                  <div className="grid grid-cols-1 md:grid-cols-2 gap-3">
+                    <input
+                      type="text"
+                      value={formData.title_fr}
+                      onChange={(e) => setFormData({ ...formData, title_fr: e.target.value })}
+                      className="border border-gray-300 rounded-md px-3 py-2 text-sm"
+                      placeholder="Titre"
+                    />
+                    <input
+                      type="text"
+                      value={formData.description_fr}
+                      onChange={(e) => setFormData({ ...formData, description_fr: e.target.value })}
+                      className="border border-gray-300 rounded-md px-3 py-2 text-sm"
+                      placeholder="Description"
+                    />
+                  </div>
+                </div>
+
+                {/* German */}
+                <div className="p-4 bg-yellow-50 rounded-lg">
+                  <h4 className="font-medium text-gray-700 mb-3">🇩🇪 Deutsch</h4>
+                  <div className="grid grid-cols-1 md:grid-cols-2 gap-3">
+                    <input
+                      type="text"
+                      value={formData.title_de}
+                      onChange={(e) => setFormData({ ...formData, title_de: e.target.value })}
+                      className="border border-gray-300 rounded-md px-3 py-2 text-sm"
+                      placeholder="Titel"
+                    />
+                    <input
+                      type="text"
+                      value={formData.description_de}
+                      onChange={(e) => setFormData({ ...formData, description_de: e.target.value })}
+                      className="border border-gray-300 rounded-md px-3 py-2 text-sm"
+                      placeholder="Beschreibung"
+                    />
+                  </div>
+                </div>
+
+                {/* Portuguese */}
+                <div className="p-4 bg-orange-50 rounded-lg">
+                  <h4 className="font-medium text-gray-700 mb-3">🇵🇹 Português</h4>
+                  <div className="grid grid-cols-1 md:grid-cols-2 gap-3">
+                    <input
+                      type="text"
+                      value={formData.title_pt}
+                      onChange={(e) => setFormData({ ...formData, title_pt: e.target.value })}
+                      className="border border-gray-300 rounded-md px-3 py-2 text-sm"
+                      placeholder="Título"
+                    />
+                    <input
+                      type="text"
+                      value={formData.description_pt}
+                      onChange={(e) => setFormData({ ...formData, description_pt: e.target.value })}
+                      className="border border-gray-300 rounded-md px-3 py-2 text-sm"
+                      placeholder="Descrição"
+                    />
+                  </div>
+                </div>
+              </div>
+            )}
+
+            {/* Icon, Order, Published */}
+            <div className="grid grid-cols-1 md:grid-cols-3 gap-4">
+              <div>
+                <label className="block text-sm font-medium text-gray-700 mb-1">Icono</label>
+                <select
+                  value={formData.icon}
+                  onChange={(e) => setFormData({ ...formData, icon: e.target.value })}
+                  className="w-full border border-gray-300 rounded-md px-3 py-2 text-sm focus:ring-2 focus:ring-omniwallet-primary focus:border-transparent"
+                >
+                  {iconOptions.map((opt) => (
+                    <option key={opt.value} value={opt.value}>
+                      {opt.label}
+                    </option>
+                  ))}
+                </select>
+              </div>
+
+              <div>
+                <label className="block text-sm font-medium text-gray-700 mb-1">Orden</label>
+                <input
+                  type="number"
+                  value={formData.order}
+                  onChange={(e) => setFormData({ ...formData, order: parseInt(e.target.value) })}
+                  className="w-full border border-gray-300 rounded-md px-3 py-2 text-sm focus:ring-2 focus:ring-omniwallet-primary focus:border-transparent"
+                  min="0"
+                />
+              </div>
+
+              <div>
+                <label className="flex items-center gap-2 mt-7">
+                  <input
+                    type="checkbox"
+                    checked={formData.isPublished}
+                    onChange={(e) => setFormData({ ...formData, isPublished: e.target.checked })}
+                    className="w-4 h-4 text-omniwallet-primary focus:ring-omniwallet-primary"
+                  />
+                  <span className="text-sm font-medium text-gray-700">Publicado</span>
+                </label>
+              </div>
+            </div>
+          </div>
+
+          <div className="flex gap-2 mt-6">
+            <button
+              type="submit"
+              disabled={loading}
+              className="inline-flex items-center gap-2 bg-omniwallet-primary text-white px-4 py-2 rounded-md text-sm font-medium hover:bg-omniwallet-secondary transition disabled:opacity-50"
+            >
+              <Save className="w-4 h-4" />
+              {loading ? t('common.submitting') : t('common.save')}
+            </button>
+            <button
+              type="button"
+              onClick={resetForm}
+              disabled={loading}
+              className="inline-flex items-center gap-2 bg-gray-200 text-gray-700 px-4 py-2 rounded-md text-sm font-medium hover:bg-gray-300 transition"
+            >
+              <X className="w-4 h-4" />
+              {t('common.cancel')}
+            </button>
+          </div>
+        </form>
+      )}
+
+      {/* Objectives List */}
+      <div className="space-y-4">
+        {objectives.length === 0 ? (
+          <div className="bg-white rounded-lg shadow-sm border border-gray-200 p-8 text-center">
+            <Target className="w-12 h-12 text-gray-300 mx-auto mb-3" />
+            <p className="text-gray-500">No hay objetivos definidos</p>
+            <p className="text-sm text-gray-400 mt-1">
+              Agrega objetivos para que los partners sepan qué aprenderán
+            </p>
+          </div>
+        ) : (
+          objectives.map((objective) => (
+            <div key={objective.id} className="bg-white rounded-lg shadow-sm border border-gray-200 p-6">
+              <div className="flex items-start justify-between">
+                <div className="flex items-start gap-4">
+                  <div className="p-3 bg-omniwallet-primary/10 rounded-lg">
+                    <Target className="w-6 h-6 text-omniwallet-primary" />
+                  </div>
+                  <div>
+                    <div className="flex items-center gap-3 mb-1">
+                      <h3 className="text-lg font-semibold text-gray-900">{objective.title}</h3>
+                      {objective.isPublished ? (
+                        <span className="text-xs px-2 py-1 rounded-full bg-green-100 text-green-700">
+                          Publicado
+                        </span>
+                      ) : (
+                        <span className="text-xs px-2 py-1 rounded-full bg-gray-100 text-gray-700">
+                          Borrador
+                        </span>
+                      )}
+                    </div>
+                    {objective.description && (
+                      <p className="text-gray-600 mb-2">{objective.description}</p>
+                    )}
+                    <div className="flex items-center gap-4 text-sm text-gray-500">
+                      <span>Orden: {objective.order}</span>
+                      <span>Icono: {objective.icon}</span>
+                      {objective.title_en && <span>🇬🇧</span>}
+                      {objective.title_it && <span>🇮🇹</span>}
+                      {objective.title_fr && <span>🇫🇷</span>}
+                      {objective.title_de && <span>🇩🇪</span>}
+                      {objective.title_pt && <span>🇵🇹</span>}
+                    </div>
+                  </div>
+                </div>
+
+                <div className="flex gap-2">
+                  <button
+                    onClick={() => handleEdit(objective)}
+                    className="p-2 text-omniwallet-primary hover:bg-omniwallet-primary/10 rounded-md transition"
+                  >
+                    <Edit2 className="w-4 h-4" />
+                  </button>
+                  <button
+                    onClick={() => handleDelete(objective.id)}
+                    className="p-2 text-red-600 hover:bg-red-50 rounded-md transition"
+                  >
+                    <Trash2 className="w-4 h-4" />
+                  </button>
+                </div>
+              </div>
+            </div>
+          ))
         )}
       </div>
     </div>

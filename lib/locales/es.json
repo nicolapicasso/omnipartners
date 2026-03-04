@@ -368,6 +368,10 @@
       "finishWithout": "Finalizar sin responder",
       "correct": "¡Correcto!",
       "incorrect": "Incorrecto"
+    },
+    "objectives": {
+      "title": "Objetivos de la Certificación",
+      "description": "Al completar esta certificación, serás capaz de:"
     }
   },
   "requirements": {

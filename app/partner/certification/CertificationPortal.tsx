@@ -1,7 +1,7 @@
 'use client'
 
 import { useState } from 'react'
-import { Award, BookOpen, CheckCircle, XCircle, ExternalLink, FileText, Video, Link as LinkIcon, AlertTriangle, Lightbulb, Code, Copy, Check, Sun, Moon } from 'lucide-react'
+import { Award, BookOpen, CheckCircle, XCircle, ExternalLink, FileText, Video, Link as LinkIcon, AlertTriangle, Lightbulb, Code, Copy, Check, Sun, Moon, Target, Star, Briefcase, Users, TrendingUp, Shield, Zap } from 'lucide-react'
 import { submitCertificationExam, verifyAnswer } from './actions'
 import { useTranslation } from '@/lib/contexts/LanguageContext'
 
@@ -31,11 +31,47 @@ type AttemptItem = {
   completedAt: Date
 }
 
+type ObjectiveItem = {
+  id: string
+  title: string
+  description: string | null
+  icon: string
+  order: number
+}
+
 type AnswerResult = {
   answer: number
   correct: boolean
   explanation: string | null
   correctAnswer: number
+}
+
+// Icon component for dynamic icon rendering
+function ObjectiveIcon({ icon, className }: { icon: string; className?: string }) {
+  const iconClass = className || 'w-5 h-5'
+  switch (icon) {
+    case 'award':
+      return <Award className={iconClass} />
+    case 'star':
+      return <Star className={iconClass} />
+    case 'check-circle':
+      return <CheckCircle className={iconClass} />
+    case 'book-open':
+      return <BookOpen className={iconClass} />
+    case 'briefcase':
+      return <Briefcase className={iconClass} />
+    case 'users':
+      return <Users className={iconClass} />
+    case 'trending-up':
+      return <TrendingUp className={iconClass} />
+    case 'shield':
+      return <Shield className={iconClass} />
+    case 'zap':
+      return <Zap className={iconClass} />
+    case 'target':
+    default:
+      return <Target className={iconClass} />
+  }
 }
 
 export default function CertificationPortal({
@@ -46,6 +82,7 @@ export default function CertificationPortal({
   contents,
   questions,
   attempts,
+  objectives,
   badgeLightUrl,
   badgeDarkUrl,
   baseUrl,
@@ -57,6 +94,7 @@ export default function CertificationPortal({
   contents: ContentItem[]
   questions: QuestionItem[]
   attempts: AttemptItem[]
+  objectives: ObjectiveItem[]
   badgeLightUrl: string | null
   badgeDarkUrl: string | null
   baseUrl: string
@@ -243,6 +281,35 @@ export default function CertificationPortal({
               </div>
             )}
           </div>
+
+          {/* Certification Objectives */}
+          {objectives.length > 0 && (
+            <div className="bg-white rounded-lg shadow-sm border border-gray-200 p-6 mb-8">
+              <div className="flex items-center gap-3 mb-4">
+                <Target className="w-6 h-6 text-omniwallet-primary" />
+                <h2 className="text-xl font-semibold text-gray-900">{t('certification.objectives.title')}</h2>
+              </div>
+              <p className="text-sm text-gray-600 mb-6">{t('certification.objectives.description')}</p>
+              <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+                {objectives.map((objective) => (
+                  <div
+                    key={objective.id}
+                    className="flex items-start gap-4 p-4 bg-gray-50 rounded-lg border border-gray-100"
+                  >
+                    <div className="p-2 bg-omniwallet-primary/10 rounded-lg flex-shrink-0">
+                      <ObjectiveIcon icon={objective.icon} className="w-5 h-5 text-omniwallet-primary" />
+                    </div>
+                    <div>
+                      <h3 className="font-medium text-gray-900">{objective.title}</h3>
+                      {objective.description && (
+                        <p className="text-sm text-gray-600 mt-1">{objective.description}</p>
+                      )}
+                    </div>
+                  </div>
+                ))}
+              </div>
+            </div>
+          )}
 
           {/* Embed Code Section - Only show if certified */}
           {isCertified && (

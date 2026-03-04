@@ -555,6 +555,49 @@ model CertificationAttempt {
   @@map("certification_attempts")
 }
 
+// Objetivos de certificación (configurables por admin)
+model CertificationObjective {
+  id          String   @id @default(cuid())
+
+  // Original content (Spanish - base language)
+  title       String
+  description String?
+
+  // Translations - English
+  title_en       String?
+  description_en String?
+
+  // Translations - Italian
+  title_it       String?
+  description_it String?
+
+  // Translations - French
+  title_fr       String?
+  description_fr String?
+
+  // Translations - German
+  title_de       String?
+  description_de String?
+
+  // Translations - Portuguese
+  title_pt       String?
+  description_pt String?
+
+  // Icon identifier (for UI rendering)
+  icon        String   @default("target")
+
+  // Order for displaying objectives
+  order       Int      @default(0)
+
+  // Visibility
+  isPublished Boolean  @default(false)
+
+  createdAt   DateTime @default(now())
+  updatedAt   DateTime @updatedAt
+
+  @@map("certification_objectives")
+}
+
 // Configuración global del sello de certificación
 model CertificationSettings {
   id                    String   @id @default(cuid())

@@ -367,6 +367,10 @@
       "finishWithout": "Finish without answering",
       "correct": "Correct!",
       "incorrect": "Incorrect"
+    },
+    "objectives": {
+      "title": "Certification Objectives",
+      "description": "Upon completing this certification, you will be able to:"
     }
   },
   "requirements": {
