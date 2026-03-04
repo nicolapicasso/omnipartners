@@ -30,6 +30,17 @@ async function getPartnerRequirements(partnerId: string, locale: string) {
     throw new Error('Partner not found')
   }
 
+  // Check if partner has a signed contract (new system)
+  const signedContract = await prisma.contract.findFirst({
+    where: {
+      partnerId,
+      status: 'SIGNED',
+    },
+  })
+
+  // For contract requirement: check new system first, fallback to old contractUrl
+  const hasSignedContract = !!signedContract || !!partner.contractUrl
+
   // Get dynamic requirements for this partner
   const reqResult = await getRequirementsForPartner(partnerId)
   const config = reqResult.data || {
@@ -69,7 +80,7 @@ async function getPartnerRequirements(partnerId: string, locale: string) {
       id: 'contract',
       title: t.requirements?.contract?.title || 'Contract',
       description: t.requirements?.contract?.description || 'Sign the partner contract',
-      completed: !!partner.contractUrl,
+      completed: hasSignedContract,
       icon: 'FileText',
     })
   }
@@ -87,9 +98,10 @@ async function getPartnerRequirements(partnerId: string, locale: string) {
 
   // Leads requirement (if > 0)
   if (config.leadsPerYear > 0) {
+    const leadsTitle = config.leadsLabel || (t.requirements?.leads?.title || 'Create {count}+ Leads per Year').replace('{count}', String(config.leadsPerYear))
     requirements.push({
       id: 'leads',
-      title: t.requirements?.leads?.title || 'Register Leads',
+      title: leadsTitle,
       description: (t.requirements?.leads?.description || 'Register at least {count} leads this year').replace('{count}', String(config.leadsPerYear)),
       completed: leadsThisYear.length >= config.leadsPerYear,
       progress: { current: leadsThisYear.length, target: config.leadsPerYear },
@@ -99,9 +111,10 @@ async function getPartnerRequirements(partnerId: string, locale: string) {
 
   // Prospects requirement (if > 0)
   if (config.prospectsPerYear > 0) {
+    const prospectsTitle = config.prospectsLabel || (t.requirements?.prospects?.title || 'Convert {count}+ Leads to Prospects').replace('{count}', String(config.prospectsPerYear))
     requirements.push({
       id: 'prospects',
-      title: t.requirements?.prospects?.title || 'Convert Prospects',
+      title: prospectsTitle,
       description: (t.requirements?.prospects?.description || 'Convert at least {count} leads to prospects').replace('{count}', String(config.prospectsPerYear)),
       completed: prospectsThisYear.length >= config.prospectsPerYear,
       progress: { current: prospectsThisYear.length, target: config.prospectsPerYear },
@@ -111,9 +124,10 @@ async function getPartnerRequirements(partnerId: string, locale: string) {
 
   // Clients requirement (if > 0)
   if (config.clientsPerYear > 0) {
+    const clientsTitle = config.clientsLabel || (t.requirements?.clients?.title || 'Close {count}+ Clients per Year').replace('{count}', String(config.clientsPerYear))
     requirements.push({
       id: 'clients',
-      title: t.requirements?.clients?.title || 'Acquire Clients',
+      title: clientsTitle,
       description: (t.requirements?.clients?.description || 'Convert at least {count} prospects to clients').replace('{count}', String(config.clientsPerYear)),
       completed: clientsThisYear.length >= config.clientsPerYear,
       progress: { current: clientsThisYear.length, target: config.clientsPerYear },
@@ -123,10 +137,11 @@ async function getPartnerRequirements(partnerId: string, locale: string) {
 
   // Events requirement (if > 0)
   if (config.eventsPerYear > 0) {
+    const eventsTitle = config.eventsLabel || (t.requirements?.event?.title || 'Host/Attend {count} Joint Event(s)').replace('{count}', String(config.eventsPerYear))
     requirements.push({
       id: 'event',
-      title: t.requirements?.event?.title || 'Yearly Event',
-      description: t.requirements?.event?.description || 'Attend the yearly partner event',
+      title: eventsTitle,
+      description: (t.requirements?.event?.description || 'Attend the yearly partner event').replace('{count}', String(config.eventsPerYear)),
       completed: partner.hasCompletedYearlyEvent,
       icon: 'Presentation',
     })

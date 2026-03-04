@@ -13,6 +13,10 @@ interface RequirementTargets {
   certificationRequired: boolean
   contractRequired: boolean
   omniwalletRequired: boolean
+  leadsLabel?: string | null
+  prospectsLabel?: string | null
+  clientsLabel?: string | null
+  eventsLabel?: string | null
 }
 
 interface RequirementsSummaryProps {
@@ -58,6 +62,12 @@ export default function RequirementsSummary({
   )
   const clientsThisYear = leadsThisYear.filter((lead) => lead.status === LeadStatus.CLIENT)
 
+  // Helper to replace {count} placeholder in translation
+  const formatTitle = (translationKey: string, count: number, customLabel?: string | null) => {
+    if (customLabel) return customLabel
+    return t(translationKey).replace('{count}', String(count))
+  }
+
   // Build requirements array based on what's required
   const requirements: Array<{ title: string; completed: boolean }> = []
 
@@ -70,19 +80,31 @@ export default function RequirementsSummary({
   }
 
   if (targets.leadsPerYear > 0) {
-    requirements.push({ title: t('requirements.leads.title'), completed: leadsThisYear.length >= targets.leadsPerYear })
+    requirements.push({
+      title: formatTitle('requirements.leads.title', targets.leadsPerYear, targets.leadsLabel),
+      completed: leadsThisYear.length >= targets.leadsPerYear
+    })
   }
 
   if (targets.prospectsPerYear > 0) {
-    requirements.push({ title: t('requirements.prospects.title'), completed: prospectsThisYear.length >= targets.prospectsPerYear })
+    requirements.push({
+      title: formatTitle('requirements.prospects.title', targets.prospectsPerYear, targets.prospectsLabel),
+      completed: prospectsThisYear.length >= targets.prospectsPerYear
+    })
   }
 
   if (targets.clientsPerYear > 0) {
-    requirements.push({ title: t('requirements.clients.title'), completed: clientsThisYear.length >= targets.clientsPerYear })
+    requirements.push({
+      title: formatTitle('requirements.clients.title', targets.clientsPerYear, targets.clientsLabel),
+      completed: clientsThisYear.length >= targets.clientsPerYear
+    })
   }
 
   if (targets.eventsPerYear > 0) {
-    requirements.push({ title: t('requirements.event.title'), completed: hasCompletedYearlyEvent })
+    requirements.push({
+      title: formatTitle('requirements.event.title', targets.eventsPerYear, targets.eventsLabel),
+      completed: hasCompletedYearlyEvent
+    })
   }
 
   if (targets.certificationRequired) {
