@@ -415,20 +415,20 @@
       "description": "Tener una cuenta activa de partner de Omniwallet configurada"
     },
     "leads": {
-      "title": "Crear 10+ Leads por Año",
-      "description": "Generar al menos 10 leads de calidad para Omniwallet anualmente"
+      "title": "Crear {count}+ Leads por Año",
+      "description": "Generar al menos {count} leads de calidad para Omniwallet anualmente"
     },
     "prospects": {
-      "title": "Convertir 5+ Leads a Prospects",
-      "description": "Tener al menos 5 leads que reciban demostraciones del producto anualmente"
+      "title": "Convertir {count}+ Leads a Prospects",
+      "description": "Tener al menos {count} leads que reciban demostraciones del producto anualmente"
     },
     "clients": {
-      "title": "Cerrar 2+ Clientes por Año",
-      "description": "Convertir exitosamente al menos 2 prospects en clientes de pago anualmente"
+      "title": "Cerrar {count}+ Clientes por Año",
+      "description": "Convertir exitosamente al menos {count} prospects en clientes de pago anualmente"
     },
     "event": {
-      "title": "Organizar/Asistir a Evento Conjunto",
-      "description": "Participar en al menos un webinar o evento conjunto con Omniwallet por año"
+      "title": "Organizar/Asistir a {count} Evento(s) Conjunto(s)",
+      "description": "Participar en al menos {count} webinar o evento conjunto con Omniwallet por año"
     },
     "certification": {
       "title": "Completar Certificación",

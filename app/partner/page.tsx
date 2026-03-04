@@ -92,6 +92,17 @@ export default async function PartnerDashboard() {
     orderBy: { createdAt: 'desc' },
   })
 
+  // Check if partner has a signed contract (new system)
+  const signedContract = await prisma.contract.findFirst({
+    where: {
+      partnerId,
+      status: 'SIGNED',
+    },
+  })
+
+  // For contract requirement: check new system first, fallback to old contractUrl
+  const hasSignedContract = !!signedContract || !!partner.contractUrl
+
   // Get dynamic requirements for this partner
   const reqResult = await getRequirementsForPartner(partnerId)
   const requirementTargets = reqResult.data ? {
@@ -102,6 +113,10 @@ export default async function PartnerDashboard() {
     certificationRequired: reqResult.data.certificationRequired,
     contractRequired: reqResult.data.contractRequired,
     omniwalletRequired: reqResult.data.omniwalletRequired,
+    leadsLabel: reqResult.data.leadsLabel,
+    prospectsLabel: reqResult.data.prospectsLabel,
+    clientsLabel: reqResult.data.clientsLabel,
+    eventsLabel: reqResult.data.eventsLabel,
   } : DEFAULT_REQUIREMENTS
 
   return (
@@ -383,7 +398,7 @@ export default async function PartnerDashboard() {
 
         {/* Partner Requirements Summary */}
         <RequirementsSummary
-          contractUrl={partner.contractUrl}
+          contractUrl={hasSignedContract ? 'signed' : null}
           omniwalletAccountUrl={partner.omniwalletAccountUrl}
           hasCompletedYearlyEvent={partner.hasCompletedYearlyEvent}
           isCertified={partner.isCertified}
