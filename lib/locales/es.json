@@ -408,6 +408,10 @@
       "title": "Organizar/Asistir a Evento Conjunto",
       "description": "Participar en al menos un webinar o evento conjunto con Omniwallet por año"
     },
+    "certification": {
+      "title": "Completar Certificación",
+      "description": "Completar el examen de certificación de Loyalty Partner"
+    },
     "helpTitle": "¿Necesitas Ayuda?",
     "helpDescription": "Si tienes preguntas sobre algún requisito o necesitas asistencia, contacta a tu gerente de partnership de Omniwallet o comunícate con nuestro equipo de soporte.",
     "contactSupport": "Contactar Soporte"

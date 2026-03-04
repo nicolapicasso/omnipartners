@@ -598,6 +598,47 @@ model CertificationObjective {
   @@map("certification_objectives")
 }
 
+// ============================================
+// PARTNER REQUIREMENTS CONFIGURATION
+// ============================================
+
+// Configuración de requisitos por partner/categoría/global
+model PartnerRequirementConfig {
+  id              String   @id @default(cuid())
+
+  // Scope: GLOBAL (defaults), BY_CATEGORY (per partner type), BY_PARTNER (individual override)
+  scope           String   @default("GLOBAL")
+
+  // If BY_CATEGORY, which partner category this applies to
+  partnerCategory String?  // AGENCY_PARTNER, TECH_PARTNER, REFERRAL, CUSTOM
+
+  // If BY_PARTNER, which specific partner this applies to
+  partnerId       String?  @unique
+
+  // Requirements - Annual targets
+  leadsPerYear       Int   @default(10)   // Leads cualificados por año
+  prospectsPerYear   Int   @default(5)    // Prospects/demos por año
+  clientsPerYear     Int   @default(2)    // Clientes convertidos por año
+  eventsPerYear      Int   @default(1)    // Eventos/webinars por año
+
+  // Boolean requirements
+  certificationRequired  Boolean @default(true)   // Debe completar certificación
+  contractRequired       Boolean @default(true)   // Debe tener contrato firmado
+  omniwalletRequired     Boolean @default(true)   // Debe tener cuenta Omniwallet
+
+  // Labels customizables (opcional, para el contrato)
+  leadsLabel          String?
+  prospectsLabel      String?
+  clientsLabel        String?
+  eventsLabel         String?
+
+  createdAt       DateTime @default(now())
+  updatedAt       DateTime @updatedAt
+
+  @@unique([scope, partnerCategory])
+  @@map("partner_requirement_configs")
+}
+
 // Configuración global del sello de certificación
 model CertificationSettings {
   id                    String   @id @default(cuid())

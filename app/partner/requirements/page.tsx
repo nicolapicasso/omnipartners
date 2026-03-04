@@ -6,6 +6,7 @@ import PartnerDashboardHeader from '@/components/PartnerDashboardHeader'
 import PartnerSidebar from '@/components/PartnerSidebar'
 import RequirementsContent from './RequirementsContent'
 import { getTranslations } from '@/lib/translations'
+import { getRequirementsForPartner, DEFAULT_REQUIREMENTS } from '@/app/admin/requirements/actions'
 
 async function getPartnerRequirements(partnerId: string, locale: string) {
   const partner = await prisma.partner.findUnique({
@@ -14,6 +15,7 @@ async function getPartnerRequirements(partnerId: string, locale: string) {
       contractUrl: true,
       omniwalletAccountUrl: true,
       hasCompletedYearlyEvent: true,
+      isCertified: true,
       leads: {
         select: {
           status: true,
@@ -25,6 +27,16 @@ async function getPartnerRequirements(partnerId: string, locale: string) {
 
   if (!partner) {
     throw new Error('Partner not found')
+  }
+
+  // Get dynamic requirements for this partner
+  const reqResult = await getRequirementsForPartner(partnerId)
+  const config = reqResult.data || {
+    ...DEFAULT_REQUIREMENTS,
+    leadsLabel: null,
+    prospectsLabel: null,
+    clientsLabel: null,
+    eventsLabel: null,
   }
 
   const currentYear = new Date().getFullYear()
@@ -41,56 +53,99 @@ async function getPartnerRequirements(partnerId: string, locale: string) {
 
   const t = getTranslations(locale)
 
-  const requirements = [
-    {
+  const requirements: Array<{
+    id: string
+    title: string
+    description: string
+    completed: boolean
+    icon: string
+    progress?: { current: number; target: number }
+  }> = []
+
+  // Contract requirement (if required)
+  if (config.contractRequired) {
+    requirements.push({
       id: 'contract',
       title: t.requirements?.contract?.title || 'Contract',
       description: t.requirements?.contract?.description || 'Sign the partner contract',
       completed: !!partner.contractUrl,
       icon: 'FileText',
-    },
-    {
+    })
+  }
+
+  // Omniwallet account requirement (if required)
+  if (config.omniwalletRequired) {
+    requirements.push({
       id: 'account',
       title: t.requirements?.account?.title || 'Omniwallet Account',
       description: t.requirements?.account?.description || 'Create your Omniwallet account',
       completed: !!partner.omniwalletAccountUrl,
       icon: 'Wallet',
-    },
-    {
+    })
+  }
+
+  // Leads requirement (if > 0)
+  if (config.leadsPerYear > 0) {
+    requirements.push({
       id: 'leads',
       title: t.requirements?.leads?.title || 'Register Leads',
-      description: t.requirements?.leads?.description || 'Register at least 10 leads this year',
-      completed: leadsThisYear.length >= 10,
-      progress: { current: leadsThisYear.length, target: 10 },
+      description: (t.requirements?.leads?.description || 'Register at least {count} leads this year').replace('{count}', String(config.leadsPerYear)),
+      completed: leadsThisYear.length >= config.leadsPerYear,
+      progress: { current: leadsThisYear.length, target: config.leadsPerYear },
       icon: 'TrendingUp',
-    },
-    {
+    })
+  }
+
+  // Prospects requirement (if > 0)
+  if (config.prospectsPerYear > 0) {
+    requirements.push({
       id: 'prospects',
       title: t.requirements?.prospects?.title || 'Convert Prospects',
-      description: t.requirements?.prospects?.description || 'Convert at least 5 leads to prospects',
-      completed: prospectsThisYear.length >= 5,
-      progress: { current: prospectsThisYear.length, target: 5 },
+      description: (t.requirements?.prospects?.description || 'Convert at least {count} leads to prospects').replace('{count}', String(config.prospectsPerYear)),
+      completed: prospectsThisYear.length >= config.prospectsPerYear,
+      progress: { current: prospectsThisYear.length, target: config.prospectsPerYear },
       icon: 'Users',
-    },
-    {
+    })
+  }
+
+  // Clients requirement (if > 0)
+  if (config.clientsPerYear > 0) {
+    requirements.push({
       id: 'clients',
       title: t.requirements?.clients?.title || 'Acquire Clients',
-      description: t.requirements?.clients?.description || 'Convert at least 2 prospects to clients',
-      completed: clientsThisYear.length >= 2,
-      progress: { current: clientsThisYear.length, target: 2 },
+      description: (t.requirements?.clients?.description || 'Convert at least {count} prospects to clients').replace('{count}', String(config.clientsPerYear)),
+      completed: clientsThisYear.length >= config.clientsPerYear,
+      progress: { current: clientsThisYear.length, target: config.clientsPerYear },
       icon: 'CheckCircle2',
-    },
-    {
+    })
+  }
+
+  // Events requirement (if > 0)
+  if (config.eventsPerYear > 0) {
+    requirements.push({
       id: 'event',
       title: t.requirements?.event?.title || 'Yearly Event',
       description: t.requirements?.event?.description || 'Attend the yearly partner event',
       completed: partner.hasCompletedYearlyEvent,
       icon: 'Presentation',
-    },
-  ]
+    })
+  }
+
+  // Certification requirement (if required)
+  if (config.certificationRequired) {
+    requirements.push({
+      id: 'certification',
+      title: t.requirements?.certification?.title || 'Certification',
+      description: t.requirements?.certification?.description || 'Complete the partner certification',
+      completed: partner.isCertified,
+      icon: 'Award',
+    })
+  }
 
   const completedCount = requirements.filter((r) => r.completed).length
-  const completionPercentage = Math.round((completedCount / requirements.length) * 100)
+  const completionPercentage = requirements.length > 0
+    ? Math.round((completedCount / requirements.length) * 100)
+    : 100
 
   return { requirements, completedCount, totalCount: requirements.length, completionPercentage }
 }
