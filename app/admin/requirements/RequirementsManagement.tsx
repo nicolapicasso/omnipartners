@@ -8,8 +8,8 @@ import {
   deleteCategoryRequirements,
   createPartnerOverride,
   deletePartnerOverride,
-  DEFAULT_REQUIREMENTS,
 } from './actions'
+import { DEFAULT_REQUIREMENTS } from './constants'
 
 type RequirementConfig = {
   id: string

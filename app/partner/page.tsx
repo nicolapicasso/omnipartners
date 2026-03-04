@@ -8,7 +8,8 @@ import PartnerDashboardHeader from '@/components/PartnerDashboardHeader'
 import PartnerSidebar from '@/components/PartnerSidebar'
 import RequirementsSummary from '@/components/RequirementsSummary'
 import { getTranslations } from '@/lib/translations'
-import { getRequirementsForPartner, DEFAULT_REQUIREMENTS } from '@/app/admin/requirements/actions'
+import { getRequirementsForPartner } from '@/app/admin/requirements/actions'
+import { DEFAULT_REQUIREMENTS } from '@/app/admin/requirements/constants'
 
 async function getPartnerStats(partnerId: string): Promise<PartnerDashboardStats> {
   const [totalLeads, totalProspects, totalClients] = await Promise.all([

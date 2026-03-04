@@ -6,7 +6,8 @@ import PartnerDashboardHeader from '@/components/PartnerDashboardHeader'
 import PartnerSidebar from '@/components/PartnerSidebar'
 import RequirementsContent from './RequirementsContent'
 import { getTranslations } from '@/lib/translations'
-import { getRequirementsForPartner, DEFAULT_REQUIREMENTS } from '@/app/admin/requirements/actions'
+import { getRequirementsForPartner } from '@/app/admin/requirements/actions'
+import { DEFAULT_REQUIREMENTS } from '@/app/admin/requirements/constants'
 
 async function getPartnerRequirements(partnerId: string, locale: string) {
   const partner = await prisma.partner.findUnique({
