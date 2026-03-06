@@ -140,6 +140,14 @@ export async function GET(
       font-weight: bold;
       color: #333;
     }
+    .signature-image {
+      background: white;
+      border: 1px solid #e2e8f0;
+      border-radius: 4px;
+      padding: 10px;
+      margin: 10px 0 15px 0;
+      text-align: center;
+    }
     .legal-note {
       margin-top: 40px;
       padding: 15px;
@@ -177,15 +185,15 @@ export async function GET(
     <table>
       <tr>
         <td>Partner:</td>
-        <td>${contract.partner.companyName}</td>
+        <td>${escapeHtml(contract.partner.companyName)}</td>
       </tr>
       <tr>
         <td>Contacto:</td>
-        <td>${contract.partner.contactName}</td>
+        <td>${escapeHtml(contract.partner.contactName)}</td>
       </tr>
       <tr>
         <td>Email:</td>
-        <td>${contract.partner.email}</td>
+        <td>${escapeHtml(contract.partner.email)}</td>
       </tr>
       <tr>
         <td>Estado:</td>
@@ -209,27 +217,47 @@ export async function GET(
   <div class="content">${escapeHtml(contract.content)}</div>
 
   <div class="signature-section">
-    <h3>Datos de la Firma Digital</h3>
+    <h3>Firmas del Contrato</h3>
     <div class="signature-grid">
       <div class="signature-box">
-        <h4>Firmante</h4>
-        <p><span class="label">Nombre:</span> <span class="value">${contract.signatoryName || 'N/A'}</span></p>
-        <p><span class="label">DNI/NIE:</span> <span class="value">${contract.signatoryDni || 'N/A'}</span></p>
-        <p><span class="label">Cargo:</span> <span class="value">${contract.signatoryPosition || 'N/A'}</span></p>
+        <h4>POR OMNIWALLET</h4>
+        <div class="signature-image">
+          <svg width="150" height="50" viewBox="0 0 150 50" style="display: block; margin: 10px auto;">
+            <text x="10" y="35" font-family="'Brush Script MT', cursive" font-size="28" fill="#1a365d">Nicola Picasso</text>
+            <line x1="5" y1="42" x2="145" y2="42" stroke="#1a365d" stroke-width="0.5"/>
+          </svg>
+        </div>
+        <p><span class="label">Nombre:</span> <span class="value">Nicola Picasso</span></p>
+        <p><span class="label">Cargo:</span> <span class="value">CEO</span></p>
+        <p><span class="label">Empresa:</span> <span class="value">Omniwallet</span></p>
+        <p><span class="label">Fecha:</span> <span class="value">${contract.signedAt ? new Date(contract.signedAt).toLocaleDateString('es-ES') : 'N/A'}</span></p>
       </div>
       <div class="signature-box">
-        <h4>Empresa</h4>
-        <p><span class="label">CIF:</span> <span class="value">${contract.companyCif || 'N/A'}</span></p>
-        <p><span class="label">Direccion:</span> <span class="value">${contract.companyAddress || 'N/A'}</span></p>
+        <h4>POR EL PARTNER</h4>
+        <div class="signature-image">
+          <svg width="150" height="50" viewBox="0 0 150 50" style="display: block; margin: 10px auto;">
+            <text x="10" y="35" font-family="'Brush Script MT', cursive" font-size="24" fill="#2d3748">${escapeHtml(contract.signatoryName || 'Firmado')}</text>
+            <line x1="5" y1="42" x2="145" y2="42" stroke="#2d3748" stroke-width="0.5"/>
+          </svg>
+        </div>
+        <p><span class="label">Nombre:</span> <span class="value">${escapeHtml(contract.signatoryName || 'N/A')}</span></p>
+        <p><span class="label">DNI/NIE:</span> <span class="value">${escapeHtml(contract.signatoryDni || 'N/A')}</span></p>
+        <p><span class="label">Cargo:</span> <span class="value">${escapeHtml(contract.signatoryPosition || 'N/A')}</span></p>
+        <p><span class="label">Empresa:</span> <span class="value">${escapeHtml(contract.partner.companyName)}</span></p>
+        <p><span class="label">CIF:</span> <span class="value">${escapeHtml(contract.companyCif || 'N/A')}</span></p>
+        <p><span class="label">Fecha:</span> <span class="value">${contract.signedAt ? new Date(contract.signedAt).toLocaleDateString('es-ES') : 'N/A'}</span></p>
       </div>
     </div>
   </div>
 
   <div class="legal-note">
-    <strong>Nota Legal:</strong> Este documento ha sido firmado electronicamente el dia ${contract.signedAt ? new Date(contract.signedAt).toLocaleDateString('es-ES') : 'N/A'}
+    <strong>Nota Legal:</strong> Este documento ha sido firmado electronicamente por ambas partes.
+    El Partner firmo el dia ${contract.signedAt ? new Date(contract.signedAt).toLocaleDateString('es-ES') : 'N/A'}
     a las ${contract.signedAt ? new Date(contract.signedAt).toLocaleTimeString('es-ES') : 'N/A'}.
+    La firma de Omniwallet fue aplicada automaticamente en el momento de la firma del Partner,
+    representando la aceptacion previa del acuerdo por parte de Omniwallet.
     La firma electronica tiene la misma validez legal que una firma manuscrita segun la legislacion vigente.
-    ${contract.signatureIp ? `IP: ${contract.signatureIp}` : ''}
+    ${contract.signatureIp ? `IP del firmante: ${contract.signatureIp}` : ''}
   </div>
 
   <div class="footer">
