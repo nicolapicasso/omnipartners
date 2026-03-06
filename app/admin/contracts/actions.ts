@@ -2,6 +2,7 @@
 
 import { prisma } from '@/lib/prisma'
 import { revalidatePath } from 'next/cache'
+import { getRequirementsForPartner } from '@/app/admin/requirements/actions'
 
 // ============================================
 // CONTRACT TEMPLATES
@@ -239,7 +240,7 @@ export async function createContractForPartner(
 
     // Replace variables in template content
     const today = new Date()
-    const content = replaceTemplateVariables(template.content, {
+    let content = replaceTemplateVariables(template.content, {
       companyName: partner.companyName,
       contactName: partner.contactName,
       email: partner.email,
@@ -247,6 +248,16 @@ export async function createContractForPartner(
       date: today.toLocaleDateString('es-ES'),
       year: today.getFullYear().toString(),
     })
+
+    // If template includes requirements, append them to the contract
+    if (template.includeRequirements) {
+      const reqResult = await getRequirementsForPartner(partnerId)
+      if (reqResult.success && reqResult.data) {
+        const req = reqResult.data
+        const requirementsText = generateRequirementsText(req)
+        content = content + '\n\n' + requirementsText
+      }
+    }
 
     // Create the contract
     const contract = await prisma.contract.create({
@@ -400,6 +411,79 @@ function replaceTemplateVariables(
     result = result.replace(new RegExp(`\\{${key}\\}`, 'g'), value)
   }
   return result
+}
+
+function generateRequirementsText(req: {
+  leadsPerYear: number
+  prospectsPerYear: number
+  clientsPerYear: number
+  eventsPerYear: number
+  certificationRequired: boolean
+  contractRequired: boolean
+  omniwalletRequired: boolean
+  leadsLabel?: string | null
+  prospectsLabel?: string | null
+  clientsLabel?: string | null
+  eventsLabel?: string | null
+}): string {
+  const lines: string[] = []
+
+  lines.push('═══════════════════════════════════════════════════════════════')
+  lines.push('ANEXO: REQUISITOS DEL PARTNER')
+  lines.push('═══════════════════════════════════════════════════════════════')
+  lines.push('')
+  lines.push('El Partner se compromete a cumplir con los siguientes requisitos')
+  lines.push('durante el periodo de vigencia del presente contrato:')
+  lines.push('')
+
+  // Performance requirements
+  lines.push('OBJETIVOS DE RENDIMIENTO ANUAL:')
+  lines.push('───────────────────────────────────────────────────────────────')
+
+  if (req.leadsPerYear > 0) {
+    const label = req.leadsLabel || `Registrar ${req.leadsPerYear} leads cualificados`
+    lines.push(`  • ${label}`)
+  }
+
+  if (req.prospectsPerYear > 0) {
+    const label = req.prospectsLabel || `Convertir ${req.prospectsPerYear} leads a prospects`
+    lines.push(`  • ${label}`)
+  }
+
+  if (req.clientsPerYear > 0) {
+    const label = req.clientsLabel || `Cerrar ${req.clientsPerYear} clientes`
+    lines.push(`  • ${label}`)
+  }
+
+  if (req.eventsPerYear > 0) {
+    const label = req.eventsLabel || `Participar en ${req.eventsPerYear} evento(s) conjunto(s)`
+    lines.push(`  • ${label}`)
+  }
+
+  lines.push('')
+
+  // Other requirements
+  const otherReqs: string[] = []
+  if (req.certificationRequired) {
+    otherReqs.push('Completar la certificacion oficial de Partner')
+  }
+  if (req.omniwalletRequired) {
+    otherReqs.push('Mantener una cuenta activa de Omniwallet Partner')
+  }
+
+  if (otherReqs.length > 0) {
+    lines.push('REQUISITOS ADICIONALES:')
+    lines.push('───────────────────────────────────────────────────────────────')
+    otherReqs.forEach(r => lines.push(`  • ${r}`))
+    lines.push('')
+  }
+
+  lines.push('El incumplimiento reiterado de estos requisitos podra dar lugar')
+  lines.push('a la revision de las condiciones del presente acuerdo.')
+  lines.push('')
+  lines.push('═══════════════════════════════════════════════════════════════')
+
+  return lines.join('\n')
 }
 
 // Get default template for a partner category
